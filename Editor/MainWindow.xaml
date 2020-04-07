@@ -275,14 +275,26 @@
                         <HeaderedContentControl Header="District / Destination Square ID" Margin="0,2,0,0">
                             <TextBox Text="{Binding DistrictDestinationId}"/>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Header="Initial Value" Margin="0,2,0,0">
-                            <TextBox Text="{Binding Value}"/>
-                        </HeaderedContentControl>
-                        <HeaderedContentControl Header="Initial Shop Payment Price" Margin="0,2,0,0">
-                            <TextBox Text="{Binding Price}"/>
-                        </HeaderedContentControl>
                         <HeaderedContentControl Header="Shop Model" Margin="0,2,0,0">
                             <ComboBox Name="ShopComboBox" SelectedItem="{Binding ShopModelId, Converter={StaticResource ShopComboBoxConverter}, Mode=TwoWay}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Initial Value" Margin="0,2,0,0">
+                            <TextBox Name="Value" Text="{Binding Value}" TextChanged="calculatePrice"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Initial Shop Payment Price" Margin="0,2,0,0">
+                            <TextBox Name="Price" Text="{Binding Price}" TextChanged="calculatePrice"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Yield" Margin="0,2,0,0">
+                            <TextBox Name="PriceRatio" IsReadOnly="True" Background="#FFF0F0F0" BorderBrush="#FFD9D9D9"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Unknown1" Margin="0,2,0,0">
+                            <TextBox Text="{Binding Unknown1}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="One-Way Lift" Margin="0,2,0,0">
+                            <TextBox Text="{Binding OneWayLift}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Unknown3" Margin="0,2,0,0">
+                            <TextBox Text="{Binding Unknown3}"/>
                         </HeaderedContentControl>
                     </StackPanel>
 

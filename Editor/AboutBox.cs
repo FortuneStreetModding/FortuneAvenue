@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -19,10 +18,10 @@ namespace Editor
             //this.labelCopyright.Text = AssemblyCopyright;
             //this.labelCompanyName.Text = AssemblyCompany;
             //this.textBoxDescription.Text = AssemblyDescription;
-            this.labelVersion.Text = "Version 2.1";
-            this.labelCopyright.Text = "© 2012, 2013   STJrInuyasha / Raspberryfloof";
+            this.labelVersion.Text = "Version 7";
+            this.labelCopyright.Text = "© 2012, 2013, 2019";
             this.labelCompanyName.Text = "";
-            this.textBoxDescription.Text = "Based on the Fortune Street Wii Board Editor begun by Xanares, Amazing Ampharos, and zerozerozerozer.\r\n\r\nFortune Street is ™ and © Nintendo, ARMOR PROJECT, and SQUARE ENIX.";
+            this.textBoxDescription.Text = "Based on the Fortune Street Wii Board Editor begun by Xanares, Amazing Ampharos, and zerozerozerozer.\r\nFurther work done by STJrInuyasha, Raspberryfloof, Deflaktor.\r\n\r\nFortune Street is ™ and © Nintendo, ARMOR PROJECT, and SQUARE ENIX.";
         }
 
         #region Assembly Attribute Accessors

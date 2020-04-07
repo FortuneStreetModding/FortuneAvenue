@@ -12,6 +12,7 @@ namespace FSEditor.FSData {
 
         public const int Size = 0x20;
 
+        private Boolean initialized = false;
 		// ----------------------------------------------------------------------------------------------------
 		/// <summary>
 		/// Gets or sets the Square ID.
@@ -103,9 +104,9 @@ namespace FSEditor.FSData {
         private Byte _DistrictDestinationId;
 
         /// <summary>
-        /// 
+        /// If 1, the lift platform will not deactivate
         /// </summary>
-        public Byte Unknown2 { get; set; }
+        public Byte OneWayLift { get; set; }
 
 		/// <summary>
 		/// Gets or sets the value of the unowned/vacant property.
@@ -120,6 +121,13 @@ namespace FSEditor.FSData {
             set
             {
                 _Value = value;
+
+                if(initialized) {
+                    double yield = -0.15 * Math.Pow(0.2, 0.005 * value) + 0.2;
+                    int price = (int)Math.Round(value * yield - 0.2);
+                    Price = (ushort)price;
+                }
+
                 RaisePropertyChanged("Value");
             }
         }
@@ -151,9 +159,23 @@ namespace FSEditor.FSData {
 		/// <summary>
 		/// Gets or sets the Shop Model ID.
 		/// </summary>
-		public Byte ShopModelId { get; set; }
-		// ----------------------------------------------------------------------------------------------------
-		#endregion
+		public Byte ShopModelId {
+            get
+            {
+                return _ShopModelId;
+            }
+            set
+            {
+                _ShopModelId = value;
+				if(initialized) {
+	                Value = (ushort) (value * 10);
+	                RaisePropertyChanged("ShopModelId");
+				}
+            }
+        }
+        private Byte _ShopModelId;
+        // ----------------------------------------------------------------------------------------------------
+        #endregion
 
 		#region Loading & Writing Methods
         public static SquareData LoadDefault(Byte squareId)
@@ -193,6 +215,7 @@ namespace FSEditor.FSData {
             };
 
             newSquare.Waypoints = new WaypointData[] { newSquare.Waypoint1, newSquare.Waypoint2, newSquare.Waypoint3, newSquare.Waypoint4, };
+            newSquare.initialized = true;
             return newSquare;
         }
 
@@ -223,7 +246,7 @@ namespace FSEditor.FSData {
 			// Read District ID / Destination ID
 			data.DistrictDestinationId = stream.ReadByte();
 
-            data.Unknown2 = stream.ReadByte();
+            data.OneWayLift = stream.ReadByte();
 
 			// Read Property Value
 			data.Value = stream.ReadUInt16();
@@ -236,7 +259,10 @@ namespace FSEditor.FSData {
 
 			// Read Shop Model ID
 			data.ShopModelId = stream.ReadByte();
-			return data;
+
+            data.initialized = true;
+
+            return data;
 		}
 
         public void WriteToStream(EndianBinaryWriter stream)
@@ -254,7 +280,7 @@ namespace FSEditor.FSData {
 
             stream.Write(DistrictDestinationId);
 
-            stream.Write(Unknown2);
+            stream.Write(OneWayLift);
 
             stream.Write(Value);
 

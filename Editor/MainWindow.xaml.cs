@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +13,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using FSEditor.FSData;
 using System.IO;
+using System.Linq;
 
 namespace Editor
 {
@@ -66,6 +66,8 @@ namespace Editor
             {SquareType.LiftMagmaliceSquareStart, "Lift / Magmalice Start"},
             {SquareType.MagmaliceSquare, "Magmalice"},
             {SquareType.LiftSquareEnd, "Lift End"},
+
+            {SquareType.unknown0x2E, "Unknown 0x2E"},
         };
         public static readonly Dictionary<Byte, String> ShopTypeList = new Dictionary<Byte, String>()
         {
@@ -474,6 +476,15 @@ namespace Editor
             if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) != 1)
                 warnsb.AppendFormat("W{0}: There should be exactly one Bank.\n", ++warnings);
 
+            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.BoonSquare) == 0)
+                warnsb.AppendFormat("W{0}: There should be at least one Boon square, or venture card 125 may cause a crash.\n", ++warnings);
+
+            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.TakeABreakSquare) == 0)
+                warnsb.AppendFormat("W{0}: There should be at least one Take-A-Break square, or various venture cards may cause a crash.\n", ++warnings);
+
+            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.ArcadeSquare) == 0)
+                warnsb.AppendFormat("W{0}: There should be at least one ArcadeSquare square, or various venture cards may cause a crash.\n", ++warnings);
+
             if (board.BoardData.Squares.Count > 0 && board.BoardData.Squares[0].SquareType != SquareType.Bank)
                 warnsb.AppendFormat("W{0}: The starting square (ID 0) should be a Bank.\n", ++warnings);
 
@@ -817,6 +828,18 @@ namespace Editor
             };
 
             return axesGrid;
+        }
+
+        private void calculatePrice(object sender, TextChangedEventArgs e)
+        {
+            PriceRatio.Text = "";
+            int value = 0, price = 0;
+            Int32.TryParse(Value.Text, out value);
+            Int32.TryParse(Price.Text, out price);
+            if (value != 0) { 
+                double yield = (double)price / (double)value;
+                PriceRatio.Text = yield.ToString("0.00");
+            }
         }
     }
 }
