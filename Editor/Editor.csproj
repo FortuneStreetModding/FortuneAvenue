@@ -155,78 +155,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\GroundBank.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundBoom.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundBoon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundCannon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundCSuit01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundCSuit02.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundCSuit03.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundCSuit04.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundDoorDQ.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundDoorMario.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundPipe.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundProperty.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundRollOn.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundStockBroker.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundSuit01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundSuit02.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundSuit03.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundSuit04.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundSwitch.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundTakeABreak.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundVacant.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundVenture.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\GroundWarp.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Path.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
@@ -252,12 +180,7 @@
     <Resource Include="GroundBoom.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\GroundArcade.png" />
-    <Resource Include="Images\GroundWarpA.png" />
-    <Resource Include="Images\GroundWarpB.png" />
-    <Resource Include="Images\GroundWarpC.png" />
-    <Resource Include="Images\GroundWarpD.png" />
-    <Resource Include="Images\GroundWarpE.png" />
+    <Resource Include="Images\*.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
