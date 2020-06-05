@@ -3,6 +3,10 @@ FortuneAvenue
 
 Fortune Street editor.  Continuation of the editor released at <http://www.gamefaqs.com/boards/632973-fortune-street/61369903?page=7>.
 
+<dl>
+  <a href="https://github.com/FortuneStreetModding/FortuneAvenue/releases/latest"><img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Download_Button.svg"/></a>
+</dl>
+
 ## Changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
