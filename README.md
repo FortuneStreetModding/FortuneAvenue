@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### [Unreleased]
 
-### [v8] - 2017-06-20
+### [v8] - 2020-06-05
 **Added**
 - More textures for square tiles
 - Possibility to edit unknown values of square tiles 
