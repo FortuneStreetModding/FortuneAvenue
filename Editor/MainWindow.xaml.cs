@@ -50,17 +50,17 @@ namespace Editor
             {SquareType.ArcadeSquare, "Arcade"},
             {SquareType.CannonSquare, "Cannon"},
 
-            {SquareType.BackStreetSquareA, "Backstreet: A"},
-            {SquareType.BackStreetSquareB, "Backstreet: B"},
-            {SquareType.BackStreetSquareC, "Backstreet: C"},
-            {SquareType.BackStreetSquareD, "Backstreet: D"},
-            {SquareType.BackStreetSquareE, "Backstreet: E"},
+            {SquareType.BackStreetSquareA, "Backstreet: A / Green Pipe"},
+            {SquareType.BackStreetSquareB, "Backstreet: B / Blue Pipe"},
+            {SquareType.BackStreetSquareC, "Backstreet: C / Red Pipe"},
+            {SquareType.BackStreetSquareD, "Backstreet: D / Yellow Pipe"},
+            {SquareType.BackStreetSquareE, "Backstreet: E / Green Pipe"},
 
             {SquareType.OneWayAlleySquare, "One-Way Alley"},
-            {SquareType.OneWayAlleyDoorA, "One-Way Alley Door: A"},
-            {SquareType.OneWayAlleyDoorB, "One-Way Alley Door: B"},
-            {SquareType.OneWayAlleyDoorC, "One-Way Alley Door: C"},
-            {SquareType.OneWayAlleyDoorD, "One-Way Alley Door: D"},
+            {SquareType.OneWayAlleyDoorA, "One-Way Alley Door: A / Blue Warp"},
+            {SquareType.OneWayAlleyDoorB, "One-Way Alley Door: B / Red Warp"},
+            {SquareType.OneWayAlleyDoorC, "One-Way Alley Door: C / Yellow Warp"},
+            {SquareType.OneWayAlleyDoorD, "One-Way Alley Door: D / Green Warp"},
 
             {SquareType.SwitchSquare, "Switch"},
             {SquareType.LiftMagmaliceSquareStart, "Lift / Magmalice Start"},
@@ -368,8 +368,11 @@ namespace Editor
             if (board == null)
                 return;
 
-            foreach (var square in board.BoardData.Squares)
+            foreach (SquareData square in board.BoardData.Squares)
             {
+                if (square.SquareType == SquareType.OneWayAlleySquare || square.SquareType == SquareType.OneWayAlleyDoorB || square.SquareType == SquareType.OneWayAlleyDoorC || square.SquareType == SquareType.OneWayAlleyDoorD)
+                    continue;
+
                 var touchingSquares = board.BoardData.Squares.Where(s => s != square && Math.Abs(square.Position.X - s.Position.X) <= 64
                             && Math.Abs(square.Position.Y - s.Position.Y) <= 64).ToArray();
 

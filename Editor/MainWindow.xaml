@@ -59,8 +59,8 @@
         <Grid IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="129" />
-                <ColumnDefinition Width="429*" />
-                <ColumnDefinition Width="166" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="180" />
                 <ColumnDefinition Width="54"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
