@@ -14,20 +14,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### [Unreleased]
 
 ### [v8] - 2017-06-20
-#### Added
+**Added**
 - More textures for square tiles
 - Possibility to edit unknown values of square tiles 
 - Possibility to edit the lift type value for square tiles
 
-#### Changed
+**Changed**
 - Prevent door tiles from being autopathed
 
 ### v7 - 2019-10-06
-#### Changed
+**Changed**
 - Fix bug which causes new squares not to calculate value and price automatically
 
 ### v6 - 2019-07-18
-#### Added
+**Added**
 - The SquareType 0x2E can now be selected in the Map Editor. This is needed for the ASM hacked main.dol
 - The yield of each shop is now automatically calculated and displayed. The formula of yield is:
 yield = -0.15 * 0.2 ^ (0.005*value) + 0.2
