@@ -290,8 +290,8 @@
                         <HeaderedContentControl Header="Unknown1" Margin="0,2,0,0">
                             <TextBox Text="{Binding Unknown1}"/>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Header="One-Way Lift" Margin="0,2,0,0">
-                            <TextBox Text="{Binding OneWayLift}"/>
+                        <HeaderedContentControl Header="Is Lift" Margin="0,2,0,0" ToolTip='This is only relevant for the "Lift / Magmalice Start" type. It is 1 for Yoshi Island type lift and 0 for Magmalice type lift.'>
+                            <TextBox Text="{Binding OneWayLift}" />
                         </HeaderedContentControl>
                         <HeaderedContentControl Header="Unknown3" Margin="0,2,0,0">
                             <TextBox Text="{Binding Unknown3}"/>
