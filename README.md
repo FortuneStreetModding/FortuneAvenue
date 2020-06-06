@@ -7,6 +7,8 @@ Fortune Street editor.  Continuation of the editor released at <http://www.gamef
   <a href="https://github.com/FortuneStreetModding/FortuneAvenue/releases/latest"><img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Download_Button.svg"/></a>
 </dl>
 
+![Forunte Avenue Screenshot](FortuneAvenue.png "Screenshot of FortuneAvenue - A map editor for Fortune Street")
+
 ## Changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
