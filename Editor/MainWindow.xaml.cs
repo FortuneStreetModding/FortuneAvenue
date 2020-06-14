@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using FSEditor.FSData;
 using System.IO;
 using System.Linq;
+using CustomStreetManager;
 
 namespace Editor
 {
@@ -843,6 +844,12 @@ namespace Editor
                 double yield = (double)price / (double)value;
                 PriceRatio.Text = yield.ToString("0.00");
             }
+        }
+
+        private void openCSMM(object sender, RoutedEventArgs e)
+        {
+            Form1 f2 = new Form1();
+            f2.ShowDialog();
         }
     }
 }

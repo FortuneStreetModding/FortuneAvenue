@@ -36,6 +36,7 @@
                     <MenuItem Header="Stock Prices" Click="StockPrices_Click"/>
                     <MenuItem Header="Create Paths" Click="Autopath_Click"/>
                     <MenuItem Header="Verify Board" Click="Verify_Click"/>
+                    <MenuItem Header="Open CSMM" Click="openCSMM"/>
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Show Help Dialog" Click="Help_Click"/>

@@ -1,4 +1,7 @@
-
+/CSMM/bin/Release/*
+/CSMM/bin/Debug/*
+/CSMM/obj/Release/*
+/CSMM/obj/Debug/*
 /Editor/bin/Release/*
 /Editor/bin/Debug/*
 /Editor/obj/Release/*

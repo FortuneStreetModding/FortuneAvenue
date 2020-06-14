@@ -149,6 +149,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CSMM\CustomStreetManager.csproj">
+      <Project>{2314AA9C-AA62-4B39-BCAF-87C148DCB2A0}</Project>
+      <Name>CustomStreetManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lib\Lib.csproj">
       <Project>{05C60070-F4CD-4485-B438-DF69A2AB8555}</Project>
       <Name>Lib</Name>
