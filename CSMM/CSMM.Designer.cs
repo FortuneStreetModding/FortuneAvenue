@@ -1,7 +1,7 @@
 ﻿
 namespace CustomStreetManager
 {
-    partial class Form1
+    partial class CSMM
     {
         /// <summary>
         /// Required designer variable.
@@ -38,7 +38,7 @@ namespace CustomStreetManager
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
             this.whichMapShouldWeReplaceLabel = new System.Windows.Forms.Label();
             this.trodainButton = new System.Windows.Forms.RadioButton();
             this.observatoryButton = new System.Windows.Forms.RadioButton();

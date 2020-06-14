@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace CustomStreetManager
 {
-    public partial class Form1 : Form
+    public partial class CSMM : Form
     {
         //Disc Operations
         string ExtractDiscFileName = "_windowspatchscript_extractDisc.bat";
@@ -129,7 +129,7 @@ namespace CustomStreetManager
 
         string Arguments = "start /wait /min /c";
 
-        public Form1()
+        public CSMM()
         {
             InitializeComponent();
         }
