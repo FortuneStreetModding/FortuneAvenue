@@ -88,23 +88,8 @@ namespace CustomStreetManager
             this.setOutputPathLabel = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.setInputISOLocation = new System.Windows.Forms.Label();
-            this.dynMapLabel1 = new System.Windows.Forms.Label();
-            this.dynMap2Label = new System.Windows.Forms.Label();
-            this.dynMap3Label = new System.Windows.Forms.Label();
-            this.dynMap4Label = new System.Windows.Forms.Label();
-            this.map1OrderDropdown = new System.Windows.Forms.ComboBox();
-            this.map2OrderDropdown = new System.Windows.Forms.ComboBox();
-            this.map3OrderDropdown = new System.Windows.Forms.ComboBox();
-            this.map4OrderDropdown = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.settingADynamicMap = new System.Windows.Forms.Label();
-            this.dynTheObservatoryButton = new System.Windows.Forms.RadioButton();
-            this.dynMtMagButton = new System.Windows.Forms.RadioButton();
-            this.dynTheColossusButton = new System.Windows.Forms.RadioButton();
-            this.dynamicMapPanel = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            this.dynamicMapPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // whichMapShouldWeReplaceLabel
@@ -514,7 +499,7 @@ namespace CustomStreetManager
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -608,167 +593,11 @@ namespace CustomStreetManager
             this.setInputISOLocation.Text = "None";
             this.setInputISOLocation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // dynMapLabel1
-            // 
-            this.dynMapLabel1.Location = new System.Drawing.Point(1, 32);
-            this.dynMapLabel1.Name = "dynMapLabel1";
-            this.dynMapLabel1.Size = new System.Drawing.Size(96, 50);
-            this.dynMapLabel1.TabIndex = 4;
-            this.dynMapLabel1.Text = "map1";
-            this.dynMapLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // dynMap2Label
-            // 
-            this.dynMap2Label.Location = new System.Drawing.Point(102, 32);
-            this.dynMap2Label.Name = "dynMap2Label";
-            this.dynMap2Label.Size = new System.Drawing.Size(96, 47);
-            this.dynMap2Label.TabIndex = 5;
-            this.dynMap2Label.Text = "map2";
-            this.dynMap2Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // dynMap3Label
-            // 
-            this.dynMap3Label.Location = new System.Drawing.Point(204, 32);
-            this.dynMap3Label.Name = "dynMap3Label";
-            this.dynMap3Label.Size = new System.Drawing.Size(96, 47);
-            this.dynMap3Label.TabIndex = 6;
-            this.dynMap3Label.Text = "map3";
-            this.dynMap3Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // dynMap4Label
-            // 
-            this.dynMap4Label.Location = new System.Drawing.Point(303, 32);
-            this.dynMap4Label.Name = "dynMap4Label";
-            this.dynMap4Label.Size = new System.Drawing.Size(96, 47);
-            this.dynMap4Label.TabIndex = 7;
-            this.dynMap4Label.Text = "map4";
-            this.dynMap4Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // map1OrderDropdown
-            // 
-            this.map1OrderDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.map1OrderDropdown.FormattingEnabled = true;
-            this.map1OrderDropdown.Location = new System.Drawing.Point(27, 85);
-            this.map1OrderDropdown.MaxDropDownItems = 4;
-            this.map1OrderDropdown.Name = "map1OrderDropdown";
-            this.map1OrderDropdown.Size = new System.Drawing.Size(40, 21);
-            this.map1OrderDropdown.TabIndex = 8;
-            // 
-            // map2OrderDropdown
-            // 
-            this.map2OrderDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.map2OrderDropdown.FormattingEnabled = true;
-            this.map2OrderDropdown.Location = new System.Drawing.Point(128, 85);
-            this.map2OrderDropdown.MaxDropDownItems = 4;
-            this.map2OrderDropdown.Name = "map2OrderDropdown";
-            this.map2OrderDropdown.Size = new System.Drawing.Size(40, 21);
-            this.map2OrderDropdown.TabIndex = 9;
-            // 
-            // map3OrderDropdown
-            // 
-            this.map3OrderDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.map3OrderDropdown.FormattingEnabled = true;
-            this.map3OrderDropdown.Location = new System.Drawing.Point(229, 85);
-            this.map3OrderDropdown.MaxDropDownItems = 4;
-            this.map3OrderDropdown.Name = "map3OrderDropdown";
-            this.map3OrderDropdown.Size = new System.Drawing.Size(40, 21);
-            this.map3OrderDropdown.TabIndex = 10;
-            // 
-            // map4OrderDropdown
-            // 
-            this.map4OrderDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.map4OrderDropdown.FormattingEnabled = true;
-            this.map4OrderDropdown.Location = new System.Drawing.Point(329, 85);
-            this.map4OrderDropdown.MaxDropDownItems = 4;
-            this.map4OrderDropdown.Name = "map4OrderDropdown";
-            this.map4OrderDropdown.Size = new System.Drawing.Size(40, 21);
-            this.map4OrderDropdown.TabIndex = 11;
-            // 
-            // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(3, 4);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(396, 23);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "Place the map files in the correct order:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // settingADynamicMap
-            // 
-            this.settingADynamicMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.settingADynamicMap.Location = new System.Drawing.Point(3, 114);
-            this.settingADynamicMap.Name = "settingADynamicMap";
-            this.settingADynamicMap.Size = new System.Drawing.Size(393, 25);
-            this.settingADynamicMap.TabIndex = 13;
-            this.settingADynamicMap.Text = "Choose which map to replace:";
-            this.settingADynamicMap.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // dynTheObservatoryButton
-            // 
-            this.dynTheObservatoryButton.AutoSize = true;
-            this.dynTheObservatoryButton.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.dynTheObservatoryButton.Location = new System.Drawing.Point(111, 142);
-            this.dynTheObservatoryButton.Name = "dynTheObservatoryButton";
-            this.dynTheObservatoryButton.Size = new System.Drawing.Size(172, 17);
-            this.dynTheObservatoryButton.TabIndex = 14;
-            this.dynTheObservatoryButton.TabStop = true;
-            this.dynTheObservatoryButton.Text = "The Observatory (max: 4 maps)";
-            this.dynTheObservatoryButton.UseVisualStyleBackColor = true;
-            this.dynTheObservatoryButton.CheckedChanged += new System.EventHandler(this.dynTheObservatoryButton_CheckedChanged);
-            // 
-            // dynMtMagButton
-            // 
-            this.dynMtMagButton.AutoSize = true;
-            this.dynMtMagButton.Location = new System.Drawing.Point(111, 165);
-            this.dynMtMagButton.Name = "dynMtMagButton";
-            this.dynMtMagButton.Size = new System.Drawing.Size(182, 17);
-            this.dynMtMagButton.TabIndex = 15;
-            this.dynMtMagButton.TabStop = true;
-            this.dynMtMagButton.Text = "Mt. Magmageddon (max: 2 maps)";
-            this.dynMtMagButton.UseVisualStyleBackColor = true;
-            this.dynMtMagButton.CheckedChanged += new System.EventHandler(this.dynMtMagButton_CheckedChanged_1);
-            // 
-            // dynTheColossusButton
-            // 
-            this.dynTheColossusButton.AutoSize = true;
-            this.dynTheColossusButton.Location = new System.Drawing.Point(111, 188);
-            this.dynTheColossusButton.Name = "dynTheColossusButton";
-            this.dynTheColossusButton.Size = new System.Drawing.Size(157, 17);
-            this.dynTheColossusButton.TabIndex = 16;
-            this.dynTheColossusButton.TabStop = true;
-            this.dynTheColossusButton.Text = "The Colossus (max: 2 maps)";
-            this.dynTheColossusButton.UseVisualStyleBackColor = true;
-            this.dynTheColossusButton.CheckedChanged += new System.EventHandler(this.dynTheColossusButton_CheckedChanged_1);
-            // 
-            // dynamicMapPanel
-            // 
-            this.dynamicMapPanel.Controls.Add(this.dynTheColossusButton);
-            this.dynamicMapPanel.Controls.Add(this.dynMtMagButton);
-            this.dynamicMapPanel.Controls.Add(this.dynTheObservatoryButton);
-            this.dynamicMapPanel.Controls.Add(this.settingADynamicMap);
-            this.dynamicMapPanel.Controls.Add(this.label1);
-            this.dynamicMapPanel.Controls.Add(this.map4OrderDropdown);
-            this.dynamicMapPanel.Controls.Add(this.map3OrderDropdown);
-            this.dynamicMapPanel.Controls.Add(this.map2OrderDropdown);
-            this.dynamicMapPanel.Controls.Add(this.map1OrderDropdown);
-            this.dynamicMapPanel.Controls.Add(this.dynMap4Label);
-            this.dynamicMapPanel.Controls.Add(this.dynMap3Label);
-            this.dynamicMapPanel.Controls.Add(this.dynMap2Label);
-            this.dynamicMapPanel.Controls.Add(this.dynMapLabel1);
-            this.dynamicMapPanel.Location = new System.Drawing.Point(290, 25);
-            this.dynamicMapPanel.Name = "dynamicMapPanel";
-            this.dynamicMapPanel.Size = new System.Drawing.Size(404, 212);
-            this.dynamicMapPanel.TabIndex = 35;
-            this.dynamicMapPanel.Visible = false;
-            // 
-            // Form1
+            // CSMM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(698, 327);
-            this.Controls.Add(this.dynamicMapPanel);
             this.Controls.Add(this.setInputISOLocation);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.setOutputPathLabel);
@@ -784,7 +613,7 @@ namespace CustomStreetManager
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
-            this.Name = "Form1";
+            this.Name = "CSMM";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Custom Street Map Manager";
@@ -792,8 +621,6 @@ namespace CustomStreetManager
             this.panel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.dynamicMapPanel.ResumeLayout(false);
-            this.dynamicMapPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -841,20 +668,6 @@ namespace CustomStreetManager
         private System.Windows.Forms.ColumnHeader isDynamic;
         private System.Windows.Forms.ColumnHeader dynOrderHeader;
         private System.Windows.Forms.ToolStripMenuItem deflaktorsASMHacksToolStripMenuItem;
-        private System.Windows.Forms.Label dynMapLabel1;
-        private System.Windows.Forms.Label dynMap2Label;
-        private System.Windows.Forms.Label dynMap3Label;
-        private System.Windows.Forms.Label dynMap4Label;
-        private System.Windows.Forms.ComboBox map1OrderDropdown;
-        private System.Windows.Forms.ComboBox map2OrderDropdown;
-        private System.Windows.Forms.ComboBox map3OrderDropdown;
-        private System.Windows.Forms.ComboBox map4OrderDropdown;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label settingADynamicMap;
-        private System.Windows.Forms.RadioButton dynTheObservatoryButton;
-        private System.Windows.Forms.RadioButton dynMtMagButton;
-        private System.Windows.Forms.RadioButton dynTheColossusButton;
-        private System.Windows.Forms.Panel dynamicMapPanel;
     }
 }
 

@@ -119,11 +119,6 @@ namespace CustomStreetManager
         bool dir1 = false;
         bool dir2 = false;
 
-
-        int observatoryDynamicCount = 0;
-        int colossusDynamicCount = 0;
-        int mtMagDynamicCount = 0;
-
         int timeLeft = 5;
         bool changesFinalized = false;
 
@@ -132,11 +127,6 @@ namespace CustomStreetManager
         public CSMM()
         {
             InitializeComponent();
-        }
-
-        public void Awake()
-        {
-            Directory.SetCurrentDirectory(Directory.GetCurrentDirectory());
         }
 
         private void UpdateMapButton_Click(object sender, EventArgs e)
@@ -170,22 +160,6 @@ namespace CustomStreetManager
                         string newMapPath = item.SubItems[2].Text;
                         string mapToReplace = item.SubItems[1].Text;
                         //the below declarations are determining what this does when it's clicked, as it is map-dependent. (probably should be its own method)
-
-                        //dynamic maps; maps that take up more than 1 map file
-
-                        if (item.SubItems[1].Text == "*The Observatory" && item.SubItems[3].Text == "true")
-                        {
-                            ReplaceDynamicObservatory(item, item.SubItems[2].Text);
-                        }
-
-                        else if (item.SubItems[1].Text == "*Colossus" && item.SubItems[3].Text == "true")
-                        {
-                            ReplaceDynamicColossus(item, item.SubItems[2].Text);
-                        }
-                        else if (item.SubItems[1].Text == "*Mt. Magmageddon" && item.SubItems[3].Text == "true")
-                        {
-                            ReplaceDynamicMtMagmageddon(item, item.SubItems[2].Text);
-                        }
 
                         //simple maps
 
@@ -304,7 +278,7 @@ namespace CustomStreetManager
 
         void timer_Tick(object sender, EventArgs e)
         {
-            if(timeLeft > 0)
+            if (timeLeft > 0)
             {
                 timeLeft -= 1;
             }
@@ -335,154 +309,6 @@ namespace CustomStreetManager
                 dir2 = false;
                 instance.SetProgressBarLabel("Error: The working directory is missing or empty!");
                 instance.SetButtonToClose();
-            }
-        }
-
-        private void ReplaceDynamicMtMagmageddon(ListViewItem item, string newMapPath)
-        {
-            if (item.SubItems[4].Text == "1")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(volcano0FilePath))
-                    {
-                        MoveFile(newMapPath, volcano0FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(volcano0FilePath2))
-                    {
-                        MoveFile(newMapPath, volcano0FilePath2);
-                    }
-                }
-            }
-            else if (item.SubItems[4].Text == "2")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(volcano1FilePath))
-                    {
-                        MoveFile(newMapPath, volcano1FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(volcano1FilePath2))
-                    {
-                        MoveFile(newMapPath, volcano1FilePath2);
-                    }
-                }
-            }
-        }
-
-        private void ReplaceDynamicColossus(ListViewItem item, string newMapPath)
-        {
-            if (item.SubItems[4].Text == "1")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(majinzo0FilePath))
-                    {
-                        MoveFile(newMapPath, majinzo0FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(majinzo0FilePath2))
-                    {
-                        MoveFile(newMapPath, majinzo0FilePath2);
-                    }
-                }
-            }
-            else if (item.SubItems[4].Text == "2")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(majinzo1FilePath))
-                    {
-                        MoveFile(newMapPath, majinzo1FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(majinzo1FilePath2))
-                    {
-                        MoveFile(newMapPath, majinzo1FilePath2);
-                    }
-                }
-            }
-        }
-
-        private void ReplaceDynamicObservatory(ListViewItem item, string newMapPath)
-        {
-            if (item.SubItems[4].Text == "1")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel0FilePath))
-                    {
-                        MoveFile(newMapPath, angel0FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel0FilePath2))
-                    {
-                        MoveFile(newMapPath, angel0FilePath2);
-                    }
-                }
-            }
-            else if (item.SubItems[4].Text == "2")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel1FilePath))
-                    {
-                        MoveFile(newMapPath, angel1FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel1FilePath2))
-                    {
-                        MoveFile(newMapPath, angel1FilePath2);
-                    }
-                }
-            }
-            else if (item.SubItems[4].Text == "3")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel2FilePath))
-                    {
-                        MoveFile(newMapPath, angel2FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel2FilePath2))
-                    {
-                        MoveFile(newMapPath, angel2FilePath2);
-                    }
-                }
-            }
-            else if (item.SubItems[4].Text == "4")
-            {
-                if (dir1)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel3FilePath))
-                    {
-                        MoveFile(newMapPath, angel3FilePath);
-                    }
-                }
-                else if (dir2)
-                {
-                    if (File.Exists(newMapPath) && File.Exists(angel3FilePath2))
-                    {
-                        MoveFile(newMapPath, angel3FilePath2);
-                    }
-                }
             }
         }
 
@@ -814,7 +640,7 @@ namespace CustomStreetManager
         {
             if (removeIntroMenuAndMapBgmToolStripMenuItem.Checked)
             {
-                
+
                 if (File.Exists(musiclessConfigFile))
                 {
                     if (dir1)
@@ -876,7 +702,7 @@ namespace CustomStreetManager
                             MoveFile(DeflaktorASMUIMessageUK, originalUIMessageUK);
                         }
                     }
-                        
+
                 }
                 else if (dir2)
                 {
@@ -923,7 +749,7 @@ namespace CustomStreetManager
 
         private void UpdateUIForWiimmfi() //updates the UI when Wiimmfi is being patched in, and the ASM hacks aren't. (They do their own UI stuff).
         {
-            if(patchToWiimmfiToolStripMenuItem.Checked && !deflaktorsASMHacksToolStripMenuItem.Checked)
+            if (patchToWiimmfiToolStripMenuItem.Checked && !deflaktorsASMHacksToolStripMenuItem.Checked)
             {
                 if (dir1)
                 {
@@ -968,7 +794,7 @@ namespace CustomStreetManager
         {
             string compileDiscBatFilePath = Path.Combine(Directory.GetCurrentDirectory(), CompileDiscFileName);
             string compileDiscWithWiimmfiBatFilePath = Path.Combine(Directory.GetCurrentDirectory(), CompileDiscWithWiimmfiFileName);
-            
+
             if (File.Exists(compileDiscBatFilePath) || File.Exists(compileDiscWithWiimmfiBatFilePath))
             {
                 if (patchToWiimmfiToolStripMenuItem.Checked)
@@ -1004,11 +830,6 @@ namespace CustomStreetManager
         {
             if (addMapButton.Text == "Add map") //if one item is selected
             {
-                dynMapLabel1.Text = "";
-                dynMap2Label.Text = "";
-                dynMap3Label.Text = "";
-                dynMap4Label.Text = "";
-
                 addMapsDialog.Multiselect = true;
                 addMapsDialog.Filter = "Map files (*.frb)|*.frb|All files (*.*)|*.*";
 
@@ -1036,190 +857,6 @@ namespace CustomStreetManager
                     sr.Close();
                 }
             }
-            else if (addMapButton.Text == "Set Dynamic") //if two or more maps are selected, the button changes!
-            {
-
-                // create temp font from the item, using BOLD
-                if(listOfMapsToPatchIn.SelectedItems.Count == 2)
-                {
-                    dynamicMapPanel.Visible = true;
-                    dynMapLabel1.Visible = true;
-                    dynMap2Label.Visible = true;
-                    dynMap3Label.Visible = false;
-                    dynMap4Label.Visible = false;
-
-                    map1OrderDropdown.Visible = true;
-                    map2OrderDropdown.Visible = true;
-                    map3OrderDropdown.Visible = false;
-                    map4OrderDropdown.Visible = false;
-
-                    map1OrderDropdown.SelectedItem = null;
-                    map2OrderDropdown.SelectedItem = null;
-
-                    map1OrderDropdown.Items.Clear();
-                    map2OrderDropdown.Items.Clear();
-
-                    dynMapLabel1.Text = "";
-                    dynMap2Label.Text = "";
-
-                    map1OrderDropdown.Items.Add("1");
-                    map1OrderDropdown.Items.Add("2");
-
-                    map2OrderDropdown.Items.Add("1");
-                    map2OrderDropdown.Items.Add("2");
-
-
-                    for (int i = 0; i < listOfMapsToPatchIn.SelectedItems.Count; i++)
-                    {
-                        if(i == 0)
-                        {
-                            dynMapLabel1.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        else if(i == 1)
-                        {
-                            dynMap2Label.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        
-                    }
-                    
-                }
-                else if(listOfMapsToPatchIn.SelectedItems.Count == 3)
-                {
-                    dynMapLabel1.Visible = true;
-                    dynMap2Label.Visible = true;
-                    dynMap3Label.Visible = true;
-                    dynMap4Label.Visible = false;
-
-                    map1OrderDropdown.Visible = true;
-                    map2OrderDropdown.Visible = true;
-                    map3OrderDropdown.Visible = true;
-                    map4OrderDropdown.Visible = false;
-
-                    dynamicMapPanel.Visible = true;
-
-                    dynMapLabel1.Text = "";
-                    dynMap2Label.Text = "";
-                    dynMap3Label.Text = "";
-
-                    map1OrderDropdown.SelectedItem = null;
-                    map2OrderDropdown.SelectedItem = null;
-                    map3OrderDropdown.SelectedItem = null;
-
-                    map1OrderDropdown.Items.Clear();
-                    map2OrderDropdown.Items.Clear();
-                    map3OrderDropdown.Items.Clear();
-
-                    map1OrderDropdown.Items.Add("1");
-                    map1OrderDropdown.Items.Add("2");
-                    map1OrderDropdown.Items.Add("3");
-
-                    map2OrderDropdown.Items.Add("1");
-                    map2OrderDropdown.Items.Add("2");
-                    map2OrderDropdown.Items.Add("3");
-
-                    map3OrderDropdown.Items.Add("1");
-                    map3OrderDropdown.Items.Add("2");
-                    map3OrderDropdown.Items.Add("3");
-
-                    for (int i = 0; i < listOfMapsToPatchIn.SelectedItems.Count; i++)
-                    {
-                        if (i == 0)
-                        {
-                            dynMapLabel1.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        else if (i == 1)
-                        {
-                            dynMap2Label.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        else if (i == 2)
-                        {
-                            dynMap3Label.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-
-                    }
-                }
-                else if (listOfMapsToPatchIn.SelectedItems.Count == 4)
-                {
-                    dynamicMapPanel.Visible = true;
-                    dynMapLabel1.Visible = true;
-                    dynMap2Label.Visible = true;
-                    dynMap3Label.Visible = true;
-                    dynMap4Label.Visible = true;
-                    map1OrderDropdown.Visible = true;
-                    map2OrderDropdown.Visible = true;
-                    map3OrderDropdown.Visible = true;
-                    map4OrderDropdown.Visible = true;
-
-                    mtmagButton.Enabled = false;
-                    colossusButton.Enabled = false;
-
-                    map1OrderDropdown.SelectedItem = null;
-                    map2OrderDropdown.SelectedItem = null;
-                    map3OrderDropdown.SelectedItem = null;
-                    map4OrderDropdown.SelectedItem = null;
-
-                    map1OrderDropdown.Items.Clear();
-                    map2OrderDropdown.Items.Clear();
-                    map3OrderDropdown.Items.Clear();
-                    map4OrderDropdown.Items.Clear();
-
-                    dynMapLabel1.Text = "";
-                    dynMap2Label.Text = "";
-                    dynMap3Label.Text = "";
-                    dynMap4Label.Text = "";
-
-                    map1OrderDropdown.Items.Add("1");
-                    map1OrderDropdown.Items.Add("2");
-                    map1OrderDropdown.Items.Add("3");
-                    map1OrderDropdown.Items.Add("4");
-
-                    map2OrderDropdown.Items.Add("1");
-                    map2OrderDropdown.Items.Add("2");
-                    map2OrderDropdown.Items.Add("3");
-                    map2OrderDropdown.Items.Add("4");
-
-                    map3OrderDropdown.Items.Add("1");
-                    map3OrderDropdown.Items.Add("2");
-                    map3OrderDropdown.Items.Add("3");
-                    map3OrderDropdown.Items.Add("4");
-
-                    map4OrderDropdown.Items.Add("1");
-                    map4OrderDropdown.Items.Add("2");
-                    map4OrderDropdown.Items.Add("3");
-                    map4OrderDropdown.Items.Add("4");
-
-                    for (int i = 0; i < listOfMapsToPatchIn.SelectedItems.Count; i++)
-                    {
-                        if (i == 0)
-                        {
-                            dynMapLabel1.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        else if (i == 1)
-                        {
-                            dynMap2Label.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        else if (i == 2)
-                        {
-                            dynMap3Label.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-                        else if (i == 3)
-                        {
-                            dynMap4Label.Text = listOfMapsToPatchIn.SelectedItems[i].SubItems[0].Text;
-                        }
-
-                    }
-                }
-                else if (listOfMapsToPatchIn.SelectedItems.Count > 4)
-                {
-                    System.Windows.Forms.MessageBox.Show("No map supports greater than 4 slots.");
-                }
-                foreach (ListViewItem item in listOfMapsToPatchIn.SelectedItems)
-                {
-                    item.SubItems[3].Text = "true";
-                }         
-                
-            }
-            
         }
 
         private void addMapDialog_FileOk(object sender, CancelEventArgs e)
@@ -1230,7 +867,7 @@ namespace CustomStreetManager
         private void removeMapButton_Click(object sender, EventArgs e)
         {
             ListView.SelectedIndexCollection indexes = listOfMapsToPatchIn.SelectedIndices;
-            for(int i = (listOfMapsToPatchIn.Items.Count - 1); i >= 0; i--)
+            for (int i = (listOfMapsToPatchIn.Items.Count - 1); i >= 0; i--)
             {
                 if (indexes.Contains(i))
                 {
@@ -1272,7 +909,6 @@ namespace CustomStreetManager
             if (listOfMapsToPatchIn.SelectedItems.Count == 1)
             {
                 addMapButton.Text = "Add map";
-                dynamicMapPanel.Visible = false;
 
                 SetAllMapButtonsActive();
 
@@ -1294,22 +930,6 @@ namespace CustomStreetManager
                     CheckAndDisableMapButton(m);
                 }
 
-            }
-            else if (listOfMapsToPatchIn.SelectedItems.Count == 2)
-            {
-                addMapButton.Text = "Set Dynamic";
-            }
-            else if (listOfMapsToPatchIn.SelectedItems.Count == 3)
-            {
-                addMapButton.Text = "Set Dynamic";
-            }
-            else if (listOfMapsToPatchIn.SelectedItems.Count == 4)
-            {
-                addMapButton.Text = "Set Dynamic";
-            }
-            else if (listOfMapsToPatchIn.SelectedItems.Count > 4)
-            {
-                addMapButton.Text = "Set Dynamic";
             }
             else //0 or fewer
             {
@@ -1375,15 +995,6 @@ namespace CustomStreetManager
                 case "Alltrades Abbey":
                     alltradesButton.Checked = true;
                     return;
-                case "*The Observatory":
-                    dynTheObservatoryButton.Checked = true;
-                    return;
-                case "*Colossus":
-                    dynTheColossusButton.Checked = true;
-                    return;
-                case "*Mt. Magmageddon":
-                    dynMtMagButton.Checked = true;
-                    return;
                 case null:
                     noneButton.Checked = true;
                     return;
@@ -1399,11 +1010,6 @@ namespace CustomStreetManager
                     return;
                 case "The Observatory":
                     observatoryButton.Enabled = false;
-                    dynTheObservatoryButton.Enabled = false;
-                    return;
-                case "*The Observatory":
-                    observatoryButton.Enabled = false;
-                    dynTheObservatoryButton.Enabled = false;
                     return;
                 case "Ghost Ship":
                     ghostShipButton.Enabled = false;
@@ -1413,11 +1019,6 @@ namespace CustomStreetManager
                     return;
                 case "Mt. Magmageddon":
                     mtmagButton.Enabled = false;
-                    dynMtMagButton.Enabled = false;
-                    return;
-                case "*Mt. Magmageddon":
-                    mtmagButton.Enabled = false;
-                    dynMtMagButton.Enabled = false;
                     return;
                 case "Robbin' Hood Ruins":
                     rhrButton.Enabled = false;
@@ -1454,11 +1055,6 @@ namespace CustomStreetManager
                     return;
                 case "Colossus":
                     colossusButton.Enabled = false;
-                    dynTheColossusButton.Enabled = false;
-                    return;
-                case "*Colossus":
-                    colossusButton.Enabled = false;
-                    dynTheColossusButton.Enabled = false;
                     return;
                 case "Alltrades Abbey":
                     alltradesButton.Enabled = false;
@@ -1490,9 +1086,6 @@ namespace CustomStreetManager
             gegButton.Enabled = true;
             colossusButton.Enabled = true;
             alltradesButton.Enabled = true;
-            dynTheColossusButton.Enabled = true;
-            dynTheObservatoryButton.Enabled = true;
-            dynMtMagButton.Enabled = true;
         }
 
         private void trodainButton_CheckedChanged(object sender, EventArgs e)
@@ -1500,7 +1093,7 @@ namespace CustomStreetManager
             if (trodainButton.Checked)
             {
                 ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if(allSelectedItems.Count != 0)
+                if (allSelectedItems.Count != 0)
                 {
                     foreach (ListViewItem item in allSelectedItems)
                     {
@@ -1515,7 +1108,7 @@ namespace CustomStreetManager
             if (observatoryButton.Checked)
             {
                 ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if(allSelectedItems.Count != 0)
+                if (allSelectedItems.Count != 0)
                 {
                     foreach (ListViewItem item in allSelectedItems)
                     {
@@ -1530,7 +1123,7 @@ namespace CustomStreetManager
             if (ghostShipButton.Checked)
             {
                 ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if(allSelectedItems.Count != 0)
+                if (allSelectedItems.Count != 0)
                 {
                     foreach (ListViewItem item in allSelectedItems)
                     {
@@ -1545,7 +1138,7 @@ namespace CustomStreetManager
             if (slimeniaButton.Checked)
             {
                 ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if(allSelectedItems.Count != 0)
+                if (allSelectedItems.Count != 0)
                 {
                     foreach (ListViewItem item in allSelectedItems)
                     {
@@ -1560,7 +1153,7 @@ namespace CustomStreetManager
             if (mtmagButton.Checked)
             {
                 ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if(allSelectedItems.Count != 0)
+                if (allSelectedItems.Count != 0)
                 {
                     foreach (ListViewItem item in allSelectedItems)
                     {
@@ -1574,7 +1167,7 @@ namespace CustomStreetManager
             if (rhrButton.Checked)
             {
                 ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if(allSelectedItems.Count != 0)
+                if (allSelectedItems.Count != 0)
                 {
                     foreach (ListViewItem item in allSelectedItems)
                     {
@@ -1792,16 +1385,16 @@ namespace CustomStreetManager
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.Filter = "ISO Image|*.iso";
             saveFileDialog1.Title = "Where should I save the patched ISO?";
-            saveFileDialog1.FileName = "UpdatedISOFile";   
+            saveFileDialog1.FileName = "UpdatedISOFile";
 
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK) 
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 setOutputPathLabel.Text = saveFileDialog1.FileName;
             }
             else
             {
                 setOutputPathLabel.Text = "None";
-            }     
+            }
         }
 
         private void OpenFileDialog(object sender, EventArgs e)
@@ -1824,190 +1417,11 @@ namespace CustomStreetManager
 
         private void deflaktorsASMHacksToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(deflaktorsASMHacksToolStripMenuItem.Checked == true)
+            if (deflaktorsASMHacksToolStripMenuItem.Checked == true)
             {
                 MessageBox.Show("Please be aware that I'm not checking for this -- " +
                     "but you need a PAL ISO to enable Deflaktor's ASM Hacks, otherwise " +
                     "your game will crash on startup.");
-            }         
-        }
-
-        private void dynTheObservatoryButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (dynTheObservatoryButton.Checked)
-            {
-                ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if (allSelectedItems.Count == 4)
-                {
-                    if (map1OrderDropdown.SelectedItem != null && map2OrderDropdown.SelectedItem != null && map3OrderDropdown.SelectedItem != null && map4OrderDropdown.SelectedItem != null
-                        && map1OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString() && map1OrderDropdown.SelectedItem.ToString() != map3OrderDropdown.SelectedItem.ToString() && map1OrderDropdown.SelectedItem.ToString() != map4OrderDropdown.SelectedItem.ToString()
-                        && map2OrderDropdown.SelectedItem.ToString() != map1OrderDropdown.SelectedItem.ToString() && map2OrderDropdown.SelectedItem.ToString() != map3OrderDropdown.SelectedItem.ToString() && map2OrderDropdown.SelectedItem.ToString() != map4OrderDropdown.SelectedItem.ToString()
-                        && map3OrderDropdown.SelectedItem.ToString() != map1OrderDropdown.SelectedItem.ToString() && map3OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString() && map3OrderDropdown.SelectedItem.ToString() != map4OrderDropdown.SelectedItem.ToString()
-                        && map4OrderDropdown.SelectedItem.ToString() != map1OrderDropdown.SelectedItem.ToString() & map4OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString() && map4OrderDropdown.SelectedItem.ToString() != map3OrderDropdown.SelectedItem.ToString())
-                    {
-                        foreach (ListViewItem item in allSelectedItems)
-                        {
-                            item.SubItems[1].Text = "*The Observatory";
-                            if (dynMapLabel1.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map1OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap2Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map2OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap3Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map3OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap4Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map4OrderDropdown.SelectedItem.ToString();
-                            }
-                        }
-                        observatoryDynamicCount = 4;
-
-
-                    }
-                }
-                else if (allSelectedItems.Count == 3)
-                {
-                    if (map1OrderDropdown.SelectedItem != null && map2OrderDropdown.SelectedItem != null && map3OrderDropdown.SelectedItem != null
-                        && map1OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString()
-                        && map1OrderDropdown.SelectedItem.ToString() != map3OrderDropdown.SelectedItem.ToString()
-                        && map2OrderDropdown.SelectedItem.ToString() != map3OrderDropdown.SelectedItem.ToString())
-                    {
-                        foreach (ListViewItem item in allSelectedItems)
-                        {
-                            item.SubItems[1].Text = "*The Observatory";
-                            if (dynMapLabel1.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map1OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap2Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map2OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap3Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map3OrderDropdown.SelectedItem.ToString();
-                            }
-                        }
-                        observatoryDynamicCount = 3;
-                    }
-                    MessageBox.Show("Dynamic map order must be set for each map, and must be unique for each map.");
-                    dynTheObservatoryButton.Checked = false;
-                }
-                else if (allSelectedItems.Count == 2)
-                {
-                    if (map1OrderDropdown.SelectedItem != null && map2OrderDropdown.SelectedItem != null
-                    && map1OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString())
-                    {
-                        //MessageBox.Show(map1OrderDropdown.SelectedItem.ToString() + "  -->  " + map2OrderDropdown.SelectedItem.ToString());
-                        foreach (ListViewItem item in allSelectedItems)
-                        {
-                            item.SubItems[1].Text = "*The Observatory";
-                            if (dynMapLabel1.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map1OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap2Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map2OrderDropdown.SelectedItem.ToString();
-                            }
-                        }
-                        observatoryDynamicCount = 2;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Dynamic map order must be set for each map, and must be unique for each map.");
-                        dynTheObservatoryButton.Checked = false;
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Dynamic map order must be set for each map, and must be unique for each map.");
-                    dynTheObservatoryButton.Checked = false;
-                }
-            }
-        }
-
-        private void dynMtMagButton_CheckedChanged_1(object sender, EventArgs e)
-        {
-            if (dynMtMagButton.Checked)
-            {
-                ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-
-                if (allSelectedItems.Count == 2)
-                {
-                    if (map1OrderDropdown.SelectedItem != null && map2OrderDropdown.SelectedItem != null
-                   && map1OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString())
-                    {
-                        //MessageBox.Show(map1OrderDropdown.SelectedItem.ToString() + "  -->  " + map2OrderDropdown.SelectedItem.ToString());
-                        foreach (ListViewItem item in allSelectedItems)
-                        {
-                            item.SubItems[1].Text = "*Mt. Magmageddon";
-                            if (dynMapLabel1.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map1OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap2Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map2OrderDropdown.SelectedItem.ToString();
-                            }
-                        }
-                        mtMagDynamicCount = 2;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Dynamic map order must be set for each map, and must be unique for each map.");
-                        dynMtMagButton.Checked = false;
-                    }
-                }
-                else
-                {
-                    System.Windows.Forms.MessageBox.Show("This map only supports a maximum of 2 map slots.");
-                    dynMtMagButton.Checked = false;
-                }
-            }
-        }
-
-        private void dynTheColossusButton_CheckedChanged_1(object sender, EventArgs e)
-        {
-            if (dynTheColossusButton.Checked)
-            {
-                ListView.SelectedListViewItemCollection allSelectedItems = this.listOfMapsToPatchIn.SelectedItems;
-                if (allSelectedItems.Count == 2)
-                {
-                    if (map1OrderDropdown.SelectedItem != null && map2OrderDropdown.SelectedItem != null
-                       && map1OrderDropdown.SelectedItem.ToString() != map2OrderDropdown.SelectedItem.ToString())
-                    {
-                        //MessageBox.Show(map1OrderDropdown.SelectedItem.ToString() + "  -->  " + map2OrderDropdown.SelectedItem.ToString());
-                        foreach (ListViewItem item in allSelectedItems)
-                        {
-                            item.SubItems[1].Text = "*Colossus";
-                            if (dynMapLabel1.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map1OrderDropdown.SelectedItem.ToString();
-                            }
-                            else if (dynMap2Label.Text == item.SubItems[0].Text)
-                            {
-                                item.SubItems[4].Text = map2OrderDropdown.SelectedItem.ToString();
-                            }
-                        }
-                        colossusDynamicCount = 2;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Dynamic map order must be set for each map, and must be unique for each map.");
-                        dynTheColossusButton.Checked = false;
-                    }
-                }
-                else
-                {
-                    System.Windows.Forms.MessageBox.Show("This map only supports a maximum of 2 map slots.");
-                    dynTheColossusButton.Checked = false;
-                }
             }
         }
     }
