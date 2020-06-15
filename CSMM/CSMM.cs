@@ -1402,7 +1402,7 @@ namespace CustomStreetManager
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to Button2.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.Filter = "ISO Image|*.iso|WBFS file|*.wbfs"; //"JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif"
+            openFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
             openFileDialog1.Title = "Which ISO image or WBFS file should we patch?";
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
