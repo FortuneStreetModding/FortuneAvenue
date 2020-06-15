@@ -1407,6 +1407,7 @@ namespace CustomStreetManager
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                WitWrapper.extractFiles(openFileDialog1.FileName);
                 setInputISOLocation.Text = openFileDialog1.FileName;
             }
             else

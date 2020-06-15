@@ -1,0 +1,4 @@
+<memory offset="0x80210a4c" value="3c60ffff" original="3c808043" /><!-- lis r3, 0xFFFF     -->
+<memory offset="0x80210a50" value="6063ffff" original="54601838" /><!-- ori r3, r3, 0xFFFF -->
+<memory offset="0x80210a54" value="3c80ffff" original="38846a88" /><!-- lis r4, 0xFFFF     -->
+<memory offset="0x80210a58" value="6084ffff" original="7c64006e" /><!-- ori r4, r4, 0xFFFF -->
