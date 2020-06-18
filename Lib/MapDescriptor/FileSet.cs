@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CustomStreetManager
+namespace FSEditor.MapDescriptor
 {
-    class FileSet
+    public class FileSet
     {
         public string main_dol
         { get; set; }

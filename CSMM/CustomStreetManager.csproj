@@ -74,7 +74,7 @@
     <Compile Include="AboutPanel.Designer.cs">
       <DependentUpon>AboutPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="FileSet.cs" />
+    <Compile Include="MapEntry.cs" />
     <Compile Include="WitWrapper.cs" />
     <Compile Include="CSMM.cs">
       <SubType>Form</SubType>
@@ -110,6 +110,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\FSEditor.FSData.MapDescriptor.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -135,6 +136,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>AllCharactersUnlocked.xml</TargetPath>
     </ContentWithTargetPath>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lib\Lib.csproj">
+      <Project>{05c60070-f4cd-4485-b438-df69a2ab8555}</Project>
+      <Name>Lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

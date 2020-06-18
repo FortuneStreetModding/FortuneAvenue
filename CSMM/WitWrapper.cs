@@ -7,18 +7,20 @@ using System.Text;
 using System.Net;
 using System.IO.Compression;
 using System.Windows.Forms;
+using FSEditor.MapDescriptor;
+using MiscUtil.Conversion;
 
 namespace CustomStreetManager
 {
     class WitWrapper
     {
-        private static readonly string[] requiredFiles = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll"};
+        private static readonly string[] requiredFiles = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll" };
 
         private static Boolean witExists()
         {
             foreach (string requiredFile in requiredFiles)
             {
-                if(!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), requiredFile)))
+                if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), requiredFile)))
                 {
                     return false;
                 }
@@ -64,7 +66,8 @@ namespace CustomStreetManager
                     if (witExists())
                     {
                         MessageBox.Show("WIT has been extracted next to this application.");
-                    } else
+                    }
+                    else
                     {
                         throw new Exception("Unable to install WIT.");
                     }
@@ -113,7 +116,8 @@ namespace CustomStreetManager
         public static FileSet extractFiles(string inputFile)
         {
             string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
-            if(Directory.Exists(tmpDirectory)) { 
+            if (Directory.Exists(tmpDirectory))
+            {
                 Directory.Delete(tmpDirectory, true);
             }
 
@@ -130,6 +134,50 @@ namespace CustomStreetManager
             fileSet.ui_message_su_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.su.csv");
             fileSet.ui_message_uk_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.uk.csv");
             return fileSet;
+        }
+
+        public static List<MainDolSection> readSections(string inputFile)
+        {
+            string arguments = "DUMP -l \"" + inputFile + "\"";
+            string witSectionDump = callWit(arguments);
+
+            List<MainDolSection> sections = new List<MainDolSection>();
+
+            using (StringReader reader = new StringReader(witSectionDump))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Contains("Delta between file offset and virtual address:"))
+                    {
+                        // remove next three lines to get to the section table
+                        reader.ReadLine();
+                        reader.ReadLine();
+                        reader.ReadLine();
+                        break;
+                    }
+                }
+                EndianBitConverter endianBitConverter = EndianBitConverter.Big;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] columns = line.Split(':');
+                    if (columns.Length == 5)
+                    {
+                        MainDolSection section = new MainDolSection();
+                        string unused = columns[0];
+                        string[] offsets = columns[1].Split(new string[] { ".." }, StringSplitOptions.None);
+                        section.offsetBeg = endianBitConverter.ToUInt32(HexUtil.StringToByteArray(offsets[0]), 0);
+                        section.offsetEnd = endianBitConverter.ToUInt32(HexUtil.StringToByteArray(offsets[1]), 0);
+                        string size = columns[2];
+                        section.fileDelta = endianBitConverter.ToUInt32(HexUtil.StringToByteArray(columns[3]), 0);
+                        section.section = columns[4].Trim();
+                        sections.Add(section);
+                    }
+                }
+
+            }
+
+            return sections;
         }
     }
 }

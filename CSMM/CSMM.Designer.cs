@@ -21,15 +21,6 @@ namespace CustomStreetManager
 
             base.Dispose(disposing);
         }
-
-        private System.Windows.Forms.Label whichMapShouldWeReplaceLabel;
-        private System.Windows.Forms.RadioButton trodainButton;
-        private System.Windows.Forms.RadioButton observatoryButton;
-        private System.Windows.Forms.RadioButton ghostShipButton;
-        private System.Windows.Forms.RadioButton slimeniaButton;
-        private System.Windows.Forms.RadioButton mtmagButton;
-        private System.Windows.Forms.RadioButton rhrButton;
-        private System.Windows.Forms.Label label2;
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -38,42 +29,12 @@ namespace CustomStreetManager
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
-            this.whichMapShouldWeReplaceLabel = new System.Windows.Forms.Label();
-            this.trodainButton = new System.Windows.Forms.RadioButton();
-            this.observatoryButton = new System.Windows.Forms.RadioButton();
-            this.ghostShipButton = new System.Windows.Forms.RadioButton();
-            this.slimeniaButton = new System.Windows.Forms.RadioButton();
-            this.mtmagButton = new System.Windows.Forms.RadioButton();
-            this.rhrButton = new System.Windows.Forms.RadioButton();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.peachButton = new System.Windows.Forms.RadioButton();
-            this.delfinoButton = new System.Windows.Forms.RadioButton();
-            this.yoshiButton = new System.Windows.Forms.RadioButton();
-            this.circuitButton = new System.Windows.Forms.RadioButton();
-            this.starshipButton = new System.Windows.Forms.RadioButton();
-            this.stadiumButton = new System.Windows.Forms.RadioButton();
-            this.label4 = new System.Windows.Forms.Label();
-            this.alltradesButton = new System.Windows.Forms.RadioButton();
-            this.colossusButton = new System.Windows.Forms.RadioButton();
-            this.gegButton = new System.Windows.Forms.RadioButton();
-            this.bowserButton = new System.Windows.Forms.RadioButton();
-            this.smbButton = new System.Windows.Forms.RadioButton();
-            this.alefgardButton = new System.Windows.Forms.RadioButton();
-            this.replaceButton = new System.Windows.Forms.Button();
-            this.noneButton = new System.Windows.Forms.RadioButton();
             this.addMapButton = new System.Windows.Forms.Button();
             this.clearListButton = new System.Windows.Forms.Button();
-            this.listOfMapsToPatchIn = new System.Windows.Forms.ListView();
-            this.customMapName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.mapToReplace = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.filePathHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.isDynamic = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.dynOrderHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.removeMapButton = new System.Windows.Forms.Button();
             this.addMapsDialog = new System.Windows.Forms.OpenFileDialog();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,282 +49,44 @@ namespace CustomStreetManager
             this.setOutputPathLabel = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.setInputISOLocation = new System.Windows.Forms.Label();
-            this.panel1.SuspendLayout();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.mapDescriptorBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.nameENDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.targetAmountDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.themeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ruleSetDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Export = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.nameENDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.targetAmountDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.themeDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ruleSetDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile1DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile2DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile3DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.frbFile4DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Import = new System.Windows.Forms.DataGridViewButtonColumn();
             this.menuStrip1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mapDescriptorBindingSource)).BeginInit();
+            this.flowLayoutPanel1.SuspendLayout();
+            this.flowLayoutPanel2.SuspendLayout();
+            this.flowLayoutPanel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // whichMapShouldWeReplaceLabel
-            // 
-            this.whichMapShouldWeReplaceLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.whichMapShouldWeReplaceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whichMapShouldWeReplaceLabel.Location = new System.Drawing.Point(3, 7);
-            this.whichMapShouldWeReplaceLabel.Name = "whichMapShouldWeReplaceLabel";
-            this.whichMapShouldWeReplaceLabel.Size = new System.Drawing.Size(393, 17);
-            this.whichMapShouldWeReplaceLabel.TabIndex = 2;
-            this.whichMapShouldWeReplaceLabel.Text = "Which map should we replace?";
-            this.whichMapShouldWeReplaceLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // trodainButton
-            // 
-            this.trodainButton.AutoSize = true;
-            this.trodainButton.Location = new System.Drawing.Point(12, 53);
-            this.trodainButton.Name = "trodainButton";
-            this.trodainButton.Size = new System.Drawing.Size(93, 17);
-            this.trodainButton.TabIndex = 3;
-            this.trodainButton.Text = "Castle Trodain";
-            this.trodainButton.UseVisualStyleBackColor = true;
-            this.trodainButton.CheckedChanged += new System.EventHandler(this.trodainButton_CheckedChanged);
-            // 
-            // observatoryButton
-            // 
-            this.observatoryButton.AutoSize = true;
-            this.observatoryButton.Location = new System.Drawing.Point(12, 76);
-            this.observatoryButton.Name = "observatoryButton";
-            this.observatoryButton.Size = new System.Drawing.Size(104, 17);
-            this.observatoryButton.TabIndex = 5;
-            this.observatoryButton.Text = "The Observatory";
-            this.observatoryButton.UseVisualStyleBackColor = true;
-            this.observatoryButton.CheckedChanged += new System.EventHandler(this.observatoryButton_CheckedChanged);
-            // 
-            // ghostShipButton
-            // 
-            this.ghostShipButton.AutoSize = true;
-            this.ghostShipButton.Location = new System.Drawing.Point(12, 99);
-            this.ghostShipButton.Name = "ghostShipButton";
-            this.ghostShipButton.Size = new System.Drawing.Size(77, 17);
-            this.ghostShipButton.TabIndex = 6;
-            this.ghostShipButton.Text = "Ghost Ship";
-            this.ghostShipButton.UseVisualStyleBackColor = true;
-            this.ghostShipButton.CheckedChanged += new System.EventHandler(this.ghostShipButton_CheckedChanged);
-            // 
-            // slimeniaButton
-            // 
-            this.slimeniaButton.AutoSize = true;
-            this.slimeniaButton.Location = new System.Drawing.Point(12, 122);
-            this.slimeniaButton.Name = "slimeniaButton";
-            this.slimeniaButton.Size = new System.Drawing.Size(64, 17);
-            this.slimeniaButton.TabIndex = 7;
-            this.slimeniaButton.Text = "Slimenia";
-            this.slimeniaButton.UseVisualStyleBackColor = true;
-            this.slimeniaButton.CheckedChanged += new System.EventHandler(this.slimeniaButton_CheckedChanged);
-            // 
-            // mtmagButton
-            // 
-            this.mtmagButton.AutoSize = true;
-            this.mtmagButton.Location = new System.Drawing.Point(12, 145);
-            this.mtmagButton.Name = "mtmagButton";
-            this.mtmagButton.Size = new System.Drawing.Size(114, 17);
-            this.mtmagButton.TabIndex = 8;
-            this.mtmagButton.Text = "Mt. Magmageddon";
-            this.mtmagButton.UseVisualStyleBackColor = true;
-            this.mtmagButton.CheckedChanged += new System.EventHandler(this.mtmagButton_CheckedChanged);
-            // 
-            // rhrButton
-            // 
-            this.rhrButton.AutoSize = true;
-            this.rhrButton.Location = new System.Drawing.Point(12, 168);
-            this.rhrButton.Name = "rhrButton";
-            this.rhrButton.Size = new System.Drawing.Size(120, 17);
-            this.rhrButton.TabIndex = 9;
-            this.rhrButton.Text = "Robbin\' Hood Ruins";
-            this.rhrButton.UseVisualStyleBackColor = true;
-            this.rhrButton.CheckedChanged += new System.EventHandler(this.robbinHoodRuinsButton_CheckedChanged);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(5, 32);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(128, 15);
-            this.label2.TabIndex = 15;
-            this.label2.Text = "Dragon Quest Tour";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(148, 32);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(119, 15);
-            this.label3.TabIndex = 22;
-            this.label3.Text = "Super Mario Tour";
-            // 
-            // peachButton
-            // 
-            this.peachButton.AutoSize = true;
-            this.peachButton.Location = new System.Drawing.Point(156, 168);
-            this.peachButton.Name = "peachButton";
-            this.peachButton.Size = new System.Drawing.Size(95, 17);
-            this.peachButton.TabIndex = 21;
-            this.peachButton.Text = "Peach\'s Castle";
-            this.peachButton.UseVisualStyleBackColor = true;
-            this.peachButton.CheckedChanged += new System.EventHandler(this.peachButton_CheckedChanged);
-            // 
-            // delfinoButton
-            // 
-            this.delfinoButton.AutoSize = true;
-            this.delfinoButton.Location = new System.Drawing.Point(156, 145);
-            this.delfinoButton.Name = "delfinoButton";
-            this.delfinoButton.Size = new System.Drawing.Size(87, 17);
-            this.delfinoButton.TabIndex = 20;
-            this.delfinoButton.Text = "Delfino Plaza";
-            this.delfinoButton.UseVisualStyleBackColor = true;
-            this.delfinoButton.CheckedChanged += new System.EventHandler(this.delfinoButton_CheckedChanged);
-            // 
-            // yoshiButton
-            // 
-            this.yoshiButton.AutoSize = true;
-            this.yoshiButton.Location = new System.Drawing.Point(156, 122);
-            this.yoshiButton.Name = "yoshiButton";
-            this.yoshiButton.Size = new System.Drawing.Size(89, 17);
-            this.yoshiButton.TabIndex = 19;
-            this.yoshiButton.Text = "Yoshi\'s Island";
-            this.yoshiButton.UseVisualStyleBackColor = true;
-            this.yoshiButton.CheckedChanged += new System.EventHandler(this.yoshiButton_CheckedChanged);
-            // 
-            // circuitButton
-            // 
-            this.circuitButton.AutoSize = true;
-            this.circuitButton.Location = new System.Drawing.Point(156, 99);
-            this.circuitButton.Name = "circuitButton";
-            this.circuitButton.Size = new System.Drawing.Size(83, 17);
-            this.circuitButton.TabIndex = 18;
-            this.circuitButton.Text = "Mario Circuit";
-            this.circuitButton.UseVisualStyleBackColor = true;
-            this.circuitButton.CheckedChanged += new System.EventHandler(this.circuitButton_CheckedChanged);
-            // 
-            // starshipButton
-            // 
-            this.starshipButton.AutoSize = true;
-            this.starshipButton.Location = new System.Drawing.Point(156, 76);
-            this.starshipButton.Name = "starshipButton";
-            this.starshipButton.Size = new System.Drawing.Size(92, 17);
-            this.starshipButton.TabIndex = 17;
-            this.starshipButton.Text = "Starship Mario";
-            this.starshipButton.UseVisualStyleBackColor = true;
-            this.starshipButton.CheckedChanged += new System.EventHandler(this.starshipButton_CheckedChanged);
-            // 
-            // stadiumButton
-            // 
-            this.stadiumButton.AutoSize = true;
-            this.stadiumButton.Location = new System.Drawing.Point(156, 53);
-            this.stadiumButton.Name = "stadiumButton";
-            this.stadiumButton.Size = new System.Drawing.Size(92, 17);
-            this.stadiumButton.TabIndex = 16;
-            this.stadiumButton.Text = "Mario Stadium";
-            this.stadiumButton.UseVisualStyleBackColor = true;
-            this.stadiumButton.CheckedChanged += new System.EventHandler(this.stadiumButton_CheckedChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(275, 32);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(88, 15);
-            this.label4.TabIndex = 29;
-            this.label4.Text = "Special Tour";
-            // 
-            // alltradesButton
-            // 
-            this.alltradesButton.AutoSize = true;
-            this.alltradesButton.Location = new System.Drawing.Point(281, 168);
-            this.alltradesButton.Name = "alltradesButton";
-            this.alltradesButton.Size = new System.Drawing.Size(98, 17);
-            this.alltradesButton.TabIndex = 28;
-            this.alltradesButton.Text = "Alltrades Abbey";
-            this.alltradesButton.UseVisualStyleBackColor = true;
-            this.alltradesButton.CheckedChanged += new System.EventHandler(this.alltradesButton_CheckedChanged);
-            // 
-            // colossusButton
-            // 
-            this.colossusButton.AutoSize = true;
-            this.colossusButton.Location = new System.Drawing.Point(281, 145);
-            this.colossusButton.Name = "colossusButton";
-            this.colossusButton.Size = new System.Drawing.Size(67, 17);
-            this.colossusButton.TabIndex = 27;
-            this.colossusButton.Text = "Colossus";
-            this.colossusButton.UseVisualStyleBackColor = true;
-            this.colossusButton.CheckedChanged += new System.EventHandler(this.colossusButton_CheckedChanged);
-            // 
-            // gegButton
-            // 
-            this.gegButton.AutoSize = true;
-            this.gegButton.Location = new System.Drawing.Point(281, 122);
-            this.gegButton.Name = "gegButton";
-            this.gegButton.Size = new System.Drawing.Size(108, 17);
-            this.gegButton.TabIndex = 26;
-            this.gegButton.Text = "Good Egg Galaxy";
-            this.gegButton.UseVisualStyleBackColor = true;
-            this.gegButton.CheckedChanged += new System.EventHandler(this.gegButton_CheckedChanged);
-            // 
-            // bowserButton
-            // 
-            this.bowserButton.AutoSize = true;
-            this.bowserButton.Location = new System.Drawing.Point(281, 99);
-            this.bowserButton.Name = "bowserButton";
-            this.bowserButton.Size = new System.Drawing.Size(99, 17);
-            this.bowserButton.TabIndex = 25;
-            this.bowserButton.Text = "Bowser\'s Castle";
-            this.bowserButton.UseVisualStyleBackColor = true;
-            this.bowserButton.CheckedChanged += new System.EventHandler(this.bowserButton_CheckedChanged);
-            // 
-            // smbButton
-            // 
-            this.smbButton.AutoSize = true;
-            this.smbButton.Location = new System.Drawing.Point(281, 76);
-            this.smbButton.Name = "smbButton";
-            this.smbButton.Size = new System.Drawing.Size(109, 17);
-            this.smbButton.TabIndex = 24;
-            this.smbButton.Text = "Super Mario Bros.";
-            this.smbButton.UseVisualStyleBackColor = true;
-            this.smbButton.CheckedChanged += new System.EventHandler(this.smbButton_CheckedChanged);
-            // 
-            // alefgardButton
-            // 
-            this.alefgardButton.AutoSize = true;
-            this.alefgardButton.Location = new System.Drawing.Point(281, 53);
-            this.alefgardButton.Name = "alefgardButton";
-            this.alefgardButton.Size = new System.Drawing.Size(64, 17);
-            this.alefgardButton.TabIndex = 23;
-            this.alefgardButton.Text = "Alefgard";
-            this.alefgardButton.UseVisualStyleBackColor = true;
-            this.alefgardButton.CheckedChanged += new System.EventHandler(this.alefgardButton_CheckedChanged);
-            // 
-            // replaceButton
-            // 
-            this.replaceButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.replaceButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.replaceButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.replaceButton.Location = new System.Drawing.Point(290, 289);
-            this.replaceButton.Name = "replaceButton";
-            this.replaceButton.Size = new System.Drawing.Size(404, 31);
-            this.replaceButton.TabIndex = 30;
-            this.replaceButton.Text = "Go!";
-            this.replaceButton.UseVisualStyleBackColor = true;
-            this.replaceButton.Click += new System.EventHandler(this.UpdateMapButton_Click);
-            // 
-            // noneButton
-            // 
-            this.noneButton.AutoSize = true;
-            this.noneButton.Checked = true;
-            this.noneButton.Location = new System.Drawing.Point(176, 191);
-            this.noneButton.Margin = new System.Windows.Forms.Padding(1);
-            this.noneButton.Name = "noneButton";
-            this.noneButton.Size = new System.Drawing.Size(51, 17);
-            this.noneButton.TabIndex = 34;
-            this.noneButton.TabStop = true;
-            this.noneButton.Text = "None";
-            this.noneButton.UseVisualStyleBackColor = true;
-            this.noneButton.CheckedChanged += new System.EventHandler(this.noneButton_CheckedChanged);
             // 
             // addMapButton
             // 
-            this.addMapButton.Location = new System.Drawing.Point(3, 289);
+            this.addMapButton.Location = new System.Drawing.Point(1, 1);
             this.addMapButton.Margin = new System.Windows.Forms.Padding(1);
             this.addMapButton.Name = "addMapButton";
             this.addMapButton.Size = new System.Drawing.Size(95, 31);
@@ -374,105 +97,28 @@ namespace CustomStreetManager
             // 
             // clearListButton
             // 
-            this.clearListButton.Location = new System.Drawing.Point(191, 289);
+            this.clearListButton.Location = new System.Drawing.Point(189, 1);
             this.clearListButton.Margin = new System.Windows.Forms.Padding(1);
             this.clearListButton.Name = "clearListButton";
             this.clearListButton.Size = new System.Drawing.Size(95, 31);
             this.clearListButton.TabIndex = 37;
             this.clearListButton.Text = "Clear list";
             this.clearListButton.UseVisualStyleBackColor = true;
-            this.clearListButton.Click += new System.EventHandler(this.clearListButton_Click);
-            // 
-            // listOfMapsToPatchIn
-            // 
-            this.listOfMapsToPatchIn.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.customMapName,
-            this.mapToReplace,
-            this.filePathHeader,
-            this.isDynamic,
-            this.dynOrderHeader});
-            this.listOfMapsToPatchIn.FullRowSelect = true;
-            this.listOfMapsToPatchIn.HideSelection = false;
-            this.listOfMapsToPatchIn.Location = new System.Drawing.Point(3, 25);
-            this.listOfMapsToPatchIn.Margin = new System.Windows.Forms.Padding(1);
-            this.listOfMapsToPatchIn.Name = "listOfMapsToPatchIn";
-            this.listOfMapsToPatchIn.Size = new System.Drawing.Size(285, 262);
-            this.listOfMapsToPatchIn.TabIndex = 39;
-            this.listOfMapsToPatchIn.UseCompatibleStateImageBehavior = false;
-            this.listOfMapsToPatchIn.View = System.Windows.Forms.View.Details;
-            this.listOfMapsToPatchIn.SelectedIndexChanged += new System.EventHandler(this.listOfMapsToPatchIn_SelectedIndexChanged);
-            // 
-            // customMapName
-            // 
-            this.customMapName.Text = "Incoming Map";
-            this.customMapName.Width = 89;
-            // 
-            // mapToReplace
-            // 
-            this.mapToReplace.Text = "Map To Replace";
-            this.mapToReplace.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.mapToReplace.Width = 108;
-            // 
-            // filePathHeader
-            // 
-            this.filePathHeader.Text = "File Path";
-            this.filePathHeader.Width = 100;
-            // 
-            // isDynamic
-            // 
-            this.isDynamic.Text = "Is Dynamic?";
-            // 
-            // dynOrderHeader
-            // 
-            this.dynOrderHeader.Text = "Dynamic Order";
-            this.dynOrderHeader.Width = 30;
             // 
             // removeMapButton
             // 
-            this.removeMapButton.Location = new System.Drawing.Point(100, 289);
+            this.removeMapButton.Location = new System.Drawing.Point(98, 1);
             this.removeMapButton.Margin = new System.Windows.Forms.Padding(1);
             this.removeMapButton.Name = "removeMapButton";
             this.removeMapButton.Size = new System.Drawing.Size(89, 31);
             this.removeMapButton.TabIndex = 40;
             this.removeMapButton.Text = "Remove map";
             this.removeMapButton.UseVisualStyleBackColor = true;
-            this.removeMapButton.Click += new System.EventHandler(this.removeMapButton_Click);
             // 
             // addMapsDialog
             // 
             this.addMapsDialog.FileName = "openFileDialog1";
             this.addMapsDialog.ReadOnlyChecked = true;
-            this.addMapsDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.addMapDialog_FileOk);
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.label4);
-            this.panel1.Controls.Add(this.alltradesButton);
-            this.panel1.Controls.Add(this.rhrButton);
-            this.panel1.Controls.Add(this.colossusButton);
-            this.panel1.Controls.Add(this.noneButton);
-            this.panel1.Controls.Add(this.trodainButton);
-            this.panel1.Controls.Add(this.bowserButton);
-            this.panel1.Controls.Add(this.observatoryButton);
-            this.panel1.Controls.Add(this.ghostShipButton);
-            this.panel1.Controls.Add(this.whichMapShouldWeReplaceLabel);
-            this.panel1.Controls.Add(this.alefgardButton);
-            this.panel1.Controls.Add(this.slimeniaButton);
-            this.panel1.Controls.Add(this.mtmagButton);
-            this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.stadiumButton);
-            this.panel1.Controls.Add(this.starshipButton);
-            this.panel1.Controls.Add(this.circuitButton);
-            this.panel1.Controls.Add(this.label3);
-            this.panel1.Controls.Add(this.yoshiButton);
-            this.panel1.Controls.Add(this.gegButton);
-            this.panel1.Controls.Add(this.delfinoButton);
-            this.panel1.Controls.Add(this.smbButton);
-            this.panel1.Controls.Add(this.peachButton);
-            this.panel1.Location = new System.Drawing.Point(290, 25);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(404, 212);
-            this.panel1.TabIndex = 41;
             // 
             // menuStrip1
             // 
@@ -484,7 +130,7 @@ namespace CustomStreetManager
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
-            this.menuStrip1.Size = new System.Drawing.Size(698, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1628, 24);
             this.menuStrip1.TabIndex = 42;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -529,7 +175,6 @@ namespace CustomStreetManager
             this.removeIntroMenuAndMapBgmToolStripMenuItem.Name = "removeIntroMenuAndMapBgmToolStripMenuItem";
             this.removeIntroMenuAndMapBgmToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
             this.removeIntroMenuAndMapBgmToolStripMenuItem.Text = "Disable All Music";
-            this.removeIntroMenuAndMapBgmToolStripMenuItem.Click += new System.EventHandler(this.removeIntroMenuAndMapBmgToolStripMenuItem_Click);
             // 
             // patchToWiimmfiToolStripMenuItem
             // 
@@ -556,7 +201,7 @@ namespace CustomStreetManager
             // 
             // setOutputLocationButton
             // 
-            this.setOutputLocationButton.Location = new System.Drawing.Point(290, 264);
+            this.setOutputLocationButton.Location = new System.Drawing.Point(3, 3);
             this.setOutputLocationButton.Name = "setOutputLocationButton";
             this.setOutputLocationButton.Size = new System.Drawing.Size(116, 23);
             this.setOutputLocationButton.TabIndex = 43;
@@ -567,7 +212,7 @@ namespace CustomStreetManager
             // setOutputPathLabel
             // 
             this.setOutputPathLabel.AutoEllipsis = true;
-            this.setOutputPathLabel.Location = new System.Drawing.Point(412, 264);
+            this.setOutputPathLabel.Location = new System.Drawing.Point(125, 0);
             this.setOutputPathLabel.Name = "setOutputPathLabel";
             this.setOutputPathLabel.Size = new System.Drawing.Size(282, 21);
             this.setOutputPathLabel.TabIndex = 44;
@@ -576,7 +221,7 @@ namespace CustomStreetManager
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(290, 240);
+            this.button1.Location = new System.Drawing.Point(3, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(116, 23);
             this.button1.TabIndex = 45;
@@ -586,71 +231,281 @@ namespace CustomStreetManager
             // 
             // setInputISOLocation
             // 
-            this.setInputISOLocation.Location = new System.Drawing.Point(412, 240);
+            this.setInputISOLocation.Location = new System.Drawing.Point(125, 0);
             this.setInputISOLocation.Name = "setInputISOLocation";
             this.setInputISOLocation.Size = new System.Drawing.Size(282, 23);
             this.setInputISOLocation.TabIndex = 46;
             this.setInputISOLocation.Text = "None";
             this.setInputISOLocation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.dataGridView2, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel2, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel3, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.dataGridView1, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1628, 684);
+            this.tableLayoutPanel1.TabIndex = 47;
+            // 
+            // dataGridView2
+            // 
+            this.dataGridView2.AllowUserToAddRows = false;
+            this.dataGridView2.AllowUserToDeleteRows = false;
+            this.dataGridView2.AutoGenerateColumns = false;
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.nameENDataGridViewTextBoxColumn1,
+            this.targetAmountDataGridViewTextBoxColumn1,
+            this.themeDataGridViewTextBoxColumn1,
+            this.ruleSetDataGridViewTextBoxColumn1,
+            this.frbFile1DataGridViewTextBoxColumn1,
+            this.frbFile2DataGridViewTextBoxColumn1,
+            this.frbFile3DataGridViewTextBoxColumn1,
+            this.frbFile4DataGridViewTextBoxColumn1,
+            this.Import});
+            this.dataGridView2.DataSource = this.mapDescriptorBindingSource;
+            this.dataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView2.Location = new System.Drawing.Point(817, 43);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.ReadOnly = true;
+            this.dataGridView2.Size = new System.Drawing.Size(808, 598);
+            this.dataGridView2.TabIndex = 46;
+            // 
+            // mapDescriptorBindingSource
+            // 
+            this.mapDescriptorBindingSource.DataSource = typeof(FSEditor.MapDescriptor.MapDescriptor);
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Controls.Add(this.setOutputLocationButton);
+            this.flowLayoutPanel1.Controls.Add(this.setOutputPathLabel);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(817, 3);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(808, 34);
+            this.flowLayoutPanel1.TabIndex = 42;
+            // 
+            // flowLayoutPanel2
+            // 
+            this.flowLayoutPanel2.Controls.Add(this.addMapButton);
+            this.flowLayoutPanel2.Controls.Add(this.removeMapButton);
+            this.flowLayoutPanel2.Controls.Add(this.clearListButton);
+            this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 647);
+            this.flowLayoutPanel2.Name = "flowLayoutPanel2";
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(808, 34);
+            this.flowLayoutPanel2.TabIndex = 43;
+            // 
+            // flowLayoutPanel3
+            // 
+            this.flowLayoutPanel3.Controls.Add(this.button1);
+            this.flowLayoutPanel3.Controls.Add(this.setInputISOLocation);
+            this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel3.Location = new System.Drawing.Point(3, 3);
+            this.flowLayoutPanel3.Name = "flowLayoutPanel3";
+            this.flowLayoutPanel3.Size = new System.Drawing.Size(808, 34);
+            this.flowLayoutPanel3.TabIndex = 44;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AutoGenerateColumns = false;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.nameENDataGridViewTextBoxColumn,
+            this.targetAmountDataGridViewTextBoxColumn,
+            this.themeDataGridViewTextBoxColumn,
+            this.ruleSetDataGridViewTextBoxColumn,
+            this.frbFile1DataGridViewTextBoxColumn,
+            this.frbFile2DataGridViewTextBoxColumn,
+            this.frbFile3DataGridViewTextBoxColumn,
+            this.frbFile4DataGridViewTextBoxColumn,
+            this.Export});
+            this.dataGridView1.DataSource = this.mapDescriptorBindingSource;
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(3, 43);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.Size = new System.Drawing.Size(808, 598);
+            this.dataGridView1.TabIndex = 45;
+            // 
+            // nameENDataGridViewTextBoxColumn
+            // 
+            this.nameENDataGridViewTextBoxColumn.DataPropertyName = "Name_EN";
+            this.nameENDataGridViewTextBoxColumn.HeaderText = "Name_EN";
+            this.nameENDataGridViewTextBoxColumn.Name = "nameENDataGridViewTextBoxColumn";
+            this.nameENDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // targetAmountDataGridViewTextBoxColumn
+            // 
+            this.targetAmountDataGridViewTextBoxColumn.DataPropertyName = "TargetAmount";
+            this.targetAmountDataGridViewTextBoxColumn.HeaderText = "TargetAmount";
+            this.targetAmountDataGridViewTextBoxColumn.Name = "targetAmountDataGridViewTextBoxColumn";
+            this.targetAmountDataGridViewTextBoxColumn.ReadOnly = true;
+            this.targetAmountDataGridViewTextBoxColumn.Width = 50;
+            // 
+            // themeDataGridViewTextBoxColumn
+            // 
+            this.themeDataGridViewTextBoxColumn.DataPropertyName = "Theme";
+            this.themeDataGridViewTextBoxColumn.HeaderText = "Theme";
+            this.themeDataGridViewTextBoxColumn.Name = "themeDataGridViewTextBoxColumn";
+            this.themeDataGridViewTextBoxColumn.ReadOnly = true;
+            this.themeDataGridViewTextBoxColumn.Width = 50;
+            // 
+            // ruleSetDataGridViewTextBoxColumn
+            // 
+            this.ruleSetDataGridViewTextBoxColumn.DataPropertyName = "RuleSet";
+            this.ruleSetDataGridViewTextBoxColumn.HeaderText = "RuleSet";
+            this.ruleSetDataGridViewTextBoxColumn.Name = "ruleSetDataGridViewTextBoxColumn";
+            this.ruleSetDataGridViewTextBoxColumn.ReadOnly = true;
+            this.ruleSetDataGridViewTextBoxColumn.Width = 50;
+            // 
+            // frbFile1DataGridViewTextBoxColumn
+            // 
+            this.frbFile1DataGridViewTextBoxColumn.DataPropertyName = "FrbFile1";
+            this.frbFile1DataGridViewTextBoxColumn.HeaderText = "FrbFile1";
+            this.frbFile1DataGridViewTextBoxColumn.Name = "frbFile1DataGridViewTextBoxColumn";
+            this.frbFile1DataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // frbFile2DataGridViewTextBoxColumn
+            // 
+            this.frbFile2DataGridViewTextBoxColumn.DataPropertyName = "FrbFile2";
+            this.frbFile2DataGridViewTextBoxColumn.HeaderText = "FrbFile2";
+            this.frbFile2DataGridViewTextBoxColumn.Name = "frbFile2DataGridViewTextBoxColumn";
+            this.frbFile2DataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // frbFile3DataGridViewTextBoxColumn
+            // 
+            this.frbFile3DataGridViewTextBoxColumn.DataPropertyName = "FrbFile3";
+            this.frbFile3DataGridViewTextBoxColumn.HeaderText = "FrbFile3";
+            this.frbFile3DataGridViewTextBoxColumn.Name = "frbFile3DataGridViewTextBoxColumn";
+            this.frbFile3DataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // frbFile4DataGridViewTextBoxColumn
+            // 
+            this.frbFile4DataGridViewTextBoxColumn.DataPropertyName = "FrbFile4";
+            this.frbFile4DataGridViewTextBoxColumn.HeaderText = "FrbFile4";
+            this.frbFile4DataGridViewTextBoxColumn.Name = "frbFile4DataGridViewTextBoxColumn";
+            this.frbFile4DataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // Export
+            // 
+            this.Export.HeaderText = "Export md";
+            this.Export.Name = "Export";
+            this.Export.ReadOnly = true;
+            // 
+            // nameENDataGridViewTextBoxColumn1
+            // 
+            this.nameENDataGridViewTextBoxColumn1.DataPropertyName = "Name_EN";
+            this.nameENDataGridViewTextBoxColumn1.HeaderText = "Name_EN";
+            this.nameENDataGridViewTextBoxColumn1.Name = "nameENDataGridViewTextBoxColumn1";
+            this.nameENDataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // targetAmountDataGridViewTextBoxColumn1
+            // 
+            this.targetAmountDataGridViewTextBoxColumn1.DataPropertyName = "TargetAmount";
+            this.targetAmountDataGridViewTextBoxColumn1.HeaderText = "TargetAmount";
+            this.targetAmountDataGridViewTextBoxColumn1.Name = "targetAmountDataGridViewTextBoxColumn1";
+            this.targetAmountDataGridViewTextBoxColumn1.ReadOnly = true;
+            this.targetAmountDataGridViewTextBoxColumn1.Width = 50;
+            // 
+            // themeDataGridViewTextBoxColumn1
+            // 
+            this.themeDataGridViewTextBoxColumn1.DataPropertyName = "Theme";
+            this.themeDataGridViewTextBoxColumn1.HeaderText = "Theme";
+            this.themeDataGridViewTextBoxColumn1.Name = "themeDataGridViewTextBoxColumn1";
+            this.themeDataGridViewTextBoxColumn1.ReadOnly = true;
+            this.themeDataGridViewTextBoxColumn1.Width = 50;
+            // 
+            // ruleSetDataGridViewTextBoxColumn1
+            // 
+            this.ruleSetDataGridViewTextBoxColumn1.DataPropertyName = "RuleSet";
+            this.ruleSetDataGridViewTextBoxColumn1.HeaderText = "RuleSet";
+            this.ruleSetDataGridViewTextBoxColumn1.Name = "ruleSetDataGridViewTextBoxColumn1";
+            this.ruleSetDataGridViewTextBoxColumn1.ReadOnly = true;
+            this.ruleSetDataGridViewTextBoxColumn1.Width = 50;
+            // 
+            // frbFile1DataGridViewTextBoxColumn1
+            // 
+            this.frbFile1DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile1";
+            this.frbFile1DataGridViewTextBoxColumn1.HeaderText = "FrbFile1";
+            this.frbFile1DataGridViewTextBoxColumn1.Name = "frbFile1DataGridViewTextBoxColumn1";
+            this.frbFile1DataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // frbFile2DataGridViewTextBoxColumn1
+            // 
+            this.frbFile2DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile2";
+            this.frbFile2DataGridViewTextBoxColumn1.HeaderText = "FrbFile2";
+            this.frbFile2DataGridViewTextBoxColumn1.Name = "frbFile2DataGridViewTextBoxColumn1";
+            this.frbFile2DataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // frbFile3DataGridViewTextBoxColumn1
+            // 
+            this.frbFile3DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile3";
+            this.frbFile3DataGridViewTextBoxColumn1.HeaderText = "FrbFile3";
+            this.frbFile3DataGridViewTextBoxColumn1.Name = "frbFile3DataGridViewTextBoxColumn1";
+            this.frbFile3DataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // frbFile4DataGridViewTextBoxColumn1
+            // 
+            this.frbFile4DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile4";
+            this.frbFile4DataGridViewTextBoxColumn1.HeaderText = "FrbFile4";
+            this.frbFile4DataGridViewTextBoxColumn1.Name = "frbFile4DataGridViewTextBoxColumn1";
+            this.frbFile4DataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // Import
+            // 
+            this.Import.HeaderText = "Import md";
+            this.Import.Name = "Import";
+            this.Import.ReadOnly = true;
+            // 
             // CSMM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(698, 327);
-            this.Controls.Add(this.setInputISOLocation);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.setOutputPathLabel);
-            this.Controls.Add(this.setOutputLocationButton);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.removeMapButton);
-            this.Controls.Add(this.listOfMapsToPatchIn);
-            this.Controls.Add(this.clearListButton);
-            this.Controls.Add(this.addMapButton);
-            this.Controls.Add(this.replaceButton);
+            this.ClientSize = new System.Drawing.Size(1628, 708);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.menuStrip1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "CSMM";
+            this.RightToLeftLayout = true;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Custom Street Map Manager";
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mapDescriptorBindingSource)).EndInit();
+            this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel2.ResumeLayout(false);
+            this.flowLayoutPanel3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.RadioButton peachButton;
-        private System.Windows.Forms.RadioButton delfinoButton;
-        private System.Windows.Forms.RadioButton yoshiButton;
-        private System.Windows.Forms.RadioButton circuitButton;
-        private System.Windows.Forms.RadioButton starshipButton;
-        private System.Windows.Forms.RadioButton stadiumButton;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.RadioButton alltradesButton;
-        private System.Windows.Forms.RadioButton colossusButton;
-        private System.Windows.Forms.RadioButton gegButton;
-        private System.Windows.Forms.RadioButton bowserButton;
-        private System.Windows.Forms.RadioButton smbButton;
-        private System.Windows.Forms.RadioButton alefgardButton;
-        private System.Windows.Forms.Button replaceButton;
-        private System.Windows.Forms.RadioButton noneButton;
         private System.Windows.Forms.Button addMapButton;
         private System.Windows.Forms.Button clearListButton;
-        private System.Windows.Forms.ListView listOfMapsToPatchIn;
-        private System.Windows.Forms.ColumnHeader customMapName;
-        private System.Windows.Forms.ColumnHeader mapToReplace;
         private System.Windows.Forms.Button removeMapButton;
         private System.Windows.Forms.OpenFileDialog addMapsDialog;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeIntroMenuAndMapBgmToolStripMenuItem;
@@ -664,10 +519,32 @@ namespace CustomStreetManager
         private System.Windows.Forms.Label setOutputPathLabel;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label setInputISOLocation;
-        private System.Windows.Forms.ColumnHeader filePathHeader;
-        private System.Windows.Forms.ColumnHeader isDynamic;
-        private System.Windows.Forms.ColumnHeader dynOrderHeader;
         private System.Windows.Forms.ToolStripMenuItem deflaktorsASMHacksToolStripMenuItem;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
+        private System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.BindingSource mapDescriptorBindingSource;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nameENDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn targetAmountDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn themeDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ruleSetDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile1DataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile2DataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile3DataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile4DataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewButtonColumn Import;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nameENDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn targetAmountDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn themeDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ruleSetDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile1DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile2DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile3DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile4DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewButtonColumn Export;
     }
 }
 

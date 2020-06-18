@@ -49,6 +49,7 @@
     <Compile Include="Conversion\DoubleConverter.cs" />
     <Compile Include="Conversion\EndianBitConverter.cs" />
     <Compile Include="Conversion\Endianness.cs" />
+    <Compile Include="Conversion\HexUtil.cs" />
     <Compile Include="Conversion\IBuffer.cs" />
     <Compile Include="Conversion\IBufferManager.cs" />
     <Compile Include="Conversion\LittleEndianBitConverter.cs" />
@@ -57,10 +58,13 @@
     <Compile Include="FSData\BoardFile.cs" />
     <Compile Include="FSData\BoardInfo.cs" />
     <Compile Include="FSData\BoardTheme.cs" />
+    <Compile Include="MapDescriptor\MainDolSection.cs" />
+    <Compile Include="MapDescriptor\MainDol.cs" />
+    <Compile Include="MapDescriptor\FileSet.cs" />
     <Compile Include="FSData\Locale.cs" />
     <Compile Include="FSData\RuleSet.cs" />
     <Compile Include="FSData\Header.cs" />
-    <Compile Include="FSData\MapDescriptor.cs" />
+    <Compile Include="MapDescriptor\MapDescriptor.cs" />
     <Compile Include="FSData\Position.cs" />
     <Compile Include="FSData\SquareData.cs" />
     <Compile Include="FSData\SquareType.cs" />
