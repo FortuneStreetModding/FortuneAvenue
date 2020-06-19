@@ -31,9 +31,7 @@ namespace CustomStreetManager
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
-            this.addMapButton = new System.Windows.Forms.Button();
             this.clearListButton = new System.Windows.Forms.Button();
-            this.removeMapButton = new System.Windows.Forms.Button();
             this.addMapsDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,12 +48,12 @@ namespace CustomStreetManager
             this.button1 = new System.Windows.Forms.Button();
             this.setInputISOLocation = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.mapDescriptorBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.nameENDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.targetAmountDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.themeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -64,56 +62,32 @@ namespace CustomStreetManager
             this.frbFile2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.frbFile3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.frbFile4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Background = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.BGMID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Venture_Card_Count = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Export = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.nameENDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.targetAmountDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.themeDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ruleSetDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile1DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile2DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile3DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile4DataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Import = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.ImportMd = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.mapDescriptorBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.Go = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mapDescriptorBindingSource)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mapDescriptorBindingSource)).BeginInit();
             this.SuspendLayout();
-            // 
-            // addMapButton
-            // 
-            this.addMapButton.Location = new System.Drawing.Point(1, 1);
-            this.addMapButton.Margin = new System.Windows.Forms.Padding(1);
-            this.addMapButton.Name = "addMapButton";
-            this.addMapButton.Size = new System.Drawing.Size(95, 31);
-            this.addMapButton.TabIndex = 35;
-            this.addMapButton.Text = "Add map";
-            this.addMapButton.UseVisualStyleBackColor = true;
-            this.addMapButton.Click += new System.EventHandler(this.openMapButton_Click);
             // 
             // clearListButton
             // 
-            this.clearListButton.Location = new System.Drawing.Point(189, 1);
+            this.clearListButton.Location = new System.Drawing.Point(1, 1);
             this.clearListButton.Margin = new System.Windows.Forms.Padding(1);
             this.clearListButton.Name = "clearListButton";
             this.clearListButton.Size = new System.Drawing.Size(95, 31);
             this.clearListButton.TabIndex = 37;
-            this.clearListButton.Text = "Clear list";
+            this.clearListButton.Text = "Clear Changes";
             this.clearListButton.UseVisualStyleBackColor = true;
-            // 
-            // removeMapButton
-            // 
-            this.removeMapButton.Location = new System.Drawing.Point(98, 1);
-            this.removeMapButton.Margin = new System.Windows.Forms.Padding(1);
-            this.removeMapButton.Name = "removeMapButton";
-            this.removeMapButton.Size = new System.Drawing.Size(89, 31);
-            this.removeMapButton.TabIndex = 40;
-            this.removeMapButton.Text = "Remove map";
-            this.removeMapButton.UseVisualStyleBackColor = true;
+            this.clearListButton.Click += new System.EventHandler(this.clearListButton_Click);
             // 
             // addMapsDialog
             // 
@@ -130,7 +104,7 @@ namespace CustomStreetManager
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
-            this.menuStrip1.Size = new System.Drawing.Size(1628, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1357, 24);
             this.menuStrip1.TabIndex = 42;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -243,11 +217,11 @@ namespace CustomStreetManager
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.dataGridView2, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel2, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel3, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.dataGridView1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.Go, 1, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -255,57 +229,40 @@ namespace CustomStreetManager
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1628, 684);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1357, 922);
             this.tableLayoutPanel1.TabIndex = 47;
-            // 
-            // dataGridView2
-            // 
-            this.dataGridView2.AllowUserToAddRows = false;
-            this.dataGridView2.AllowUserToDeleteRows = false;
-            this.dataGridView2.AutoGenerateColumns = false;
-            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.nameENDataGridViewTextBoxColumn1,
-            this.targetAmountDataGridViewTextBoxColumn1,
-            this.themeDataGridViewTextBoxColumn1,
-            this.ruleSetDataGridViewTextBoxColumn1,
-            this.frbFile1DataGridViewTextBoxColumn1,
-            this.frbFile2DataGridViewTextBoxColumn1,
-            this.frbFile3DataGridViewTextBoxColumn1,
-            this.frbFile4DataGridViewTextBoxColumn1,
-            this.Import});
-            this.dataGridView2.DataSource = this.mapDescriptorBindingSource;
-            this.dataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView2.Location = new System.Drawing.Point(817, 43);
-            this.dataGridView2.Name = "dataGridView2";
-            this.dataGridView2.ReadOnly = true;
-            this.dataGridView2.Size = new System.Drawing.Size(808, 598);
-            this.dataGridView2.TabIndex = 46;
-            // 
-            // mapDescriptorBindingSource
-            // 
-            this.mapDescriptorBindingSource.DataSource = typeof(FSEditor.MapDescriptor.MapDescriptor);
             // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.Controls.Add(this.setOutputLocationButton);
             this.flowLayoutPanel1.Controls.Add(this.setOutputPathLabel);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(817, 3);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(681, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(808, 34);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(673, 34);
             this.flowLayoutPanel1.TabIndex = 42;
             // 
             // flowLayoutPanel2
             // 
-            this.flowLayoutPanel2.Controls.Add(this.addMapButton);
-            this.flowLayoutPanel2.Controls.Add(this.removeMapButton);
             this.flowLayoutPanel2.Controls.Add(this.clearListButton);
+            this.flowLayoutPanel2.Controls.Add(this.checkBox1);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 647);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 885);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(808, 34);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(672, 34);
             this.flowLayoutPanel2.TabIndex = 43;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.checkBox1.Location = new System.Drawing.Point(100, 3);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(93, 27);
+            this.checkBox1.TabIndex = 38;
+            this.checkBox1.Text = "Show Unused";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // flowLayoutPanel3
             // 
@@ -314,7 +271,7 @@ namespace CustomStreetManager
             this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel3.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-            this.flowLayoutPanel3.Size = new System.Drawing.Size(808, 34);
+            this.flowLayoutPanel3.Size = new System.Drawing.Size(672, 34);
             this.flowLayoutPanel3.TabIndex = 44;
             // 
             // dataGridView1
@@ -322,8 +279,8 @@ namespace CustomStreetManager
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AutoGenerateColumns = false;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ID,
             this.nameENDataGridViewTextBoxColumn,
             this.targetAmountDataGridViewTextBoxColumn,
             this.themeDataGridViewTextBoxColumn,
@@ -332,14 +289,27 @@ namespace CustomStreetManager
             this.frbFile2DataGridViewTextBoxColumn,
             this.frbFile3DataGridViewTextBoxColumn,
             this.frbFile4DataGridViewTextBoxColumn,
-            this.Export});
+            this.Background,
+            this.BGMID,
+            this.Venture_Card_Count,
+            this.Export,
+            this.ImportMd});
+            this.tableLayoutPanel1.SetColumnSpan(this.dataGridView1, 2);
             this.dataGridView1.DataSource = this.mapDescriptorBindingSource;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(3, 43);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(808, 598);
+            this.dataGridView1.Size = new System.Drawing.Size(1351, 836);
             this.dataGridView1.TabIndex = 45;
+            // 
+            // ID
+            // 
+            this.ID.DataPropertyName = "ID";
+            this.ID.HeaderText = "ID";
+            this.ID.Name = "ID";
+            this.ID.ReadOnly = true;
+            this.ID.Width = 30;
             // 
             // nameENDataGridViewTextBoxColumn
             // 
@@ -347,6 +317,7 @@ namespace CustomStreetManager
             this.nameENDataGridViewTextBoxColumn.HeaderText = "Name_EN";
             this.nameENDataGridViewTextBoxColumn.Name = "nameENDataGridViewTextBoxColumn";
             this.nameENDataGridViewTextBoxColumn.ReadOnly = true;
+            this.nameENDataGridViewTextBoxColumn.Width = 150;
             // 
             // targetAmountDataGridViewTextBoxColumn
             // 
@@ -354,7 +325,7 @@ namespace CustomStreetManager
             this.targetAmountDataGridViewTextBoxColumn.HeaderText = "TargetAmount";
             this.targetAmountDataGridViewTextBoxColumn.Name = "targetAmountDataGridViewTextBoxColumn";
             this.targetAmountDataGridViewTextBoxColumn.ReadOnly = true;
-            this.targetAmountDataGridViewTextBoxColumn.Width = 50;
+            this.targetAmountDataGridViewTextBoxColumn.Width = 80;
             // 
             // themeDataGridViewTextBoxColumn
             // 
@@ -362,7 +333,7 @@ namespace CustomStreetManager
             this.themeDataGridViewTextBoxColumn.HeaderText = "Theme";
             this.themeDataGridViewTextBoxColumn.Name = "themeDataGridViewTextBoxColumn";
             this.themeDataGridViewTextBoxColumn.ReadOnly = true;
-            this.themeDataGridViewTextBoxColumn.Width = 50;
+            this.themeDataGridViewTextBoxColumn.Width = 90;
             // 
             // ruleSetDataGridViewTextBoxColumn
             // 
@@ -370,7 +341,7 @@ namespace CustomStreetManager
             this.ruleSetDataGridViewTextBoxColumn.HeaderText = "RuleSet";
             this.ruleSetDataGridViewTextBoxColumn.Name = "ruleSetDataGridViewTextBoxColumn";
             this.ruleSetDataGridViewTextBoxColumn.ReadOnly = true;
-            this.ruleSetDataGridViewTextBoxColumn.Width = 50;
+            this.ruleSetDataGridViewTextBoxColumn.Width = 70;
             // 
             // frbFile1DataGridViewTextBoxColumn
             // 
@@ -378,6 +349,7 @@ namespace CustomStreetManager
             this.frbFile1DataGridViewTextBoxColumn.HeaderText = "FrbFile1";
             this.frbFile1DataGridViewTextBoxColumn.Name = "frbFile1DataGridViewTextBoxColumn";
             this.frbFile1DataGridViewTextBoxColumn.ReadOnly = true;
+            this.frbFile1DataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // frbFile2DataGridViewTextBoxColumn
             // 
@@ -400,82 +372,65 @@ namespace CustomStreetManager
             this.frbFile4DataGridViewTextBoxColumn.Name = "frbFile4DataGridViewTextBoxColumn";
             this.frbFile4DataGridViewTextBoxColumn.ReadOnly = true;
             // 
+            // Background
+            // 
+            this.Background.DataPropertyName = "Background";
+            this.Background.HeaderText = "Background";
+            this.Background.Name = "Background";
+            this.Background.ReadOnly = true;
+            // 
+            // BGMID
+            // 
+            this.BGMID.DataPropertyName = "BGMID";
+            this.BGMID.HeaderText = "BGMID";
+            this.BGMID.Name = "BGMID";
+            this.BGMID.ReadOnly = true;
+            this.BGMID.Width = 50;
+            // 
+            // Venture_Card_Count
+            // 
+            this.Venture_Card_Count.DataPropertyName = "Venture_Card_Count";
+            this.Venture_Card_Count.HeaderText = "Venture Card Count";
+            this.Venture_Card_Count.Name = "Venture_Card_Count";
+            this.Venture_Card_Count.ReadOnly = true;
+            this.Venture_Card_Count.Width = 115;
+            // 
             // Export
             // 
             this.Export.HeaderText = "Export md";
             this.Export.Name = "Export";
             this.Export.ReadOnly = true;
+            this.Export.Text = "Export md";
+            this.Export.UseColumnTextForButtonValue = true;
             // 
-            // nameENDataGridViewTextBoxColumn1
+            // ImportMd
             // 
-            this.nameENDataGridViewTextBoxColumn1.DataPropertyName = "Name_EN";
-            this.nameENDataGridViewTextBoxColumn1.HeaderText = "Name_EN";
-            this.nameENDataGridViewTextBoxColumn1.Name = "nameENDataGridViewTextBoxColumn1";
-            this.nameENDataGridViewTextBoxColumn1.ReadOnly = true;
+            this.ImportMd.HeaderText = "Import md";
+            this.ImportMd.Name = "ImportMd";
+            this.ImportMd.ReadOnly = true;
+            this.ImportMd.Text = "Import md";
+            this.ImportMd.UseColumnTextForButtonValue = true;
             // 
-            // targetAmountDataGridViewTextBoxColumn1
+            // mapDescriptorBindingSource
             // 
-            this.targetAmountDataGridViewTextBoxColumn1.DataPropertyName = "TargetAmount";
-            this.targetAmountDataGridViewTextBoxColumn1.HeaderText = "TargetAmount";
-            this.targetAmountDataGridViewTextBoxColumn1.Name = "targetAmountDataGridViewTextBoxColumn1";
-            this.targetAmountDataGridViewTextBoxColumn1.ReadOnly = true;
-            this.targetAmountDataGridViewTextBoxColumn1.Width = 50;
+            this.mapDescriptorBindingSource.DataSource = typeof(FSEditor.MapDescriptor.MapDescriptor);
             // 
-            // themeDataGridViewTextBoxColumn1
+            // Go
             // 
-            this.themeDataGridViewTextBoxColumn1.DataPropertyName = "Theme";
-            this.themeDataGridViewTextBoxColumn1.HeaderText = "Theme";
-            this.themeDataGridViewTextBoxColumn1.Name = "themeDataGridViewTextBoxColumn1";
-            this.themeDataGridViewTextBoxColumn1.ReadOnly = true;
-            this.themeDataGridViewTextBoxColumn1.Width = 50;
-            // 
-            // ruleSetDataGridViewTextBoxColumn1
-            // 
-            this.ruleSetDataGridViewTextBoxColumn1.DataPropertyName = "RuleSet";
-            this.ruleSetDataGridViewTextBoxColumn1.HeaderText = "RuleSet";
-            this.ruleSetDataGridViewTextBoxColumn1.Name = "ruleSetDataGridViewTextBoxColumn1";
-            this.ruleSetDataGridViewTextBoxColumn1.ReadOnly = true;
-            this.ruleSetDataGridViewTextBoxColumn1.Width = 50;
-            // 
-            // frbFile1DataGridViewTextBoxColumn1
-            // 
-            this.frbFile1DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile1";
-            this.frbFile1DataGridViewTextBoxColumn1.HeaderText = "FrbFile1";
-            this.frbFile1DataGridViewTextBoxColumn1.Name = "frbFile1DataGridViewTextBoxColumn1";
-            this.frbFile1DataGridViewTextBoxColumn1.ReadOnly = true;
-            // 
-            // frbFile2DataGridViewTextBoxColumn1
-            // 
-            this.frbFile2DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile2";
-            this.frbFile2DataGridViewTextBoxColumn1.HeaderText = "FrbFile2";
-            this.frbFile2DataGridViewTextBoxColumn1.Name = "frbFile2DataGridViewTextBoxColumn1";
-            this.frbFile2DataGridViewTextBoxColumn1.ReadOnly = true;
-            // 
-            // frbFile3DataGridViewTextBoxColumn1
-            // 
-            this.frbFile3DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile3";
-            this.frbFile3DataGridViewTextBoxColumn1.HeaderText = "FrbFile3";
-            this.frbFile3DataGridViewTextBoxColumn1.Name = "frbFile3DataGridViewTextBoxColumn1";
-            this.frbFile3DataGridViewTextBoxColumn1.ReadOnly = true;
-            // 
-            // frbFile4DataGridViewTextBoxColumn1
-            // 
-            this.frbFile4DataGridViewTextBoxColumn1.DataPropertyName = "FrbFile4";
-            this.frbFile4DataGridViewTextBoxColumn1.HeaderText = "FrbFile4";
-            this.frbFile4DataGridViewTextBoxColumn1.Name = "frbFile4DataGridViewTextBoxColumn1";
-            this.frbFile4DataGridViewTextBoxColumn1.ReadOnly = true;
-            // 
-            // Import
-            // 
-            this.Import.HeaderText = "Import md";
-            this.Import.Name = "Import";
-            this.Import.ReadOnly = true;
+            this.Go.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Go.Location = new System.Drawing.Point(681, 885);
+            this.Go.Name = "Go";
+            this.Go.Size = new System.Drawing.Size(673, 34);
+            this.Go.TabIndex = 46;
+            this.Go.Text = "Go !";
+            this.Go.UseVisualStyleBackColor = true;
+            this.Go.Click += new System.EventHandler(this.Go_Click);
             // 
             // CSMM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1628, 708);
+            this.ClientSize = new System.Drawing.Size(1357, 946);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
@@ -490,21 +445,19 @@ namespace CustomStreetManager
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mapDescriptorBindingSource)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel2.ResumeLayout(false);
+            this.flowLayoutPanel2.PerformLayout();
             this.flowLayoutPanel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mapDescriptorBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Button addMapButton;
         private System.Windows.Forms.Button clearListButton;
-        private System.Windows.Forms.Button removeMapButton;
         private System.Windows.Forms.OpenFileDialog addMapsDialog;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
@@ -524,18 +477,11 @@ namespace CustomStreetManager
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
-        private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.BindingSource mapDescriptorBindingSource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn nameENDataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn targetAmountDataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn themeDataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ruleSetDataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile1DataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile2DataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile3DataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile4DataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewButtonColumn Import;
+        private System.Windows.Forms.Button Go;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameENDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn targetAmountDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn themeDataGridViewTextBoxColumn;
@@ -544,7 +490,11 @@ namespace CustomStreetManager
         private System.Windows.Forms.DataGridViewTextBoxColumn frbFile2DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn frbFile3DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn frbFile4DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Background;
+        private System.Windows.Forms.DataGridViewTextBoxColumn BGMID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Venture_Card_Count;
         private System.Windows.Forms.DataGridViewButtonColumn Export;
+        private System.Windows.Forms.DataGridViewButtonColumn ImportMd;
     }
 }
 

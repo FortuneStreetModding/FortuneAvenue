@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Threading;
 using FSEditor.MapDescriptor;
 using System.Collections.Generic;
+using System.Data;
 
 namespace CustomStreetManager
 {
@@ -65,34 +66,6 @@ namespace CustomStreetManager
             instance.SetProgressBarValue(amount);
         }
 
-        private void openMapButton_Click(object sender, EventArgs e)
-        {
-            if (addMapButton.Text == "Add map") //if one item is selected
-            {
-                addMapsDialog.Multiselect = true;
-                addMapsDialog.Filter = "Map files (*.frb)|*.frb|All files (*.*)|*.*";
-
-                if (addMapsDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string[] arr = new string[5];
-
-                    for (int i = 0; i < addMapsDialog.SafeFileNames.Count(); i++)
-                    {
-                        ListViewItem newItem;
-
-                        arr[0] = addMapsDialog.SafeFileNames[i];
-                        arr[1] = "None";
-                        arr[2] = addMapsDialog.FileNames[i];
-                        arr[3] = "false";
-                        arr[4] = "0";
-
-                        newItem = new ListViewItem(arr);
-
-                    }
-                }
-            }
-        }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -142,7 +115,21 @@ namespace CustomStreetManager
                 {
                     MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
                     List<MapDescriptor> mapDescriptors = mainDol.ReadMainDol(binReader);
-                    dataGridView1.DataSource = mapDescriptors;
+                    UI_Message en = new UI_Message(fileSet.ui_message_en_csv);
+                    UI_Message de = new UI_Message(fileSet.ui_message_de_csv);
+                    UI_Message fr = new UI_Message(fileSet.ui_message_fr_csv);
+                    UI_Message it = new UI_Message(fileSet.ui_message_it_csv);
+                    UI_Message es = new UI_Message(fileSet.ui_message_su_csv);
+                    UI_Message jp = new UI_Message(fileSet.ui_message_jp_csv);
+                    UI_Message uk = new UI_Message(fileSet.ui_message_uk_csv);
+                    foreach (MapDescriptor mapDescriptor in mapDescriptors)
+                    {
+                        mapDescriptor.Name_EN = en.get(mapDescriptor.Name_MSG_ID);
+                    }
+                    // Convert to DataTable.
+                    DataTable table = DataTableHelper.ToDataTable(mapDescriptors);
+                    dataGridView1.DataSource = table;
+                    checkBox1_CheckedChanged(null, null);
                 }
             }
             else
@@ -158,6 +145,29 @@ namespace CustomStreetManager
                 MessageBox.Show("Please be aware that I'm not checking for this -- " +
                     "but you need a PAL ISO to enable Deflaktor's ASM Hacks, otherwise " +
                     "your game will crash on startup.");
+            }
+        }
+
+        private void clearListButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                BindingSource bs = new BindingSource();
+                bs.DataSource = dataGridView1.DataSource;
+                bs.Filter = "";
+                dataGridView1.DataSource = bs;
+            }
+            else
+            {
+                BindingSource bs = new BindingSource();
+                bs.DataSource = dataGridView1.DataSource;
+                bs.Filter = "ID >= 0 AND ID < 18";
+                dataGridView1.DataSource = bs;
             }
         }
     }

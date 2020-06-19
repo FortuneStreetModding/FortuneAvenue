@@ -58,6 +58,7 @@
     <Compile Include="FSData\BoardFile.cs" />
     <Compile Include="FSData\BoardInfo.cs" />
     <Compile Include="FSData\BoardTheme.cs" />
+    <Compile Include="MapDescriptor\UI_Message.cs" />
     <Compile Include="MapDescriptor\MainDolSection.cs" />
     <Compile Include="MapDescriptor\MainDol.cs" />
     <Compile Include="MapDescriptor\FileSet.cs" />

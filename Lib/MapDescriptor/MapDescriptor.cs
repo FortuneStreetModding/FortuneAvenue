@@ -24,9 +24,10 @@ namespace FSEditor.MapDescriptor
         public string FrbFile3 { get; set; }
         public UInt32 FrbFile4Addr { get; set; }
         public string FrbFile4 { get; set; }
+        public UInt32 BackgroundAddr { get; set; }
         public string Background { get; set; }
         public UInt32 BGMID { get; set; }
-        public UInt32 Name_ID { get; set; }
+        public UInt32 Name_MSG_ID { get; set; }
         public string Name_DE { get; set; }
         public string Name_EN { get; set; }
         public string Name_FR { get; set; }
@@ -42,6 +43,7 @@ namespace FSEditor.MapDescriptor
         public string Desc_SU { get; set; }
         public string Desc_UK { get; set; }
         public byte[] Venture_Cards { get; private set; }
+        public int Venture_Card_Count { get; private set; }
 
         public MapDescriptor()
         {
@@ -50,10 +52,10 @@ namespace FSEditor.MapDescriptor
 
         public void ReadMapDataFromStream(EndianBinaryReader stream)
         {
-            Name_ID = stream.ReadUInt32();
+            Name_MSG_ID = stream.ReadUInt32();
             BGMID = stream.ReadUInt32();
             UInt32 InternalNameAddr = stream.ReadUInt32();
-            UInt32 BackgroundAddr = stream.ReadUInt32();
+            BackgroundAddr = stream.ReadUInt32();
             RuleSet = (RuleSet)stream.ReadUInt32();
             Theme = (BoardTheme)stream.ReadUInt32();
             FrbFile1Addr = stream.ReadUInt32();
@@ -84,6 +86,14 @@ namespace FSEditor.MapDescriptor
             for (int i = 0; i < Venture_Cards.Length; i++)
             {
                 Venture_Cards[i] = stream.ReadByte();
+            }
+            Venture_Card_Count = 0;
+            for (int i = 0; i < Venture_Cards.Length; i++)
+            {
+                if (Venture_Cards[i] != 0)
+                {
+                    Venture_Card_Count++;
+                }
             }
         }
     }

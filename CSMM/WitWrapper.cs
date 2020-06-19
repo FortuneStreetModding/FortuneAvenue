@@ -166,10 +166,10 @@ namespace CustomStreetManager
                         MainDolSection section = new MainDolSection();
                         string unused = columns[0];
                         string[] offsets = columns[1].Split(new string[] { ".." }, StringSplitOptions.None);
-                        section.offsetBeg = endianBitConverter.ToUInt32(HexUtil.StringToByteArray(offsets[0]), 0);
-                        section.offsetEnd = endianBitConverter.ToUInt32(HexUtil.StringToByteArray(offsets[1]), 0);
+                        section.offsetBeg = endianBitConverter.ToUInt32(HexUtil.HexStringToByteArray(offsets[0]), 0);
+                        section.offsetEnd = endianBitConverter.ToUInt32(HexUtil.HexStringToByteArray(offsets[1]), 0);
                         string size = columns[2];
-                        section.fileDelta = endianBitConverter.ToUInt32(HexUtil.StringToByteArray(columns[3]), 0);
+                        section.fileDelta = endianBitConverter.ToUInt32(HexUtil.HexStringToByteArray(columns[3]), 0);
                         section.section = columns[4].Trim();
                         sections.Add(section);
                     }
