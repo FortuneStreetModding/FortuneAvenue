@@ -9,6 +9,7 @@ using System.Threading;
 using FSEditor.MapDescriptor;
 using System.Collections.Generic;
 using System.Data;
+using System.Reflection;
 
 namespace CustomStreetManager
 {
@@ -17,6 +18,13 @@ namespace CustomStreetManager
         public CSMM()
         {
             InitializeComponent();
+            if (!System.Windows.Forms.SystemInformation.TerminalServerSession)
+            {
+                Type dgvType = dataGridView1.GetType();
+                PropertyInfo pi = dgvType.GetProperty("DoubleBuffered",
+                  BindingFlags.Instance | BindingFlags.NonPublic);
+                pi.SetValue(dataGridView1, true, null);
+            }
         }
 
         private void Go_Click(object sender, EventArgs e)
@@ -125,6 +133,20 @@ namespace CustomStreetManager
                     foreach (MapDescriptor mapDescriptor in mapDescriptors)
                     {
                         mapDescriptor.Name_EN = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_DE = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_FR = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_IT = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_SU = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_JP = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_UK = en.get(mapDescriptor.Name_MSG_ID);
+
+                        mapDescriptor.Desc_EN = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_DE = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_FR = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_IT = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_SU = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_JP = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_UK = en.get(mapDescriptor.Name_MSG_ID);
                     }
                     // Convert to DataTable.
                     DataTable table = DataTableHelper.ToDataTable(mapDescriptors);
