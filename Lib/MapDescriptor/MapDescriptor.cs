@@ -114,40 +114,162 @@ namespace FSEditor.MapDescriptor
         public void ReadMapDescriptorFromFile(string fileName)
         {
             string[] lines = File.ReadAllLines(fileName);
-            MDParserState state = MDParserState.NoHeading;
             MapDescriptor mapDescriptor = new MapDescriptor();
+            if (lines[0].StartsWith("# "))
+            {
+                mapDescriptor.Name_EN = lines[0].Replace("#", "").Trim();
+            }
+            else
+            {
+                throw new Exception("Could not parse " + fileName + " because the first line does not start with a '# '.");
+            }
             mapDescriptor.Desc_EN = "";
-            for (int i = 0; i < lines.Length; i += 1)
+            MDParserState state = MDParserState.Description;
+            for (int i = 1; i < lines.Length; i += 1)
             {
                 string line = lines[i];
                 MDParserState newState = detectHeading(state, line);
-                if(newState != MDParserState.NoHeading)
+                if (newState == MDParserState.NoHeading)
                 {
-                    if(newState == MDParserState.Description)
-                    {
-                        mapDescriptor.Name_EN = line.Replace("#", "").Trim();
-                    }
+                    mapDescriptor.parseContent(state, line);
+                }
+                else
+                {
                     state = newState;
-                } else
-                {
-                    parseContent(state, line);
                 }
             }
+            // if everything went well, set the parsed map descriptor values
+            set(mapDescriptor);
         }
 
         private void parseContent(MDParserState state, string line)
         {
+            string[] columns;
             switch (state)
             {
                 case MDParserState.Description:
-                    Desc_EN += line;
+                    Desc_EN += " ";
+                    Desc_EN += line.Trim();
+                    Desc_EN = Desc_EN.Trim();
                     break;
                 case MDParserState.KeyValueTable:
-                    string[] columns = line.Split('|');
-                    if(columns.Length > 0)
+                    columns = line.Split('|');
+                    if (columns.Length > 1)
                     {
-                        parseKeyValuePair(columns);
+                        KeyValuePair<string, string> keyValuePair = parseKeyValuePair(columns);
+                        setProperty(keyValuePair);
                     }
+                    break;
+                case MDParserState.BackgroundTable:
+                    columns = line.Split('|');
+                    if (columns.Length > 1)
+                    {
+                        string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
+                        if(flaggedValueOrNull != null)
+                        {
+                            Background = flaggedValueOrNull;
+                        }
+                    }
+                    break;
+                case MDParserState.BGMTable:
+                    columns = line.Split('|');
+                    if (columns.Length > 1)
+                    {
+                        string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
+                        if (flaggedValueOrNull != null)
+                        {
+                            BGMID = uint.Parse(flaggedValueOrNull);
+                        }
+                    }
+                    break;
+                case MDParserState.VentureCardTable:
+                    columns = line.Split('|');
+                    if (columns.Length > 1)
+                    {
+                        string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
+                        if (flaggedValueOrNull != null)
+                        {
+                            var index = uint.Parse(flaggedValueOrNull);
+                            Venture_Cards[index] = 1;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void setProperty(KeyValuePair<string, string> keyValuePair)
+        {
+            switch (keyValuePair.Key.Replace(" ","").Replace("(","").Replace(")","").ToLower())
+            {
+                case "initialcash":
+                    InitialCash = uint.Parse(keyValuePair.Value);
+                    break;
+                case "targetamount":
+                    TargetAmount = uint.Parse(keyValuePair.Value);
+                    break;
+                case "rules":
+                    switch (keyValuePair.Value.Replace(" ", "").ToLower())
+                    {
+                        case "standard":
+                            RuleSet = RuleSet.Standard;
+                            break;
+                        case "basic":
+                            RuleSet = RuleSet.Basic;
+                            break;
+                    }
+                    break;
+                case "theme":
+                    switch (keyValuePair.Value.Replace(" ", "").ToLower())
+                    {
+                        case "mario":
+                            Theme = BoardTheme.Mario;
+                            break;
+                        case "dragonquest":
+                            Theme = BoardTheme.DragonQuest;
+                            break;
+                    }
+                    break;
+                case "frbfilename1":
+                    FrbFile1 = keyValuePair.Value;
+                    break;
+                case "frbfilename2":
+                    FrbFile2 = keyValuePair.Value;
+                    break;
+                case "frbfilename3":
+                    FrbFile3 = keyValuePair.Value;
+                    break;
+                case "frbfilename4":
+                    FrbFile4 = keyValuePair.Value;
+                    break;
+                case "namede":
+                    Name_DE = keyValuePair.Value;
+                    break;
+                case "namees":
+                    Name_SU = keyValuePair.Value;
+                    break;
+                case "namefr":
+                    Name_FR = keyValuePair.Value;
+                    break;
+                case "nameit":
+                    Name_IT = keyValuePair.Value;
+                    break;
+                case "namejp":
+                    Name_JP = keyValuePair.Value;
+                    break;
+                case "descde":
+                    Desc_DE = keyValuePair.Value;
+                    break;
+                case "desces":
+                    Desc_SU = keyValuePair.Value;
+                    break;
+                case "descfr":
+                    Desc_FR = keyValuePair.Value;
+                    break;
+                case "descit":
+                    Desc_IT = keyValuePair.Value;
+                    break;
+                case "descjp":
+                    Desc_JP = keyValuePair.Value;
                     break;
             }
         }
@@ -155,32 +277,64 @@ namespace FSEditor.MapDescriptor
         private KeyValuePair<string, string> parseKeyValuePair(string[] columns)
         {
             bool isValue = false;
-            KeyValuePair<string, string> keyValuePair = new KeyValuePair<string, string>();
+            string key = null;
+            string value = null;
             for (int i = 0; i < columns.Length; i++)
             {
                 if (columns[i].Trim().Length > 0)
                 {
                     if (isValue)
                     {
-                        keyValuePair.Value = columns[i].Trim();
+                        value = columns[i].Trim();
+                        break;
                     }
                     else
                     {
-                        keyValuePair.Key = columns[i].Trim();
+                        key = columns[i].Trim();
                     }
                     isValue = true;
                 }
             }
+            return new KeyValuePair<string, string>(key, value);
+        }
+
+        private string parseFlaggedValueOrReturnNull(string[] columns)
+        {
+            bool firstValueFound = false;
+            string firstValue = null;
+            string secondValue = null;
+            // go through each column and find the first two entries with content
+            for (int i = 0; i < columns.Length; i++)
+            {
+                if (columns[i].Trim().Length > 0)
+                {
+                    if (firstValueFound)
+                    {
+                        secondValue = columns[i].Trim();
+                        break;
+                    }
+                    else
+                    {
+                        firstValue = columns[i].Trim();
+                    }
+                    firstValueFound = true;
+                }
+            }
+            if(firstValue.Equals(":o:"))
+            {
+                return secondValue;
+            }
+            if (secondValue.Equals(":o:"))
+            {
+                return firstValue;
+            }
+            return null;
         }
 
         private MDParserState detectHeading(MDParserState state, string line)
         {
             if (line.StartsWith("#"))
             {
-                if (state == MDParserState.NoHeading)
-                {
-                    return MDParserState.Description;
-                }
                 string headingText = line.Replace("#", "").Trim();
                 if (headingText.Contains("Properties") || headingText.Contains("Configuration") || headingText.Contains("Localization"))
                 {
