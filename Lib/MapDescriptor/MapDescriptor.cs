@@ -320,6 +320,7 @@ namespace FSEditor.MapDescriptor
                     firstValueFound = true;
                 }
             }
+            // if one of the column is marked with ":o:" return the other one
             if(firstValue.Equals(":o:"))
             {
                 return secondValue;
@@ -328,6 +329,7 @@ namespace FSEditor.MapDescriptor
             {
                 return firstValue;
             }
+            // otherwise return null
             return null;
         }
 
