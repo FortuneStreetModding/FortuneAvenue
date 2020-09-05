@@ -59,6 +59,7 @@
     <Compile Include="FSData\BoardInfo.cs" />
     <Compile Include="FSData\BoardTheme.cs" />
     <Compile Include="FSData\LoopingMode.cs" />
+    <Compile Include="FSData\Character.cs" />
     <Compile Include="MapDescriptor\UI_Message.cs" />
     <Compile Include="MapDescriptor\MainDolSection.cs" />
     <Compile Include="MapDescriptor\MainDol.cs" />
