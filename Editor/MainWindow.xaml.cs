@@ -175,13 +175,13 @@ namespace Editor
 
             switch (board.BoardInfo.GalaxyStatus)
             {
-                case 0:
+                case LoopingMode.None:
                     this.GalaxyNLoop.IsChecked = true;
                     break;
-                case 1:
+                case LoopingMode.Both:
                     this.GalaxyVHLoop.IsChecked = true;
                     break;
-                case 2:
+                case LoopingMode.Vertical:
                     this.GalaxyVLoop.IsChecked = true;
                     break;
                 default:
@@ -771,15 +771,15 @@ namespace Editor
 
             if ((bool)this.GalaxyNLoop.IsChecked)
             {
-                board.BoardInfo.GalaxyStatus = 0;
+                board.BoardInfo.GalaxyStatus = LoopingMode.None;
             }
             else if ((bool)this.GalaxyVLoop.IsChecked)
             {
-                board.BoardInfo.GalaxyStatus = 2;
+                board.BoardInfo.GalaxyStatus = LoopingMode.Vertical;
             }
             else if ((bool)this.GalaxyVHLoop.IsChecked)
             {
-                board.BoardInfo.GalaxyStatus = 1;
+                board.BoardInfo.GalaxyStatus = LoopingMode.Both;
             }
         }
 

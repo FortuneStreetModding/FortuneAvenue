@@ -41,7 +41,7 @@ namespace FSEditor.FSData {
         /// <summary>
         /// Determines "galaxy" status -- boards wrapping around on themselves
         /// </summary>
-        public UInt16 GalaxyStatus { get; set; }
+        public LoopingMode GalaxyStatus { get; set; }
 
         // ----------------------------------------------------------------------------------------------------
 		#endregion
@@ -81,7 +81,7 @@ namespace FSEditor.FSData {
 			boardInfo.BaseSalary = stream.ReadUInt16();
 			boardInfo.SalaryIncrement = stream.ReadUInt16();
             boardInfo.MaxDiceRoll = stream.ReadUInt16();
-            boardInfo.GalaxyStatus = stream.ReadUInt16();
+            boardInfo.GalaxyStatus = (LoopingMode) stream.ReadUInt16();
             stream.ReadUInt32(); // Read padding data.
 
 			return boardInfo;
@@ -100,7 +100,7 @@ namespace FSEditor.FSData {
             stream.Write(BaseSalary);
             stream.Write(SalaryIncrement);
             stream.Write(MaxDiceRoll);
-            stream.Write(GalaxyStatus);
+            stream.Write((UInt16)GalaxyStatus);
             stream.Write((Int32)0); // Data padding.
         }
 		// ----------------------------------------------------------------------------------------------------
