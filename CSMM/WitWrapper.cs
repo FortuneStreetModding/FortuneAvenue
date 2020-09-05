@@ -121,7 +121,7 @@ namespace CustomStreetManager
                 Directory.Delete(tmpDirectory, true);
             }
 
-            string arguments = "COPY --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message; \"" + inputFile + "\" tmp";
+            string arguments = "COPY --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
             callWit(arguments);
 
             FileSet fileSet = new FileSet();
@@ -133,6 +133,7 @@ namespace CustomStreetManager
             fileSet.ui_message_jp_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.jp.csv");
             fileSet.ui_message_su_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.su.csv");
             fileSet.ui_message_uk_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.uk.csv");
+            fileSet.param_folder = Path.Combine(tmpDirectory, "files", "param");
             return fileSet;
         }
 

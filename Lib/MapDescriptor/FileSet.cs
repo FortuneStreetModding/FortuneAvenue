@@ -23,5 +23,7 @@ namespace FSEditor.MapDescriptor
         { get; set; }
         public string ui_message_uk_csv
         { get; set; }
+        public string param_folder 
+        { get; set; }
     }
 }
