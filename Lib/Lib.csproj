@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -60,6 +60,12 @@
     <Compile Include="FSData\BoardTheme.cs" />
     <Compile Include="FSData\LoopingMode.cs" />
     <Compile Include="FSData\Character.cs" />
+    <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
+    <Compile Include="MapDescriptor\MapDescriptorTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MapDescriptorTemplate.md</DependentUpon>
+    </Compile>
     <Compile Include="MapDescriptor\UI_Message.cs" />
     <Compile Include="MapDescriptor\MainDolSection.cs" />
     <Compile Include="MapDescriptor\MainDol.cs" />
@@ -80,6 +86,16 @@
     <Compile Include="IO\StreamUtil.cs" />
     <Compile Include="IO\StringWriterWithEncoding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MapDescriptor\MapDescriptorTemplate.md">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MapDescriptorTemplate.cs</LastGenOutput>
+      <CustomToolNamespace>FSEditor.MapDescriptor</CustomToolNamespace>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,11 +10,16 @@ using FSEditor.MapDescriptor;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using System.Text;
+using System.Drawing;
 
 namespace CustomStreetManager
 {
     public partial class CSMM : Form
     {
+        private FileSet fileSet;
+        private List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
+
         public CSMM()
         {
             InitializeComponent();
@@ -112,9 +117,11 @@ namespace CustomStreetManager
             openFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
             openFileDialog1.Title = "Which ISO image or WBFS file should we patch?";
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (openFileDialog1.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
-                FileSet fileSet = WitWrapper.extractFiles(openFileDialog1.FileName);
+                string warnings = "";
+
+                fileSet = WitWrapper.extractFiles(openFileDialog1.FileName);
                 List<MainDolSection> sections = WitWrapper.readSections(fileSet.main_dol);
                 MainDol mainDol = new MainDol(sections);
                 setInputISOLocation.Text = openFileDialog1.FileName;
@@ -122,7 +129,7 @@ namespace CustomStreetManager
                 using (var stream = File.OpenRead(fileSet.main_dol))
                 {
                     MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
-                    List<MapDescriptor> mapDescriptors = mainDol.ReadMainDol(binReader);
+                    mapDescriptors = mainDol.ReadMainDol(binReader);
                     UI_Message en = new UI_Message(fileSet.ui_message_en_csv);
                     UI_Message de = new UI_Message(fileSet.ui_message_de_csv);
                     UI_Message fr = new UI_Message(fileSet.ui_message_fr_csv);
@@ -133,26 +140,35 @@ namespace CustomStreetManager
                     foreach (MapDescriptor mapDescriptor in mapDescriptors)
                     {
                         mapDescriptor.Name_EN = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_DE = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_FR = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_IT = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_SU = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_JP = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_UK = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_DE = de.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_FR = fr.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_IT = it.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_SU = es.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_JP = jp.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Name_UK = uk.get(mapDescriptor.Name_MSG_ID);
 
-                        mapDescriptor.Desc_EN = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Desc_DE = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Desc_FR = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Desc_IT = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Desc_SU = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Desc_JP = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Desc_UK = en.get(mapDescriptor.Name_MSG_ID);
+                        mapDescriptor.Desc_EN = en.get(mapDescriptor.Desc_MSG_ID);
+                        mapDescriptor.Desc_DE = de.get(mapDescriptor.Desc_MSG_ID);
+                        mapDescriptor.Desc_FR = fr.get(mapDescriptor.Desc_MSG_ID);
+                        mapDescriptor.Desc_IT = it.get(mapDescriptor.Desc_MSG_ID);
+                        mapDescriptor.Desc_SU = es.get(mapDescriptor.Desc_MSG_ID);
+                        mapDescriptor.Desc_JP = jp.get(mapDescriptor.Desc_MSG_ID);
+                        mapDescriptor.Desc_UK = uk.get(mapDescriptor.Desc_MSG_ID);
+
+                        warnings += mapDescriptor.ReadFrbFileInfo(fileSet.param_folder);
                     }
-                    // Convert to DataTable.
-                    DataTable table = DataTableHelper.ToDataTable(mapDescriptors);
-                    dataGridView1.DataSource = table;
-                    checkBox1_CheckedChanged(null, null);
                 }
+                if (!string.IsNullOrWhiteSpace(warnings))
+                {
+                    MessageBox.Show(warnings, "Warnings", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                // Convert to DataTable.
+                //DataTable table = DataTableHelper.ToDataTable(mapDescriptors);
+                BindingSource bs = new BindingSource();
+                bs.DataSource = mapDescriptors;
+                dataGridView1.DataSource = bs;
+                checkBox1_CheckedChanged(null, null);
+                
             }
             else
             {
@@ -177,19 +193,131 @@ namespace CustomStreetManager
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
+            BindingSource bs = dataGridView1.DataSource as BindingSource;
             if (checkBox1.Checked)
             {
-                BindingSource bs = new BindingSource();
-                bs.DataSource = dataGridView1.DataSource;
-                bs.Filter = "";
-                dataGridView1.DataSource = bs;
+                bs.DataSource = mapDescriptors;
             }
             else
             {
-                BindingSource bs = new BindingSource();
-                bs.DataSource = dataGridView1.DataSource;
-                bs.Filter = "ID >= 0 AND ID < 18";
-                dataGridView1.DataSource = bs;
+                bs.DataSource = mapDescriptors.FindAll(md => md.ID >= 0 && md.ID < 18);
+            }
+            dataGridView1.DataSource = bs;
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var senderGrid = (DataGridView)sender;
+
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
+                e.RowIndex >= 0)
+            {
+                MapDescriptor mapDescriptor = senderGrid.Rows[e.RowIndex].DataBoundItem as MapDescriptor;
+                if (senderGrid.Columns[e.ColumnIndex].Name.ToLower().Contains("export"))
+                {
+                    exportMd(mapDescriptor);
+                }
+                else if (senderGrid.Columns[e.ColumnIndex].Name.ToLower().Contains("import"))
+                {
+                    Console.WriteLine("Import " + mapDescriptor.Name_EN);
+                }
+            }
+        }
+
+        private void exportMd(MapDescriptor mapDescriptor)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    string fileNameMd = Path.Combine(fbd.SelectedPath, mapDescriptor.InternalName + ".md");
+                    string fileNameFrb1 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile1 + ".frb");
+                    string fileNameFrb2 = null;
+                    string fileNameFrb3 = null;
+                    string fileNameFrb4 = null;
+                    if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile2))
+                        fileNameFrb2 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile2 + ".frb");
+                    if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile3))
+                        fileNameFrb3 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile3 + ".frb");
+                    if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile4))
+                        fileNameFrb4 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile4 + ".frb");
+
+                    string filesToBeReplaced = "";
+                    if (File.Exists(fileNameMd))
+                    {
+                        filesToBeReplaced += fileNameMd + '\n';
+                    }
+                    if (File.Exists(fileNameFrb1))
+                    {
+                        filesToBeReplaced += fileNameFrb1 + '\n';
+                    }
+                    if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
+                    {
+                        filesToBeReplaced += fileNameFrb2 + '\n';
+                    }
+                    if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
+                    {
+                        filesToBeReplaced += fileNameFrb3 + '\n';
+                    }
+                    if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
+                    {
+                        filesToBeReplaced += fileNameFrb4 + '\n';
+                    }
+
+                    if(!string.IsNullOrWhiteSpace(filesToBeReplaced))
+                    {
+                        DialogResult dialogResult = MessageBox.Show("The following files already exist and will be replaced:" + '\n' + filesToBeReplaced, "Files already exist", MessageBoxButtons.OKCancel);
+
+                        if (dialogResult == DialogResult.OK)
+                        {
+                            if (File.Exists(fileNameMd))
+                            {
+                                File.Delete(fileNameMd);
+                            }
+                            if (File.Exists(fileNameFrb1))
+                            {
+                                File.Delete(fileNameFrb1);
+                            }
+                            if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
+                            {
+                                File.Delete(fileNameFrb2);
+                            }
+                            if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
+                            {
+                                File.Delete(fileNameFrb3);
+                            }
+                            if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
+                            {
+                                File.Delete(fileNameFrb4);
+                            }
+                        }
+                        else if (dialogResult == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+                    }
+  
+                    using (FileStream fs = File.Create(fileNameMd))
+                    {
+                        // byte[] content = Encoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(mapDescriptor.generateMapDescriptorFileContent()));
+                        byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.generateMapDescriptorFileContent());
+                        fs.Write(content, 0, content.Length);
+                    }
+                    File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile1 + ".frb"), fileNameFrb1);
+                    if (fileNameFrb2 != null)
+                    {
+                        File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile2 + ".frb"), fileNameFrb2);
+                    }
+                    if (fileNameFrb3 != null)
+                    {
+                        File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile3 + ".frb"), fileNameFrb3);
+                    }
+                    if (fileNameFrb4 != null)
+                    {
+                        File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile4 + ".frb"), fileNameFrb4);
+                    }
+                }
             }
         }
     }

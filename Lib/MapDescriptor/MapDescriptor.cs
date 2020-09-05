@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using MiscUtil.IO;
 using System.ComponentModel;
+using MiscUtil.Conversion;
 
 namespace FSEditor.MapDescriptor
 {
@@ -16,6 +17,8 @@ namespace FSEditor.MapDescriptor
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
         public RuleSet RuleSet { get; set; }
+        public UInt32 InternalNameAddr { get; set; }
+        public string InternalName { get; set; }
         public UInt32 FrbFile1Addr { get; set; }
         public string FrbFile1 { get; set; }
         public UInt32 FrbFile2Addr { get; set; }
@@ -45,6 +48,18 @@ namespace FSEditor.MapDescriptor
         public string Desc_UK { get; set; }
         public byte[] Venture_Cards { get; private set; }
         public int Venture_Card_Count { get; private set; }
+        public UInt32 BaseSalary { get; set; }
+        public UInt32 SalaryIncrement { get; set; }
+        public UInt32 MaxDiceRoll { get; set; }
+        public LoopingMode LoopingMode { get; set; }
+        public UInt32 TourBankruptcyLimit { get; set; }
+        public UInt32 TourInitialCash { get; set; }
+        public Character TourOpponent1 { get; set; }
+        public Character TourOpponent2 { get; set; }
+        public Character TourOpponent3 { get; set; }
+        public UInt32 TourClearRank { get; set; }
+        public UInt32 TourDifficulty { get; set; }
+        public UInt32 TourGeneralPlayTime { get; set; }
 
         public MapDescriptor()
         {
@@ -55,7 +70,7 @@ namespace FSEditor.MapDescriptor
         {
             Name_MSG_ID = stream.ReadUInt32();
             BGMID = stream.ReadUInt32();
-            UInt32 InternalNameAddr = stream.ReadUInt32();
+            InternalNameAddr = stream.ReadUInt32();
             BackgroundAddr = stream.ReadUInt32();
             RuleSet = (RuleSet)stream.ReadUInt32();
             Theme = (BoardTheme)stream.ReadUInt32();
@@ -63,6 +78,7 @@ namespace FSEditor.MapDescriptor
             FrbFile2Addr = stream.ReadUInt32();
             FrbFile3Addr = stream.ReadUInt32();
             FrbFile4Addr = stream.ReadUInt32();
+            // todo 
             UInt32 MapSwitchParamAddr = stream.ReadUInt32();
             UInt32 MapGalaxyParamAddr = stream.ReadUInt32();
             ID = stream.ReadUInt32();
@@ -77,14 +93,14 @@ namespace FSEditor.MapDescriptor
         public void ReadMapDefaultsFromStream(EndianBinaryReader stream)
         {
             TargetAmount = stream.ReadUInt32();
-            UInt32 DefaultHasanPlayer = stream.ReadUInt32();
-            InitialCash = stream.ReadUInt32();
-            UInt32 TourOpponent1 = stream.ReadUInt32();
-            UInt32 TourOpponent2 = stream.ReadUInt32();
-            UInt32 TourOpponent3 = stream.ReadUInt32();
-            UInt32 TourClearRank = stream.ReadUInt32();
-            UInt32 TourDifficulty = stream.ReadUInt32();
-            UInt32 GeneralPlayTime = stream.ReadUInt32();
+            TourBankruptcyLimit = stream.ReadUInt32();
+            TourInitialCash = stream.ReadUInt32();
+            TourOpponent1 = (Character)stream.ReadUInt32();
+            TourOpponent2 = (Character)stream.ReadUInt32();
+            TourOpponent3 = (Character)stream.ReadUInt32();
+            TourClearRank = stream.ReadUInt32();
+            TourDifficulty = stream.ReadUInt32();
+            TourGeneralPlayTime = stream.ReadUInt32();
         }
 
         public void ReadVentureCardTableFromStream(EndianBinaryReader stream)
@@ -102,6 +118,63 @@ namespace FSEditor.MapDescriptor
                 }
             }
         }
+
+        public string ReadFrbFileInfo(string param_folder)
+        {
+            string warning = "";
+            var file = Path.Combine(param_folder, FrbFile1 + ".frb");
+            using (var stream = File.OpenRead(file))
+            {
+                EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
+                BoardFile board = BoardFile.LoadFromStream(binReader);
+                // TODO: What is unused and what is used? check InitialCash and TargetAmount. Fixate on only the real one
+                MaxDiceRoll = board.BoardInfo.MaxDiceRoll;
+                BaseSalary = board.BoardInfo.BaseSalary;
+                SalaryIncrement = board.BoardInfo.SalaryIncrement;
+                InitialCash = board.BoardInfo.InitialCash;
+                if (TargetAmount != board.BoardInfo.TargetAmount)
+                {
+                    warning += "[" + ID + "]: FRB target amount is " + board.BoardInfo.TargetAmount + " but DOL target amount is " + TargetAmount + '\n';
+                    warning += "The DOL target amount will be used." + '\n';
+                }
+                LoopingMode = board.BoardInfo.GalaxyStatus;
+                // TODO: Check conformity with MapGalaxyParamAddr
+                if (LoopingMode != 0)
+                {
+
+                }
+            }
+            // check the other frb files for validity
+            if (!string.IsNullOrWhiteSpace(FrbFile2))
+            {
+                file = Path.Combine(param_folder, FrbFile2 + ".frb");
+                using (var stream = File.OpenRead(file))
+                {
+                    EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
+                    BoardFile.LoadFromStream(binReader);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(FrbFile3))
+            {
+                file = Path.Combine(param_folder, FrbFile3 + ".frb");
+                using (var stream = File.OpenRead(file))
+                {
+                    EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
+                    BoardFile.LoadFromStream(binReader);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(FrbFile4))
+            {
+                file = Path.Combine(param_folder, FrbFile4 + ".frb");
+                using (var stream = File.OpenRead(file))
+                {
+                    EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
+                    BoardFile.LoadFromStream(binReader);
+                }
+            }
+            return warning;
+        }
+
         enum MDParserState
         {
             NoHeading,
@@ -165,7 +238,7 @@ namespace FSEditor.MapDescriptor
                     if (columns.Length > 1)
                     {
                         string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
-                        if(flaggedValueOrNull != null)
+                        if (flaggedValueOrNull != null)
                         {
                             Background = flaggedValueOrNull;
                         }
@@ -199,13 +272,25 @@ namespace FSEditor.MapDescriptor
 
         private void setProperty(KeyValuePair<string, string> keyValuePair)
         {
-            switch (keyValuePair.Key.Replace(" ","").Replace("(","").Replace(")","").ToLower())
+            switch (keyValuePair.Key.Replace(" ", "").Replace("(", "").Replace(")", "").ToLower())
             {
                 case "initialcash":
                     InitialCash = uint.Parse(keyValuePair.Value);
                     break;
                 case "targetamount":
                     TargetAmount = uint.Parse(keyValuePair.Value);
+                    break;
+                case "basesalary":
+                    BaseSalary = uint.Parse(keyValuePair.Value);
+                    break;
+                case "salaryincrement":
+                    SalaryIncrement = uint.Parse(keyValuePair.Value);
+                    break;
+                case "maximumdiceroll":
+                    MaxDiceRoll = uint.Parse(keyValuePair.Value);
+                    break;
+                case "loopingmode":
+                    MaxDiceRoll = uint.Parse(keyValuePair.Value);
                     break;
                 case "rules":
                     switch (keyValuePair.Value.Replace(" ", "").ToLower())
@@ -321,7 +406,7 @@ namespace FSEditor.MapDescriptor
                 }
             }
             // if one of the column is marked with ":o:" return the other one
-            if(firstValue.Equals(":o:"))
+            if (firstValue.Equals(":o:"))
             {
                 return secondValue;
             }
@@ -360,6 +445,7 @@ namespace FSEditor.MapDescriptor
             TargetAmount = mapDescriptor.TargetAmount;
             Theme = mapDescriptor.Theme;
             RuleSet = mapDescriptor.RuleSet;
+            InternalName = mapDescriptor.InternalName;
             FrbFile1 = mapDescriptor.FrbFile1;
             FrbFile2 = mapDescriptor.FrbFile2;
             FrbFile3 = mapDescriptor.FrbFile3;
@@ -386,6 +472,26 @@ namespace FSEditor.MapDescriptor
             {
                 Venture_Cards[i] = mapDescriptor.Venture_Cards[i];
             }
+
+            BaseSalary = mapDescriptor.BaseSalary;
+            SalaryIncrement = mapDescriptor.SalaryIncrement;
+            MaxDiceRoll = mapDescriptor.MaxDiceRoll;
+            LoopingMode = mapDescriptor.LoopingMode;
+
+            TourBankruptcyLimit = mapDescriptor.TourBankruptcyLimit;
+            TourInitialCash = mapDescriptor.TourInitialCash;
+            TourOpponent1 = mapDescriptor.TourOpponent1;
+            TourOpponent2 = mapDescriptor.TourOpponent2;
+            TourOpponent3 = mapDescriptor.TourOpponent3;
+            TourClearRank = mapDescriptor.TourClearRank;
+            TourDifficulty = mapDescriptor.TourDifficulty;
+            TourGeneralPlayTime = mapDescriptor.TourGeneralPlayTime;
+        }
+
+        public string generateMapDescriptorFileContent()
+        {
+            MapDescriptorTemplate t = new MapDescriptorTemplate(this);
+            return t.TransformText().TrimStart();
         }
     }
 }

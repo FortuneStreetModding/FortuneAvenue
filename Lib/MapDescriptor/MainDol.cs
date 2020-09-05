@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using MiscUtil.IO;
 using MiscUtil.Conversion;
+using FSEditor.FSData;
 
 namespace FSEditor.MapDescriptor
 {
@@ -98,6 +99,7 @@ namespace FSEditor.MapDescriptor
                 mapDescriptor.FrbFile2 = resolveAddressToString(mapDescriptor.FrbFile2Addr, binReader);
                 mapDescriptor.FrbFile3 = resolveAddressToString(mapDescriptor.FrbFile3Addr, binReader);
                 mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, binReader);
+                mapDescriptor.InternalName = resolveAddressToString(mapDescriptor.InternalNameAddr, binReader);
             }
 
             binReader.Seek(positionMapDefaultTable, SeekOrigin.Begin);

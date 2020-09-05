@@ -74,7 +74,6 @@
     <Compile Include="AboutPanel.Designer.cs">
       <DependentUpon>AboutPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataTableHelper.cs" />
     <Compile Include="MapEntry.cs" />
     <Compile Include="WitWrapper.cs" />
     <Compile Include="CSMM.cs">

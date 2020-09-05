@@ -1,4 +1,6 @@
 ﻿
+using System.Drawing;
+
 namespace CustomStreetManager
 {
     partial class CSMM
@@ -279,6 +281,8 @@ namespace CustomStreetManager
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AutoGenerateColumns = false;
+            this.dataGridView1.RowsDefaultCellStyle.BackColor = Color.White;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ID,
             this.nameENDataGridViewTextBoxColumn,
@@ -302,6 +306,7 @@ namespace CustomStreetManager
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.Size = new System.Drawing.Size(1351, 836);
             this.dataGridView1.TabIndex = 45;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // ID
             // 
