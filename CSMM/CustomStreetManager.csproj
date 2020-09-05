@@ -68,12 +68,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutPanel.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AboutPanel.Designer.cs">
-      <DependentUpon>AboutPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="MapEntry.cs" />
     <Compile Include="WitWrapper.cs" />
     <Compile Include="CSMM.cs">
@@ -90,9 +84,6 @@
       <DependentUpon>ProgressBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AboutPanel.resx">
-      <DependentUpon>AboutPanel.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="CSMM.resx">
       <DependentUpon>CSMM.cs</DependentUpon>
     </EmbeddedResource>

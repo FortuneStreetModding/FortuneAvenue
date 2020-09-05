@@ -34,6 +34,8 @@ namespace CustomStreetManager
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
             this.clearListButton = new System.Windows.Forms.Button();
             this.addMapsDialog = new System.Windows.Forms.OpenFileDialog();
@@ -44,8 +46,6 @@ namespace CustomStreetManager
             this.deflaktorsASMHacksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeIntroMenuAndMapBgmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.patchToWiimmfiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutCustomStreetMapManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.setOutputLocationButton = new System.Windows.Forms.Button();
             this.setOutputPathLabel = new System.Windows.Forms.Label();
@@ -103,8 +103,7 @@ namespace CustomStreetManager
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.optionsToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
@@ -123,7 +122,7 @@ namespace CustomStreetManager
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -161,21 +160,6 @@ namespace CustomStreetManager
             this.patchToWiimmfiToolStripMenuItem.Name = "patchToWiimmfiToolStripMenuItem";
             this.patchToWiimmfiToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
             this.patchToWiimmfiToolStripMenuItem.Text = "Wiimmfi";
-            // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aboutCustomStreetMapManagerToolStripMenuItem});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
-            this.helpToolStripMenuItem.Text = "Help";
-            // 
-            // aboutCustomStreetMapManagerToolStripMenuItem
-            // 
-            this.aboutCustomStreetMapManagerToolStripMenuItem.Name = "aboutCustomStreetMapManagerToolStripMenuItem";
-            this.aboutCustomStreetMapManagerToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
-            this.aboutCustomStreetMapManagerToolStripMenuItem.Text = "About Custom Street Map Manager...";
-            this.aboutCustomStreetMapManagerToolStripMenuItem.Click += new System.EventHandler(this.aboutCustomStreetMapManagerToolStripMenuItem_Click);
             // 
             // setOutputLocationButton
             // 
@@ -282,9 +266,9 @@ namespace CustomStreetManager
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Lavender;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.AutoGenerateColumns = false;
-            this.dataGridView1.RowsDefaultCellStyle.BackColor = Color.White;
-            this.dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ID,
             this.nameENDataGridViewTextBoxColumn,
@@ -306,10 +290,12 @@ namespace CustomStreetManager
             this.dataGridView1.Location = new System.Drawing.Point(3, 43);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Size = new System.Drawing.Size(1351, 836);
             this.dataGridView1.TabIndex = 45;
-            this.dataGridView1.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.dataGridView1_RowPrePaint);
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.dataGridView1.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.dataGridView1_RowPrePaint);
             // 
             // ID
             // 
@@ -426,6 +412,7 @@ namespace CustomStreetManager
             // Go
             // 
             this.Go.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Go.Enabled = false;
             this.Go.Location = new System.Drawing.Point(681, 885);
             this.Go.Name = "Go";
             this.Go.Size = new System.Drawing.Size(673, 34);
@@ -471,8 +458,6 @@ namespace CustomStreetManager
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeIntroMenuAndMapBgmToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem patchToWiimmfiToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutCustomStreetMapManagerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;

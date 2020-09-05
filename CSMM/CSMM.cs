@@ -24,68 +24,37 @@ namespace CustomStreetManager
         public CSMM()
         {
             InitializeComponent();
-            if (!System.Windows.Forms.SystemInformation.TerminalServerSession)
+            if (!SystemInformation.TerminalServerSession)
             {
                 Type dgvType = dataGridView1.GetType();
-                PropertyInfo pi = dgvType.GetProperty("DoubleBuffered",
-                  BindingFlags.Instance | BindingFlags.NonPublic);
+                PropertyInfo pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
                 pi.SetValue(dataGridView1, true, null);
             }
         }
 
-        private void Go_Click(object sender, EventArgs e)
+        private void reset()
         {
-            // TODO
-            string ExtractDiscFileName = "";
-            string extractDiscBatFilePath = Path.Combine(Directory.GetCurrentDirectory(), ExtractDiscFileName);
-
-            ProgressBar instance = new ProgressBar();
-            instance.Show();
-
-            UpdateProgressWindow(instance, "Extracting disc...", 25);
-
-            if (File.Exists(setInputISOLocation.Text))
-            {
-                if (setOutputPathLabel.Text != "None")
-                {
-                    UpdateProgressWindow(instance, "Replacing maps...", 40);
-
-                    UpdateProgressWindow(instance, "Setting Options...", 70);
-
-                    UpdateProgressWindow(instance, "Finalizing changes...", 85);
-
-                    UpdateProgressWindow(instance, "Re-compiling disc...", 90);
-
-                    UpdateProgressWindow(instance, "Done!", 100);
-                }
-                else
-                {
-                    instance.SetProgressBarLabel("Error: The output file path cannot be blank!");
-                    instance.SetProgressBarValue(100);
-                }
-            }
-            else
-            {
-                instance.SetProgressBarLabel("Error: The source ISO could not be opened.");
-                instance.SetProgressBarValue(100);
-            }
+            fileSet = null;
+            mapDescriptors = null;
+            mainDol = null;
+            setInputISOLocation.Text = "None";
+            Go.Enabled = false;
         }
 
-        private static void UpdateProgressWindow(ProgressBar instance, string status, int amount)
+        private void Go_Click(object sender, EventArgs e)
         {
-            instance.SetProgressBarLabel(status);
-            instance.SetProgressBarValue(amount);
+            DialogResult dialogResult = MessageBox.Show("Proceeding will inject the imported map descriptors the input ISO/WBFS file. Please make sure to have a backup.", "Start Injection", MessageBoxButtons.OKCancel);
+            if (dialogResult == DialogResult.OK)
+            {
+                ProgressBar instance = new ProgressBar();
+                instance.Show();
+
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void aboutCustomStreetMapManagerToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            AboutPanel instance = new AboutPanel();
-            instance.Show();
         }
 
         private void SaveFileDialog(object sender, EventArgs e) //set output location button
@@ -114,10 +83,6 @@ namespace CustomStreetManager
             ProgressBar progressBar = new ProgressBar();
             progressBar.Show();
             progressBar.SetProgress(0, "Extract relevant files from iso/wbfs...");
-
-            fileSet = null;
-            mapDescriptors = null;
-            mainDol = null;
 
             if (setInputISOLocation.Text == "None")
             {
@@ -172,6 +137,7 @@ namespace CustomStreetManager
                 }
                 progressBar.SetProgress(80, "Populate UI...");
 
+                Go.Enabled = false;
                 BindingSource bs = new BindingSource();
                 bs.DataSource = mapDescriptors;
                 dataGridView1.DataSource = bs;
@@ -188,10 +154,7 @@ namespace CustomStreetManager
             }
             catch (Exception e2)
             {
-                fileSet = null;
-                mapDescriptors = null;
-                mainDol = null;
-                setInputISOLocation.Text = "None";
+                reset();
 
                 progressBar.SetProgressBarText(e2.Message);
                 progressBar.EnableButton();
@@ -454,6 +417,7 @@ namespace CustomStreetManager
                     progressBar.SetProgress(90, "Update UI...");
                     mapDescriptor.set(mapDescriptorImport);
                     mapDescriptor.Dirty = true;
+                    Go.Enabled = true;
                     updateDataGridData(null, null);
 
                     progressBar.SetProgress(100, "Done. Imported Files:");
