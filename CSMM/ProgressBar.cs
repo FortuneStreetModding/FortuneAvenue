@@ -17,14 +17,20 @@ namespace CustomStreetManager
             InitializeComponent();
         }
 
-        private void ProgressBar_Load(object sender, EventArgs e)
+        public void SetProgress(int num, string label)
         {
-
+            SetProgressBarLabel(label);
+            SetProgressBarValue(num);
         }
 
         public void SetProgressBarLabel(string text)
         {
             progressLabel.Text = text;
+        }
+
+        public void SetProgressBarText(string text)
+        {
+            textBox1.Text = text;
         }
 
         public void SetProgressBarValue(int num)
@@ -37,39 +43,18 @@ namespace CustomStreetManager
             else
             {
                 mapReplaceProgressBar.Value = num;
+                cancelButton.Enabled = true;
             }
         }
 
-        public void SetButtonToClose()
+        public void EnableButton()
         {
-            cancelButton.Text = "Close";
-        }
-
-        public void SetButtonToGoBack()
-        {
-            cancelButton.Text = "Go Back";
-        }
-
-        private void progressLabel_Click(object sender, EventArgs e)
-        {
-
+             cancelButton.Enabled = true;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
-            if (cancelButton.Text == "Go Back")
-            {
-                //I don't want to quit the app if there's an error, but I do want to remove the working directory folder.
-                if (Directory.Exists("..\\_working_directory\\"))
-                {
-                    Directory.Delete("..\\_working_directory\\");
-                }
-            }
-            else if (cancelButton.Text == "Close") 
-            {
-                Application.Exit();
-            }
         }
     }
 }

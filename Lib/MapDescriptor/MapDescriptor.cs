@@ -134,8 +134,8 @@ namespace FSEditor.MapDescriptor
                 InitialCash = board.BoardInfo.InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
-                    warning += "[" + ID + "]: FRB target amount is " + board.BoardInfo.TargetAmount + " but DOL target amount is " + TargetAmount + '\n';
-                    warning += "The DOL target amount will be used." + '\n';
+                    warning += "[" + ID + "]: FRB target amount is " + board.BoardInfo.TargetAmount + " but DOL target amount is " + TargetAmount + System.Environment.NewLine;
+                    warning += "The DOL target amount will be used." + System.Environment.NewLine;
                 }
                 LoopingMode = board.BoardInfo.GalaxyStatus;
                 // TODO: Check conformity with MapGalaxyParamAddr

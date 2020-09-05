@@ -18,7 +18,7 @@ namespace CustomStreetManager
     public partial class CSMM : Form
     {
         private FileSet fileSet;
-        private List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
+        private List<MapDescriptor> mapDescriptors;
 
         public CSMM()
         {
@@ -56,20 +56,17 @@ namespace CustomStreetManager
                     UpdateProgressWindow(instance, "Re-compiling disc...", 90);
 
                     UpdateProgressWindow(instance, "Done!", 100);
-                    instance.SetButtonToClose();
                 }
                 else
                 {
                     instance.SetProgressBarLabel("Error: The output file path cannot be blank!");
                     instance.SetProgressBarValue(100);
-                    instance.SetButtonToGoBack();
                 }
             }
             else
             {
                 instance.SetProgressBarLabel("Error: The source ISO could not be opened.");
                 instance.SetProgressBarValue(100);
-                instance.SetButtonToGoBack();
             }
         }
 
@@ -121,58 +118,84 @@ namespace CustomStreetManager
             {
                 string warnings = "";
 
-                fileSet = WitWrapper.extractFiles(openFileDialog1.FileName);
-                List<MainDolSection> sections = WitWrapper.readSections(fileSet.main_dol);
-                MainDol mainDol = new MainDol(sections);
-                setInputISOLocation.Text = openFileDialog1.FileName;
+                ProgressBar progressBar = new ProgressBar();
+                progressBar.Show();
+                progressBar.SetProgress(0,"Extract relevant files from iso/wbfs...");
 
-                using (var stream = File.OpenRead(fileSet.main_dol))
-                {
-                    MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
-                    mapDescriptors = mainDol.ReadMainDol(binReader);
-                    UI_Message en = new UI_Message(fileSet.ui_message_en_csv);
-                    UI_Message de = new UI_Message(fileSet.ui_message_de_csv);
-                    UI_Message fr = new UI_Message(fileSet.ui_message_fr_csv);
-                    UI_Message it = new UI_Message(fileSet.ui_message_it_csv);
-                    UI_Message es = new UI_Message(fileSet.ui_message_su_csv);
-                    UI_Message jp = new UI_Message(fileSet.ui_message_jp_csv);
-                    UI_Message uk = new UI_Message(fileSet.ui_message_uk_csv);
-                    foreach (MapDescriptor mapDescriptor in mapDescriptors)
-                    {
-                        mapDescriptor.Name_EN = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_DE = de.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_FR = fr.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_IT = it.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_SU = es.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_JP = jp.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_UK = uk.get(mapDescriptor.Name_MSG_ID);
-
-                        mapDescriptor.Desc_EN = en.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_DE = de.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_FR = fr.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_IT = it.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_SU = es.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_JP = jp.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_UK = uk.get(mapDescriptor.Desc_MSG_ID);
-
-                        warnings += mapDescriptor.ReadFrbFileInfo(fileSet.param_folder);
-                    }
-                }
-                if (!string.IsNullOrWhiteSpace(warnings))
-                {
-                    MessageBox.Show(warnings, "Warnings", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-                // Convert to DataTable.
-                //DataTable table = DataTableHelper.ToDataTable(mapDescriptors);
-                BindingSource bs = new BindingSource();
-                bs.DataSource = mapDescriptors;
-                dataGridView1.DataSource = bs;
-                checkBox1_CheckedChanged(null, null);
-                
-            }
-            else
-            {
+                fileSet = null;
+                mapDescriptors = null;
                 setInputISOLocation.Text = "None";
+
+                try { 
+
+                    fileSet = WitWrapper.extractFiles(openFileDialog1.FileName);
+
+                    progressBar.SetProgress(20, "Detect the sections in main.dol file...");
+                    List<MainDolSection> sections = WitWrapper.readSections(fileSet.main_dol);
+                    MainDol mainDol = new MainDol(sections);
+                    setInputISOLocation.Text = openFileDialog1.FileName;
+
+                    progressBar.SetProgress(40, "Read data from main.dol file...");
+                    using (var stream = File.OpenRead(fileSet.main_dol))
+                    {
+                        MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
+                        mapDescriptors = mainDol.ReadMainDol(binReader);
+
+                        progressBar.SetProgress(60, "Read localization files...");
+                        UI_Message en = new UI_Message(fileSet.ui_message_en_csv);
+                        UI_Message de = new UI_Message(fileSet.ui_message_de_csv);
+                        UI_Message fr = new UI_Message(fileSet.ui_message_fr_csv);
+                        UI_Message it = new UI_Message(fileSet.ui_message_it_csv);
+                        UI_Message es = new UI_Message(fileSet.ui_message_su_csv);
+                        UI_Message jp = new UI_Message(fileSet.ui_message_jp_csv);
+                        UI_Message uk = new UI_Message(fileSet.ui_message_uk_csv);
+                        foreach (MapDescriptor mapDescriptor in mapDescriptors)
+                        {
+                            mapDescriptor.Name_EN = en.get(mapDescriptor.Name_MSG_ID);
+                            mapDescriptor.Name_DE = de.get(mapDescriptor.Name_MSG_ID);
+                            mapDescriptor.Name_FR = fr.get(mapDescriptor.Name_MSG_ID);
+                            mapDescriptor.Name_IT = it.get(mapDescriptor.Name_MSG_ID);
+                            mapDescriptor.Name_SU = es.get(mapDescriptor.Name_MSG_ID);
+                            mapDescriptor.Name_JP = jp.get(mapDescriptor.Name_MSG_ID);
+                            mapDescriptor.Name_UK = uk.get(mapDescriptor.Name_MSG_ID);
+
+                            mapDescriptor.Desc_EN = en.get(mapDescriptor.Desc_MSG_ID);
+                            mapDescriptor.Desc_DE = de.get(mapDescriptor.Desc_MSG_ID);
+                            mapDescriptor.Desc_FR = fr.get(mapDescriptor.Desc_MSG_ID);
+                            mapDescriptor.Desc_IT = it.get(mapDescriptor.Desc_MSG_ID);
+                            mapDescriptor.Desc_SU = es.get(mapDescriptor.Desc_MSG_ID);
+                            mapDescriptor.Desc_JP = jp.get(mapDescriptor.Desc_MSG_ID);
+                            mapDescriptor.Desc_UK = uk.get(mapDescriptor.Desc_MSG_ID);
+
+                            warnings += mapDescriptor.ReadFrbFileInfo(fileSet.param_folder);
+                        }
+                    }
+                    progressBar.SetProgress(80, "Populate UI...");
+
+                    BindingSource bs = new BindingSource();
+                    bs.DataSource = mapDescriptors;
+                    dataGridView1.DataSource = bs;
+                    
+                    if (!string.IsNullOrWhiteSpace(warnings))
+                    {
+                        progressBar.SetProgress(100, "Loaded successfully. Warnings:");
+                        progressBar.SetProgressBarText(warnings);
+                    } 
+                    else
+                    {
+                        progressBar.Close();
+                    }
+                } 
+                catch(Exception e2)
+                {
+                    fileSet = null;
+                    mapDescriptors = null;
+                    setInputISOLocation.Text = "None";
+
+                    progressBar.SetProgressBarText(e2.Message);
+                    progressBar.EnableButton();
+                }
+                checkBox1_CheckedChanged(null, null);
             }
         }
 
@@ -194,14 +217,21 @@ namespace CustomStreetManager
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             BindingSource bs = dataGridView1.DataSource as BindingSource;
-            if (checkBox1.Checked)
+            if(mapDescriptors != null)
             {
-                bs.DataSource = mapDescriptors;
-            }
-            else
+                if (checkBox1.Checked)
+                {
+                    bs.DataSource = mapDescriptors;
+                }
+                else
+                {
+                    bs.DataSource = mapDescriptors.FindAll(md => md.ID >= 0 && md.ID < 18);
+                }
+            } else
             {
-                bs.DataSource = mapDescriptors.FindAll(md => md.ID >= 0 && md.ID < 18);
+                bs.DataSource = null;
             }
+
             dataGridView1.DataSource = bs;
         }
 
@@ -297,26 +327,41 @@ namespace CustomStreetManager
                             return;
                         }
                     }
-  
+
+                    ProgressBar progressBar = new ProgressBar();
+                    progressBar.Show();
+                    progressBar.SetProgress(0, "Generating Map Descriptor File...");
+
+                    string extractedFiles = "";
                     using (FileStream fs = File.Create(fileNameMd))
                     {
                         // byte[] content = Encoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(mapDescriptor.generateMapDescriptorFileContent()));
                         byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.generateMapDescriptorFileContent());
                         fs.Write(content, 0, content.Length);
                     }
+                    extractedFiles += fileNameMd + '\n';
+
+                    progressBar.SetProgress(50, "Copying frb files...");
+
                     File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile1 + ".frb"), fileNameFrb1);
+                    extractedFiles += fileNameFrb1 + '\n';
                     if (fileNameFrb2 != null)
                     {
                         File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile2 + ".frb"), fileNameFrb2);
+                        extractedFiles += fileNameFrb2 + '\n';
                     }
                     if (fileNameFrb3 != null)
                     {
                         File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile3 + ".frb"), fileNameFrb3);
+                        extractedFiles += fileNameFrb3 + '\n';
                     }
                     if (fileNameFrb4 != null)
                     {
                         File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile4 + ".frb"), fileNameFrb4);
+                        extractedFiles += fileNameFrb4 + '\n';
                     }
+                    progressBar.SetProgress(100, "Done");
+                    progressBar.SetProgressBarText(extractedFiles);
                 }
             }
         }
