@@ -12,6 +12,7 @@ namespace FSEditor.MapDescriptor
 {
     public class MapDescriptor
     {
+        public bool Dirty { get; set; }
         public UInt32 ID { get; set; }
         public UInt32 InitialCash { get; set; }
         public UInt32 TargetAmount { get; set; }
@@ -134,8 +135,8 @@ namespace FSEditor.MapDescriptor
                 InitialCash = board.BoardInfo.InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
-                    warning += "[" + ID + "]: FRB target amount is " + board.BoardInfo.TargetAmount + " but DOL target amount is " + TargetAmount + System.Environment.NewLine;
-                    warning += "The DOL target amount will be used." + System.Environment.NewLine;
+                    warning += "[" + ID + "]: FRB target amount is " + board.BoardInfo.TargetAmount + " but DOL target amount is " + TargetAmount + Environment.NewLine;
+                    warning += "The DOL target amount will be used." + Environment.NewLine;
                 }
                 LoopingMode = board.BoardInfo.GalaxyStatus;
                 // TODO: Check conformity with MapGalaxyParamAddr
@@ -188,6 +189,7 @@ namespace FSEditor.MapDescriptor
         {
             string[] lines = File.ReadAllLines(fileName);
             MapDescriptor mapDescriptor = new MapDescriptor();
+            mapDescriptor.InternalName = Path.GetFileNameWithoutExtension(fileName);
             if (lines[0].StartsWith("# "))
             {
                 mapDescriptor.Name_EN = lines[0].Replace("#", "").Trim();
@@ -274,6 +276,30 @@ namespace FSEditor.MapDescriptor
         {
             switch (keyValuePair.Key.Replace(" ", "").Replace("(", "").Replace(")", "").ToLower())
             {
+                case "tourbankruptcylimit":
+                    TourBankruptcyLimit = uint.Parse(keyValuePair.Value);
+                    break;
+                case "tourinitialcash":
+                    TourInitialCash = uint.Parse(keyValuePair.Value);
+                    break;
+                case "touropponent1":
+                    TourOpponent1 = (Character)Enum.Parse(typeof(Character), keyValuePair.Value.Replace(" ", ""), true);
+                    break;
+                case "touropponent2":
+                    TourOpponent2 = (Character)Enum.Parse(typeof(Character), keyValuePair.Value.Replace(" ", ""), true);
+                    break;
+                case "touropponent3":
+                    TourOpponent3 = (Character)Enum.Parse(typeof(Character), keyValuePair.Value.Replace(" ", ""), true);
+                    break;
+                case "tourclearrank":
+                    TourClearRank = uint.Parse(keyValuePair.Value);
+                    break;
+                case "tourdifficulty":
+                    TourDifficulty = uint.Parse(keyValuePair.Value);
+                    break;
+                case "tourgeneralplaytime":
+                    TourGeneralPlayTime = uint.Parse(keyValuePair.Value);
+                    break;
                 case "initialcash":
                     InitialCash = uint.Parse(keyValuePair.Value);
                     break;
@@ -290,29 +316,13 @@ namespace FSEditor.MapDescriptor
                     MaxDiceRoll = uint.Parse(keyValuePair.Value);
                     break;
                 case "loopingmode":
-                    MaxDiceRoll = uint.Parse(keyValuePair.Value);
+                    LoopingMode = (LoopingMode)Enum.Parse(typeof(LoopingMode), keyValuePair.Value.Replace(" ", ""), true);
                     break;
                 case "rules":
-                    switch (keyValuePair.Value.Replace(" ", "").ToLower())
-                    {
-                        case "standard":
-                            RuleSet = RuleSet.Standard;
-                            break;
-                        case "basic":
-                            RuleSet = RuleSet.Basic;
-                            break;
-                    }
+                    RuleSet = (RuleSet)Enum.Parse(typeof(RuleSet), keyValuePair.Value.Replace(" ", ""), true);
                     break;
                 case "theme":
-                    switch (keyValuePair.Value.Replace(" ", "").ToLower())
-                    {
-                        case "mario":
-                            Theme = BoardTheme.Mario;
-                            break;
-                        case "dragonquest":
-                            Theme = BoardTheme.DragonQuest;
-                            break;
-                    }
+                    Theme = (BoardTheme)Enum.Parse(typeof(BoardTheme), keyValuePair.Value.Replace(" ", ""), true);
                     break;
                 case "frbfilename1":
                     FrbFile1 = keyValuePair.Value;
@@ -422,16 +432,20 @@ namespace FSEditor.MapDescriptor
         {
             if (line.StartsWith("#"))
             {
-                string headingText = line.Replace("#", "").Trim();
-                if (headingText.Contains("Properties") || headingText.Contains("Configuration") || headingText.Contains("Localization"))
+                string headingText = line.Replace("#", "").ToLower().Trim();
+                if (headingText.Contains("properties") || headingText.Contains("configuration") || headingText.Contains("localization"))
                 {
                     return MDParserState.KeyValueTable;
                 }
-                if (headingText.Contains("Music"))
+                else if (headingText.Contains("music"))
                 {
                     return MDParserState.BGMTable;
                 }
-                if (headingText.Contains("Card"))
+                else if (headingText.Contains("background"))
+                {
+                    return MDParserState.BackgroundTable;
+                }
+                else if (headingText.Contains("card"))
                 {
                     return MDParserState.VentureCardTable;
                 }
@@ -439,7 +453,7 @@ namespace FSEditor.MapDescriptor
             return MDParserState.NoHeading;
         }
 
-        private void set(MapDescriptor mapDescriptor)
+        public void set(MapDescriptor mapDescriptor)
         {
             InitialCash = mapDescriptor.InitialCash;
             TargetAmount = mapDescriptor.TargetAmount;

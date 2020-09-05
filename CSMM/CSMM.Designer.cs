@@ -1,5 +1,7 @@
 ﻿
+using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace CustomStreetManager
 {
@@ -264,7 +266,7 @@ namespace CustomStreetManager
             this.checkBox1.TabIndex = 38;
             this.checkBox1.Text = "Show Unused";
             this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.updateDataGridData);
             // 
             // flowLayoutPanel3
             // 
@@ -306,6 +308,7 @@ namespace CustomStreetManager
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.Size = new System.Drawing.Size(1351, 836);
             this.dataGridView1.TabIndex = 45;
+            this.dataGridView1.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.dataGridView1_RowPrePaint);
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // ID
