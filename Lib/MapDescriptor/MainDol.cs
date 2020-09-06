@@ -13,6 +13,11 @@ namespace FSEditor.MapDescriptor
     {
         private readonly List<MainDolSection> sections;
 
+        public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON = 0x806b8df0;
+        public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_COLLOSUS = 0x8047d598;
+        public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_OBSERVATORY = 0x8047d5b4;
+        public static readonly UInt32 MAP_BGSEQUENCE_ADDR_MARIOSTADIUM = 0x80428968;
+
         public static readonly string KEYWORD_START_MAP_DEFAULTS_TABLE = "6e 5f 62 75 79 5f 6d 73 67 00 76 65 63 74 6f 72 20 6c 65 6e 67 74 68 20 65 72 72 6f 72 00 00 62 " +
             "61 73 69 63 5f 73 74 72 69 6e 67 3a 3a 72 65 73 65 72 76 65 20 6c 65 6e 67 74 68 5f 65 72 72 6f 72 00 62 61 73 69 63 5f 73 74 72 69 6e 67 3a 20 6f 75 74 5f " +
             "6f 66 5f 72 61 6e 67 65 00 62 61 73 69 63 5f 73 74 72 69 6e 67 3a 20 6c 65 6e 67 74 68 5f 65 72 72 6f 72 00";
@@ -58,11 +63,11 @@ namespace FSEditor.MapDescriptor
             byte[] buff = StreamUtil.ReadFully(binReader.BaseStream);
 
             byte[] pattern = HexUtil.HexStringToByteArray(KEYWORD_START_MAP_DEFAULTS_TABLE);
-            positionMapDefaultTable = Search(buff, pattern) + pattern.Length;
+            positionMapDefaultTable = search(buff, pattern) + pattern.Length;
             pattern = HexUtil.HexStringToByteArray(KEYWORD_START_MAP_DATA_TABLE);
-            positionMapDataTable = Search(buff, pattern) + pattern.Length;
+            positionMapDataTable = search(buff, pattern) + pattern.Length;
             pattern = HexUtil.HexStringToByteArray(KEYWORD_VENTURE_CARD_TABLE);
-            positionVentureCardTable = Search(buff, pattern) + pattern.Length;
+            positionVentureCardTable = search(buff, pattern) + pattern.Length;
         }
 
         private string resolveAddressToString(uint address, EndianBinaryReader binReader)
@@ -80,7 +85,7 @@ namespace FSEditor.MapDescriptor
             }
         }
 
-        public List<MapDescriptor> ReadMainDol(EndianBinaryReader binReader)
+        public List<MapDescriptor> readMainDol(EndianBinaryReader binReader)
         {
             findTablePositions(binReader);
 
@@ -89,37 +94,49 @@ namespace FSEditor.MapDescriptor
             for (int i = 0; i < 48; i++)
             {
                 MapDescriptor mapDescriptor = new MapDescriptor();
-                mapDescriptor.ReadMapDataFromStream(binReader);
+                mapDescriptor.readMapDataFromStream(binReader);
                 mapDescriptors.Add(mapDescriptor);
             }
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
+                mapDescriptor.InternalName = resolveAddressToString(mapDescriptor.InternalNameAddr, binReader);
                 mapDescriptor.Background = resolveAddressToString(mapDescriptor.BackgroundAddr, binReader);
                 mapDescriptor.FrbFile1 = resolveAddressToString(mapDescriptor.FrbFile1Addr, binReader);
                 mapDescriptor.FrbFile2 = resolveAddressToString(mapDescriptor.FrbFile2Addr, binReader);
                 mapDescriptor.FrbFile3 = resolveAddressToString(mapDescriptor.FrbFile3Addr, binReader);
                 mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, binReader);
-                mapDescriptor.InternalName = resolveAddressToString(mapDescriptor.InternalNameAddr, binReader);
+                mapDescriptor.readRotationOriginPoints(binReader, toFileAddress(mapDescriptor.MapSwitchParamAddr));
+                mapDescriptor.readLoopingModeParams(binReader, toFileAddress(mapDescriptor.LoopingModeParamAddr));
             }
-
             binReader.Seek(positionMapDefaultTable, SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.ReadMapDefaultsFromStream(binReader);
+                mapDescriptor.readMapDefaultsFromStream(binReader);
             }
 
             binReader.Seek(positionVentureCardTable, SeekOrigin.Begin);
             for (int i = 0; i < 42; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.ReadVentureCardTableFromStream(binReader);
+                mapDescriptor.readVentureCardTableFromStream(binReader);
             }
 
             return mapDescriptors;
         }
 
-        private int Search(byte[] src, byte[] pattern)
+        public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors)
+        {
+            stream.Seek(positionMapDataTable, SeekOrigin.Begin);
+            if(mapDescriptors.Count != 48)
+            {
+                throw new ArgumentException("length of map descriptor list is not 48.");
+            }
+            
+            return mapDescriptors;
+        }
+
+        private int search(byte[] src, byte[] pattern)
         {
             int c = src.Length - pattern.Length + 1;
             int j;

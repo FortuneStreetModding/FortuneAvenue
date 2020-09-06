@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ output encoding="utf-8"#>
+<#@ import namespace="FSEditor.FSData" #>
 
 # <#= md.Name_EN #>
 
@@ -110,19 +111,45 @@
 | <#= md.BGMID == 33?":o:":"   " #> |  33 |     0 | 01_BGM_TITLE             | Title Screen             |
 | <#= md.BGMID == 34?":o:":"   " #> |  34 |     5 | 05_BGM_MENU              | Menu                     |
 | <#= md.BGMID == 35?":o:":"   " #> |  35 |     3 | 04_BGM_SAVELOAD          | Save/Load Screen         |
-| <#= md.BGMID == 36?":o:":"   " #> |  36 |     4 | 04_BGM_SAVELOAD_old      | unused                   |
+| <#= md.BGMID == 36?":o:":"   " #> |  36 |     4 | 04_BGM_SAVELOAD_old      | Unused                   |
 | <#= md.BGMID == 37?":o:":"   " #> |  37 |     6 | 06_BGM_WIFI              | Wi-Fi                    |
 | <#= md.BGMID == 38?":o:":"   " #> |  38 |     3 | 04_BGM_SAVELOAD          | Unknown                  |
 | <#= md.BGMID == 39?":o:":"   " #> |  39 |     7 | 07_BGM_ENDING_M          | Credits                  |
 
 </details>
+<# if(md.SwitchRotationOriginPoints.Count > 0) { #>
+### Switch Rotation Animation Configuration
 
+<details>
+  <summary>Click to expand!</summary>
+
+| Switch Rotation Origin Points |           Value |
+| ----------------------------- | --------------- |
+<#     for(int i = 0; i < md.SwitchRotationOriginPoints.Count; i++) { 
+#><#=      String.Format("| {0,-29} | {1,15} |", "Rotation Origin Point "+ (i+1) +" X", md.SwitchRotationOriginPoints[i].X) #>
+<#=        String.Format("| {0,-29} | {1,15} |", "Rotation Origin Point "+ (i+1) +" Y", md.SwitchRotationOriginPoints[i].Y) #>
+<#     } #>
+</details>
+<# } if(md.LoopingMode != LoopingMode.None) { #>
+### Looping Mode Configuration
+
+<details>
+  <summary>Click to expand!</summary>
+
+| Looping Mode Configuration    |           Value |
+| ----------------------------- | --------------- |
+| Radius                        | <#= String.Format("{0,15}", md.LoopingModeRadius) #> |
+| Horizontal Padding            | <#= String.Format("{0,15}", md.LoopingModeHorizontalPadding) #> |
+| Vertical Square Count         | <#= String.Format("{0,15}", md.LoopingModeVerticalSquareCount) #> |
+
+</details>
+<# } #>
 ### Tour Configuration
 
 <details>
   <summary>Click to expand!</summary>
 
-| Tour Configuration     | Value           |
+| Tour Configuration     |           Value |
 | ---------------------- | --------------- |
 | Tour Bankruptcy Limit  | <#= String.Format("{0,15}", md.TourBankruptcyLimit) #> |
 | Tour Initial Cash      | <#= String.Format("{0,15}", md.TourInitialCash) #> |
@@ -162,134 +189,134 @@
 
 | ID  | On  | Description                                                                                                      |
 | --- | --- | ---------------------------------------------------------------------------------------------------------------- |
-|   1 | <#= md.Venture_Cards[  0] != 0?":o:":"   " #> | Adventurous turning point! You can choose which way to move on your next go, (player's name).                    |
-|   2 | <#= md.Venture_Cards[  1] != 0?":o:":"   " #> | Venture on! Roll the die again and move forward.                                                                 |
-|   3 | <#= md.Venture_Cards[  2] != 0?":o:":"   " #> | Venture through space! Zoom over to any non-venture, non-suit square you like!                                   |
-|   4 | <#= md.Venture_Cards[  3] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 40 times the number shown in gold coins from the player in 1st place!  |
-|   5 | <#= md.Venture_Cards[  4] != 0?":o:":"   " #> | Venture through space! Zoom over to any shop or vacant plot!                                                     |
-|   6 | <#= md.Venture_Cards[  5] != 0?":o:":"   " #> | Venture through space! Zoom over to any venture or suit square!                                                  |
-|   7 | <#= md.Venture_Cards[  6] != 0?":o:":"   " #> | Special bonus! Your shops all grow by 7%!                                                                        |
-|   8 | <#= md.Venture_Cards[  7] != 0?":o:":"   " #> | Venture on! Everyone's shop prices increase by 30%! Now roll the die and move again.                             |
-|   9 | <#= md.Venture_Cards[  8] != 0?":o:":"   " #> | Venture on! Everyone's shops close for the day! Now roll the die and move again.                                 |
-|  10 | <#= md.Venture_Cards[  9] != 0?":o:":"   " #> | Venture on! Everyone's shop prices cut in half! Now roll the die and move again.                                 |
-|  11 | <#= md.Venture_Cards[ 10] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 11 times the number shown in gold coins from all other players!        |
-|  12 | <#= md.Venture_Cards[ 11] != 0?":o:":"   " #> | Capital venture! You can invest capital in any of your shops.                                                    |
-|  13 | <#= md.Venture_Cards[ 12] != 0?":o:":"   " #> | Misadventure! The values of all your shops drop by 13%!                                                          |
-|  14 | <#= md.Venture_Cards[ 13] != 0?":o:":"   " #> | Misadventure! You give everyone 30G each!                                                                        |
-|  15 | <#= md.Venture_Cards[ 14] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 50 times the number shown in gold coins from the bank!                 |
-|  16 | <#= md.Venture_Cards[ 15] != 0?":o:":"   " #> | Random venture! Shops expand in three districts picked at random!                                                |
-|  17 | <#= md.Venture_Cards[ 16] != 0?":o:":"   " #> | Special bonus! You receive half of your salary!                                                                  |
-|  18 | <#= md.Venture_Cards[ 17] != 0?":o:":"   " #> | Misadventure! The bank is forcibly buying you out! You're compelled to sell a shop for only twice its value.     |
-|  19 | <#= md.Venture_Cards[ 18] != 0?":o:":"   " #> | Price hike venture! Your shop prices go up by 30% until your next turn.                                          |
-|  20 | <#= md.Venture_Cards[ 19] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 20%.                                                |
-|  21 | <#= md.Venture_Cards[ 20] != 0?":o:":"   " #> | Random venture! You receive 20 stocks in a district picked at random!                                            |
-|  22 | <#= md.Venture_Cards[ 21] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for twice its shop value.                                 |
-|  23 | <#= md.Venture_Cards[ 22] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 50%.                                                |
-|  24 | <#= md.Venture_Cards[ 23] != 0?":o:":"   " #> | Misadventure! The bank is forcibly buying you out! You're compelled to sell a shop for 200G more than its value. |
-|  25 | <#= md.Venture_Cards[ 24] != 0?":o:":"   " #> | Misadventure! Your shop prices halve until your next turn!                                                       |
-|  26 | <#= md.Venture_Cards[ 25] != 0?":o:":"   " #> | Lucky venture! You get a big commission until your next turn!                                                    |
-|  27 | <#= md.Venture_Cards[ 26] != 0?":o:":"   " #> | Special bonus! You receive 27 times the number of shops you own in gold coins from the bank!                     |
-|  28 | <#= md.Venture_Cards[ 27] != 0?":o:":"   " #> | Cameo adventure! A goodybag appears!                                                                             |
-|  29 | <#= md.Venture_Cards[ 28] != 0?":o:":"   " #> | Freebie! Take a Heart!                                                                                           |
-|  30 | <#= md.Venture_Cards[ 29] != 0?":o:":"   " #> | Venture on! All shops charge a 100G flat rate! Now roll the die and move again.                                  |
-|  31 | <#= md.Venture_Cards[ 30] != 0?":o:":"   " #> | Random venture! Shops expand by 10% in a district picked at random!                                              |
-|  32 | <#= md.Venture_Cards[ 31] != 0?":o:":"   " #> | Random venture! Shops expand by 20% in a district picked at random!                                              |
-|  33 | <#= md.Venture_Cards[ 32] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for three times its shop value.                           |
-|  34 | <#= md.Venture_Cards[ 33] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and your shops close for the day. Roll 2/4/6 and everyone else's shops close.        |
-|  35 | <#= md.Venture_Cards[ 34] != 0?":o:":"   " #> | Stock venture! You can sell stocks you own at 35% above the market value.                                        |
-|  36 | <#= md.Venture_Cards[ 35] != 0?":o:":"   " #> | Capital venture! You can pay 100G for the chance to invest in your shops.                                        |
-|  37 | <#= md.Venture_Cards[ 36] != 0?":o:":"   " #> | Random venture! Shops expand by 30% in a district picked at random!                                              |
-|  38 | <#= md.Venture_Cards[ 37] != 0?":o:":"   " #> | Stock venture! You can buy stocks in a district of your choice at 10% above the market value.                    |
-|  39 | <#= md.Venture_Cards[ 38] != 0?":o:":"   " #> | Suit venture! Buy a Suit Yourself card for 100G.                                                                 |
-|  40 | <#= md.Venture_Cards[ 39] != 0?":o:":"   " #> | Misadventure! You give away 10% of your ready cash to the player in last place!                                  |
-|  41 | <#= md.Venture_Cards[ 40] != 0?":o:":"   " #> | Misadventure! Stock prices fall by 10% in a district picked at random!                                           |
-|  42 | <#= md.Venture_Cards[ 41] != 0?":o:":"   " #> | Misadventure! Stock prices fall by 20% in a district picked at random!                                           |
-|  43 | <#= md.Venture_Cards[ 42] != 0?":o:":"   " #> | Misadventure! You pay an assets tax of two gold coins per unit of stock that you own!                            |
-|  44 | <#= md.Venture_Cards[ 43] != 0?":o:":"   " #> | Misadventure! Roll the die and pay 44 times the number in gold coins to the player in last place!                |
-|  45 | <#= md.Venture_Cards[ 44] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 to warp to a take-a-break square. Roll 2/4/6 to warp to the arcade.                  |
-|  46 | <#= md.Venture_Cards[ 45] != 0?":o:":"   " #> | Misadventure! You drop your wallet and lose 10% of your ready cash!                                              |
-|  47 | <#= md.Venture_Cards[ 46] != 0?":o:":"   " #> | Dicey adventure! Roll 2-6 to get all the suits. Roll 1 and lose all your suits.                                  |
-|  48 | <#= md.Venture_Cards[ 47] != 0?":o:":"   " #> | Misadventure! All shops in a district picked at random fall in value by 10%!                                     |
-|  49 | <#= md.Venture_Cards[ 48] != 0?":o:":"   " #> | Misadventure! All shops in a district picked at random fall in value by 20%!                                     |
-|  50 | <#= md.Venture_Cards[ 49] != 0?":o:":"   " #> | Venture on! Move forward the same number of squares again.                                                       |
-|  51 | <#= md.Venture_Cards[ 50] != 0?":o:":"   " #> | Venture on! Move forward 1 square more.                                                                          |
-|  52 | <#= md.Venture_Cards[ 51] != 0?":o:":"   " #> | Venture on! Move forward another 2 squares.                                                                      |
-|  53 | <#= md.Venture_Cards[ 52] != 0?":o:":"   " #> | Venture through space! Zoom over to the bank!                                                                    |
-|  54 | <#= md.Venture_Cards[ 53] != 0?":o:":"   " #> | Venture through space! Pay 100G to zoom straight to the bank!                                                    |
-|  55 | <#= md.Venture_Cards[ 54] != 0?":o:":"   " #> | Venture on! Roll the die again and move forward (with an invitation to browse thrown in!).                       |
-|  56 | <#= md.Venture_Cards[ 55] != 0?":o:":"   " #> | Venture on! Roll the die again and move forward (with a half-price special offer thrown in!).                    |
-|  57 | <#= md.Venture_Cards[ 56] != 0?":o:":"   " #> | Venture through space! Zoom to any square you like.                                                              |
-|  58 | <#= md.Venture_Cards[ 57] != 0?":o:":"   " #> | Venture through space! Pay 100G to zoom to any non-venture, non-suit square you like!                            |
-|  59 | <#= md.Venture_Cards[ 58] != 0?":o:":"   " #> | Stock venture! You can buy stocks in a district of your choice at 10% below the market value.                    |
-|  60 | <#= md.Venture_Cards[ 59] != 0?":o:":"   " #> | Random venture! Stock prices increase by 10% in a district picked at random!                                     |
-|  61 | <#= md.Venture_Cards[ 60] != 0?":o:":"   " #> | Special bonus! You receive a 10% dividend on your stocks!                                                        |
-|  62 | <#= md.Venture_Cards[ 61] != 0?":o:":"   " #> | Special bonus! You receive a 20% dividend on your stocks!                                                        |
-|  63 | <#= md.Venture_Cards[ 62] != 0?":o:":"   " #> | Random venture! Stock prices increase by 20% in a district picked at random!                                     |
-|  64 | <#= md.Venture_Cards[ 63] != 0?":o:":"   " #> | Random venture! Stock prices increase by 30% in a district picked at random!                                     |
-|  65 | <#= md.Venture_Cards[ 64] != 0?":o:":"   " #> | Forced buyout! You can buy a vacant plot or shop for five times its value, whether someone else owns it or not.  |
-|  66 | <#= md.Venture_Cards[ 65] != 0?":o:":"   " #> | Special bonus! You receive 10 of the most valuable stocks!                                                       |
-|  67 | <#= md.Venture_Cards[ 66] != 0?":o:":"   " #> | Stock venture! You can buy stocks in a district of your choice.                                                  |
-|  68 | <#= md.Venture_Cards[ 67] != 0?":o:":"   " #> | Special arcade adventure! You're invited to play Memory Block!                                                   |
-|  69 | <#= md.Venture_Cards[ 68] != 0?":o:":"   " #> | Stock venture! You can sell stocks you own at 20% above the market value.                                        |
-|  70 | <#= md.Venture_Cards[ 69] != 0?":o:":"   " #> | Special bonus! You get a sudden promotion and receive a salary! (You lose any suits you have.)                   |
-|  71 | <#= md.Venture_Cards[ 70] != 0?":o:":"   " #> | Capital venture! You can invest up to 200G of the bank's money in your shops.                                    |
-|  72 | <#= md.Venture_Cards[ 71] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 to take 20 times the number of your shops in gold coins. Roll 2/4/6 to pay the same. |
-|  73 | <#= md.Venture_Cards[ 72] != 0?":o:":"   " #> | Property venture! You can buy any unowned shop or vacant plot.                                                   |
-|  74 | <#= md.Venture_Cards[ 73] != 0?":o:":"   " #> | Misadventure! You are forced to auction one of your shops (with a starting price of twice the shop's value).     |
-|  75 | <#= md.Venture_Cards[ 74] != 0?":o:":"   " #> | Property venture! You can buy any unowned shop or vacant plot for twice its value.                               |
-|  76 | <#= md.Venture_Cards[ 75] != 0?":o:":"   " #> | Special arcade adventure! You're invited to play Round the Blocks!                                               |
-|  77 | <#= md.Venture_Cards[ 76] != 0?":o:":"   " #> | Freebie! Take five of each district's stocks.                                                                    |
-|  78 | <#= md.Venture_Cards[ 77] != 0?":o:":"   " #> | Property venture! You can buy any unowned shop or vacant plot for 200G more than its value.                      |
-|  79 | <#= md.Venture_Cards[ 78] != 0?":o:":"   " #> | Forced buyout! You can buy a vacant plot or shop for three times its value, whether someone else owns it or not. |
-|  80 | <#= md.Venture_Cards[ 79] != 0?":o:":"   " #> | Freebie! Take a Spade!                                                                                           |
-|  81 | <#= md.Venture_Cards[ 80] != 0?":o:":"   " #> | Misadventure! All other players can only move forward 1 on their next turn.                                      |
-|  82 | <#= md.Venture_Cards[ 81] != 0?":o:":"   " #> | Freebie! Take a Club!                                                                                            |
-|  83 | <#= md.Venture_Cards[ 82] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and warp to a random location. Roll 2/4/6 and everyone else warps.                   |
-|  84 | <#= md.Venture_Cards[ 83] != 0?":o:":"   " #> | Moneymaking venture! The winning player must pay you 10% of their ready cash!                                    |
-|  85 | <#= md.Venture_Cards[ 84] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 85 times the number shown in gold coins from the bank!                 |
-|  86 | <#= md.Venture_Cards[ 85] != 0?":o:":"   " #> | Moneymaking venture! Take 100G from all other players!                                                           |
-|  87 | <#= md.Venture_Cards[ 86] != 0?":o:":"   " #> | Venture on! Roll the special all-7s-and-8s die and move forward again.                                           |
-|  88 | <#= md.Venture_Cards[ 87] != 0?":o:":"   " #> | Misadventure! All other players swap places!                                                                     |
-|  89 | <#= md.Venture_Cards[ 88] != 0?":o:":"   " #> | Freebie! All players take a Suit Yourself card!                                                                  |
-|  90 | <#= md.Venture_Cards[ 89] != 0?":o:":"   " #> | Price hike venture! All shop prices go up by 30% until your next turn.                                           |
-|  91 | <#= md.Venture_Cards[ 90] != 0?":o:":"   " #> | Cameo adventure! A healslime appears!                                                                            |
-|  92 | <#= md.Venture_Cards[ 91] != 0?":o:":"   " #> | Cameo adventure! Lakitu appears!                                                                                 |
-|  93 | <#= md.Venture_Cards[ 92] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and your shops expand by 10%. Roll 2/4/6 and everyone else's shops expand by 5%.     |
-|  94 | <#= md.Venture_Cards[ 93] != 0?":o:":"   " #> | Freebie! Take a Diamond!                                                                                         |
-|  95 | <#= md.Venture_Cards[ 94] != 0?":o:":"   " #> | Misadventure! You throw an impromptu party. All other players come to your location!                             |
-|  96 | <#= md.Venture_Cards[ 95] != 0?":o:":"   " #> | Misadventure! All players scramble to another player's location!                                                 |
-|  97 | <#= md.Venture_Cards[ 96] != 0?":o:":"   " #> | Stock rise venture! Increase stock value by 20% in a district of your choice.                                    |
-|  98 | <#= md.Venture_Cards[ 97] != 0?":o:":"   " #> | Forced buyout! You can buy a vacant plot or shop for four times its value, whether someone else owns it or not.  |
-|  99 | <#= md.Venture_Cards[ 98] != 0?":o:":"   " #> | Freebie! What's inside...?                                                                                       |
-| 100 | <#= md.Venture_Cards[ 99] != 0?":o:":"   " #> | Freebie! Take a Suit Yourself card!                                                                              |
-| 101 | <#= md.Venture_Cards[100] != 0?":o:":"   " #> | Special bonus! Your shops all grow by 21%!                                                                       |
-| 102 | <#= md.Venture_Cards[101] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 33 times the number shown in gold coins from all other players!        |
-| 103 | <#= md.Venture_Cards[102] != 0?":o:":"   " #> | Misadventure! The values of all your shops drop by 25%!                                                          |
-| 104 | <#= md.Venture_Cards[103] != 0?":o:":"   " #> | Misadventure! You give everyone 80G each!                                                                        |
-| 105 | <#= md.Venture_Cards[104] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get the number shown x your level x 40G from the bank!                     |
-| 106 | <#= md.Venture_Cards[105] != 0?":o:":"   " #> | Freebie! Roll the die and get half the number shown of Suit Yourself cards! (Decimals will be rounded down.)     |
-| 107 | <#= md.Venture_Cards[106] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 30%.                                                |
-| 108 | <#= md.Venture_Cards[107] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for four times its shop value.                            |
-| 109 | <#= md.Venture_Cards[108] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 75%.                                                |
-| 110 | <#= md.Venture_Cards[109] != 0?":o:":"   " #> | Special bonus! You receive 77 times the number of shops you own in gold coins from the bank!                     |
-| 111 | <#= md.Venture_Cards[110] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for 500G more than its shop value.                        |
-| 112 | <#= md.Venture_Cards[111] != 0?":o:":"   " #> | Special bonus! You receive 100 times the number of shops you own in gold coins!                                  |
-| 113 | <#= md.Venture_Cards[112] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get the number shown x your level x 20G from the bank!                     |
-| 114 | <#= md.Venture_Cards[113] != 0?":o:":"   " #> | Moneymaking venture! Take your level times 40G from all other players!                                           |
-| 115 | <#= md.Venture_Cards[114] != 0?":o:":"   " #> | Misadventure! All other players can only move forward 7 on their next turn.                                      |
-| 116 | <#= md.Venture_Cards[115] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 60 times the number shown in gold coins from the player in 1st place!  |
-| 117 | <#= md.Venture_Cards[116] != 0?":o:":"   " #> | Adventurous turning point! Everyone gets to choose which way to move on their next go.                           |
-| 118 | <#= md.Venture_Cards[117] != 0?":o:":"   " #> | Lucky venture! You get a really big commission until your next turn!                                             |
-| 119 | <#= md.Venture_Cards[118] != 0?":o:":"   " #> | Misadventure! You give 20% of your ready cash to the player in last place!                                       |
-| 120 | <#= md.Venture_Cards[119] != 0?":o:":"   " #> | Misadventure! You drop your wallet and lose 20% of your ready cash!                                              |
-| 121 | <#= md.Venture_Cards[120] != 0?":o:":"   " #> | Capital venture! You can invest up to 400G of the bank's money in your shops.                                    |
-| 122 | <#= md.Venture_Cards[121] != 0?":o:":"   " #> | Moneymaking venture! The winning player must pay you 20% of their ready cash!                                    |
-| 123 | <#= md.Venture_Cards[122] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and your shops expand by 20%. Roll 2/4/6 and everyone else's shops expand by 5%.     |
-| 124 | <#= md.Venture_Cards[123] != 0?":o:":"   " #> | Suit venture! Buy a Suit Yourself card for 50G.                                                                  |
-| 125 | <#= md.Venture_Cards[124] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 to warp to a boon square. Roll 2/4/6 to warp to the arcade.                          |
-| 126 | <#= md.Venture_Cards[125] != 0?":o:":"   " #> | Revaluation venture! Roll the die and expand your shops by 2% for each number.                                   |
-| 127 | <#= md.Venture_Cards[126] != 0?":o:":"   " #> | Special arcade adventure! You're invited to play Round the Blocks and Memory Block!                              |
-| 128 | <#= md.Venture_Cards[127] != 0?":o:":"   " #> | Special bonus! You receive 55 times the number of shops you own in gold coins from the bank!                     |
+|   1 | <#= md.VentureCard[  0] != 0?":o:":"   " #> | Adventurous turning point! You can choose which way to move on your next go, (player's name).                    |
+|   2 | <#= md.VentureCard[  1] != 0?":o:":"   " #> | Venture on! Roll the die again and move forward.                                                                 |
+|   3 | <#= md.VentureCard[  2] != 0?":o:":"   " #> | Venture through space! Zoom over to any non-venture, non-suit square you like!                                   |
+|   4 | <#= md.VentureCard[  3] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 40 times the number shown in gold coins from the player in 1st place!  |
+|   5 | <#= md.VentureCard[  4] != 0?":o:":"   " #> | Venture through space! Zoom over to any shop or vacant plot!                                                     |
+|   6 | <#= md.VentureCard[  5] != 0?":o:":"   " #> | Venture through space! Zoom over to any venture or suit square!                                                  |
+|   7 | <#= md.VentureCard[  6] != 0?":o:":"   " #> | Special bonus! Your shops all grow by 7%!                                                                        |
+|   8 | <#= md.VentureCard[  7] != 0?":o:":"   " #> | Venture on! Everyone's shop prices increase by 30%! Now roll the die and move again.                             |
+|   9 | <#= md.VentureCard[  8] != 0?":o:":"   " #> | Venture on! Everyone's shops close for the day! Now roll the die and move again.                                 |
+|  10 | <#= md.VentureCard[  9] != 0?":o:":"   " #> | Venture on! Everyone's shop prices cut in half! Now roll the die and move again.                                 |
+|  11 | <#= md.VentureCard[ 10] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 11 times the number shown in gold coins from all other players!        |
+|  12 | <#= md.VentureCard[ 11] != 0?":o:":"   " #> | Capital venture! You can invest capital in any of your shops.                                                    |
+|  13 | <#= md.VentureCard[ 12] != 0?":o:":"   " #> | Misadventure! The values of all your shops drop by 13%!                                                          |
+|  14 | <#= md.VentureCard[ 13] != 0?":o:":"   " #> | Misadventure! You give everyone 30G each!                                                                        |
+|  15 | <#= md.VentureCard[ 14] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 50 times the number shown in gold coins from the bank!                 |
+|  16 | <#= md.VentureCard[ 15] != 0?":o:":"   " #> | Random venture! Shops expand in three districts picked at random!                                                |
+|  17 | <#= md.VentureCard[ 16] != 0?":o:":"   " #> | Special bonus! You receive half of your salary!                                                                  |
+|  18 | <#= md.VentureCard[ 17] != 0?":o:":"   " #> | Misadventure! The bank is forcibly buying you out! You're compelled to sell a shop for only twice its value.     |
+|  19 | <#= md.VentureCard[ 18] != 0?":o:":"   " #> | Price hike venture! Your shop prices go up by 30% until your next turn.                                          |
+|  20 | <#= md.VentureCard[ 19] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 20%.                                                |
+|  21 | <#= md.VentureCard[ 20] != 0?":o:":"   " #> | Random venture! You receive 20 stocks in a district picked at random!                                            |
+|  22 | <#= md.VentureCard[ 21] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for twice its shop value.                                 |
+|  23 | <#= md.VentureCard[ 22] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 50%.                                                |
+|  24 | <#= md.VentureCard[ 23] != 0?":o:":"   " #> | Misadventure! The bank is forcibly buying you out! You're compelled to sell a shop for 200G more than its value. |
+|  25 | <#= md.VentureCard[ 24] != 0?":o:":"   " #> | Misadventure! Your shop prices halve until your next turn!                                                       |
+|  26 | <#= md.VentureCard[ 25] != 0?":o:":"   " #> | Lucky venture! You get a big commission until your next turn!                                                    |
+|  27 | <#= md.VentureCard[ 26] != 0?":o:":"   " #> | Special bonus! You receive 27 times the number of shops you own in gold coins from the bank!                     |
+|  28 | <#= md.VentureCard[ 27] != 0?":o:":"   " #> | Cameo adventure! A goodybag appears!                                                                             |
+|  29 | <#= md.VentureCard[ 28] != 0?":o:":"   " #> | Freebie! Take a Heart!                                                                                           |
+|  30 | <#= md.VentureCard[ 29] != 0?":o:":"   " #> | Venture on! All shops charge a 100G flat rate! Now roll the die and move again.                                  |
+|  31 | <#= md.VentureCard[ 30] != 0?":o:":"   " #> | Random venture! Shops expand by 10% in a district picked at random!                                              |
+|  32 | <#= md.VentureCard[ 31] != 0?":o:":"   " #> | Random venture! Shops expand by 20% in a district picked at random!                                              |
+|  33 | <#= md.VentureCard[ 32] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for three times its shop value.                           |
+|  34 | <#= md.VentureCard[ 33] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and your shops close for the day. Roll 2/4/6 and everyone else's shops close.        |
+|  35 | <#= md.VentureCard[ 34] != 0?":o:":"   " #> | Stock venture! You can sell stocks you own at 35% above the market value.                                        |
+|  36 | <#= md.VentureCard[ 35] != 0?":o:":"   " #> | Capital venture! You can pay 100G for the chance to invest in your shops.                                        |
+|  37 | <#= md.VentureCard[ 36] != 0?":o:":"   " #> | Random venture! Shops expand by 30% in a district picked at random!                                              |
+|  38 | <#= md.VentureCard[ 37] != 0?":o:":"   " #> | Stock venture! You can buy stocks in a district of your choice at 10% above the market value.                    |
+|  39 | <#= md.VentureCard[ 38] != 0?":o:":"   " #> | Suit venture! Buy a Suit Yourself card for 100G.                                                                 |
+|  40 | <#= md.VentureCard[ 39] != 0?":o:":"   " #> | Misadventure! You give away 10% of your ready cash to the player in last place!                                  |
+|  41 | <#= md.VentureCard[ 40] != 0?":o:":"   " #> | Misadventure! Stock prices fall by 10% in a district picked at random!                                           |
+|  42 | <#= md.VentureCard[ 41] != 0?":o:":"   " #> | Misadventure! Stock prices fall by 20% in a district picked at random!                                           |
+|  43 | <#= md.VentureCard[ 42] != 0?":o:":"   " #> | Misadventure! You pay an assets tax of two gold coins per unit of stock that you own!                            |
+|  44 | <#= md.VentureCard[ 43] != 0?":o:":"   " #> | Misadventure! Roll the die and pay 44 times the number in gold coins to the player in last place!                |
+|  45 | <#= md.VentureCard[ 44] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 to warp to a take-a-break square. Roll 2/4/6 to warp to the arcade.                  |
+|  46 | <#= md.VentureCard[ 45] != 0?":o:":"   " #> | Misadventure! You drop your wallet and lose 10% of your ready cash!                                              |
+|  47 | <#= md.VentureCard[ 46] != 0?":o:":"   " #> | Dicey adventure! Roll 2-6 to get all the suits. Roll 1 and lose all your suits.                                  |
+|  48 | <#= md.VentureCard[ 47] != 0?":o:":"   " #> | Misadventure! All shops in a district picked at random fall in value by 10%!                                     |
+|  49 | <#= md.VentureCard[ 48] != 0?":o:":"   " #> | Misadventure! All shops in a district picked at random fall in value by 20%!                                     |
+|  50 | <#= md.VentureCard[ 49] != 0?":o:":"   " #> | Venture on! Move forward the same number of squares again.                                                       |
+|  51 | <#= md.VentureCard[ 50] != 0?":o:":"   " #> | Venture on! Move forward 1 square more.                                                                          |
+|  52 | <#= md.VentureCard[ 51] != 0?":o:":"   " #> | Venture on! Move forward another 2 squares.                                                                      |
+|  53 | <#= md.VentureCard[ 52] != 0?":o:":"   " #> | Venture through space! Zoom over to the bank!                                                                    |
+|  54 | <#= md.VentureCard[ 53] != 0?":o:":"   " #> | Venture through space! Pay 100G to zoom straight to the bank!                                                    |
+|  55 | <#= md.VentureCard[ 54] != 0?":o:":"   " #> | Venture on! Roll the die again and move forward (with an invitation to browse thrown in!).                       |
+|  56 | <#= md.VentureCard[ 55] != 0?":o:":"   " #> | Venture on! Roll the die again and move forward (with a half-price special offer thrown in!).                    |
+|  57 | <#= md.VentureCard[ 56] != 0?":o:":"   " #> | Venture through space! Zoom to any square you like.                                                              |
+|  58 | <#= md.VentureCard[ 57] != 0?":o:":"   " #> | Venture through space! Pay 100G to zoom to any non-venture, non-suit square you like!                            |
+|  59 | <#= md.VentureCard[ 58] != 0?":o:":"   " #> | Stock venture! You can buy stocks in a district of your choice at 10% below the market value.                    |
+|  60 | <#= md.VentureCard[ 59] != 0?":o:":"   " #> | Random venture! Stock prices increase by 10% in a district picked at random!                                     |
+|  61 | <#= md.VentureCard[ 60] != 0?":o:":"   " #> | Special bonus! You receive a 10% dividend on your stocks!                                                        |
+|  62 | <#= md.VentureCard[ 61] != 0?":o:":"   " #> | Special bonus! You receive a 20% dividend on your stocks!                                                        |
+|  63 | <#= md.VentureCard[ 62] != 0?":o:":"   " #> | Random venture! Stock prices increase by 20% in a district picked at random!                                     |
+|  64 | <#= md.VentureCard[ 63] != 0?":o:":"   " #> | Random venture! Stock prices increase by 30% in a district picked at random!                                     |
+|  65 | <#= md.VentureCard[ 64] != 0?":o:":"   " #> | Forced buyout! You can buy a vacant plot or shop for five times its value, whether someone else owns it or not.  |
+|  66 | <#= md.VentureCard[ 65] != 0?":o:":"   " #> | Special bonus! You receive 10 of the most valuable stocks!                                                       |
+|  67 | <#= md.VentureCard[ 66] != 0?":o:":"   " #> | Stock venture! You can buy stocks in a district of your choice.                                                  |
+|  68 | <#= md.VentureCard[ 67] != 0?":o:":"   " #> | Special arcade adventure! You're invited to play Memory Block!                                                   |
+|  69 | <#= md.VentureCard[ 68] != 0?":o:":"   " #> | Stock venture! You can sell stocks you own at 20% above the market value.                                        |
+|  70 | <#= md.VentureCard[ 69] != 0?":o:":"   " #> | Special bonus! You get a sudden promotion and receive a salary! (You lose any suits you have.)                   |
+|  71 | <#= md.VentureCard[ 70] != 0?":o:":"   " #> | Capital venture! You can invest up to 200G of the bank's money in your shops.                                    |
+|  72 | <#= md.VentureCard[ 71] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 to take 20 times the number of your shops in gold coins. Roll 2/4/6 to pay the same. |
+|  73 | <#= md.VentureCard[ 72] != 0?":o:":"   " #> | Property venture! You can buy any unowned shop or vacant plot.                                                   |
+|  74 | <#= md.VentureCard[ 73] != 0?":o:":"   " #> | Misadventure! You are forced to auction one of your shops (with a starting price of twice the shop's value).     |
+|  75 | <#= md.VentureCard[ 74] != 0?":o:":"   " #> | Property venture! You can buy any unowned shop or vacant plot for twice its value.                               |
+|  76 | <#= md.VentureCard[ 75] != 0?":o:":"   " #> | Special arcade adventure! You're invited to play Round the Blocks!                                               |
+|  77 | <#= md.VentureCard[ 76] != 0?":o:":"   " #> | Freebie! Take five of each district's stocks.                                                                    |
+|  78 | <#= md.VentureCard[ 77] != 0?":o:":"   " #> | Property venture! You can buy any unowned shop or vacant plot for 200G more than its value.                      |
+|  79 | <#= md.VentureCard[ 78] != 0?":o:":"   " #> | Forced buyout! You can buy a vacant plot or shop for three times its value, whether someone else owns it or not. |
+|  80 | <#= md.VentureCard[ 79] != 0?":o:":"   " #> | Freebie! Take a Spade!                                                                                           |
+|  81 | <#= md.VentureCard[ 80] != 0?":o:":"   " #> | Misadventure! All other players can only move forward 1 on their next turn.                                      |
+|  82 | <#= md.VentureCard[ 81] != 0?":o:":"   " #> | Freebie! Take a Club!                                                                                            |
+|  83 | <#= md.VentureCard[ 82] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and warp to a random location. Roll 2/4/6 and everyone else warps.                   |
+|  84 | <#= md.VentureCard[ 83] != 0?":o:":"   " #> | Moneymaking venture! The winning player must pay you 10% of their ready cash!                                    |
+|  85 | <#= md.VentureCard[ 84] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 85 times the number shown in gold coins from the bank!                 |
+|  86 | <#= md.VentureCard[ 85] != 0?":o:":"   " #> | Moneymaking venture! Take 100G from all other players!                                                           |
+|  87 | <#= md.VentureCard[ 86] != 0?":o:":"   " #> | Venture on! Roll the special all-7s-and-8s die and move forward again.                                           |
+|  88 | <#= md.VentureCard[ 87] != 0?":o:":"   " #> | Misadventure! All other players swap places!                                                                     |
+|  89 | <#= md.VentureCard[ 88] != 0?":o:":"   " #> | Freebie! All players take a Suit Yourself card!                                                                  |
+|  90 | <#= md.VentureCard[ 89] != 0?":o:":"   " #> | Price hike venture! All shop prices go up by 30% until your next turn.                                           |
+|  91 | <#= md.VentureCard[ 90] != 0?":o:":"   " #> | Cameo adventure! A healslime appears!                                                                            |
+|  92 | <#= md.VentureCard[ 91] != 0?":o:":"   " #> | Cameo adventure! Lakitu appears!                                                                                 |
+|  93 | <#= md.VentureCard[ 92] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and your shops expand by 10%. Roll 2/4/6 and everyone else's shops expand by 5%.     |
+|  94 | <#= md.VentureCard[ 93] != 0?":o:":"   " #> | Freebie! Take a Diamond!                                                                                         |
+|  95 | <#= md.VentureCard[ 94] != 0?":o:":"   " #> | Misadventure! You throw an impromptu party. All other players come to your location!                             |
+|  96 | <#= md.VentureCard[ 95] != 0?":o:":"   " #> | Misadventure! All players scramble to another player's location!                                                 |
+|  97 | <#= md.VentureCard[ 96] != 0?":o:":"   " #> | Stock rise venture! Increase stock value by 20% in a district of your choice.                                    |
+|  98 | <#= md.VentureCard[ 97] != 0?":o:":"   " #> | Forced buyout! You can buy a vacant plot or shop for four times its value, whether someone else owns it or not.  |
+|  99 | <#= md.VentureCard[ 98] != 0?":o:":"   " #> | Freebie! What's inside...?                                                                                       |
+| 100 | <#= md.VentureCard[ 99] != 0?":o:":"   " #> | Freebie! Take a Suit Yourself card!                                                                              |
+| 101 | <#= md.VentureCard[100] != 0?":o:":"   " #> | Special bonus! Your shops all grow by 21%!                                                                       |
+| 102 | <#= md.VentureCard[101] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 33 times the number shown in gold coins from all other players!        |
+| 103 | <#= md.VentureCard[102] != 0?":o:":"   " #> | Misadventure! The values of all your shops drop by 25%!                                                          |
+| 104 | <#= md.VentureCard[103] != 0?":o:":"   " #> | Misadventure! You give everyone 80G each!                                                                        |
+| 105 | <#= md.VentureCard[104] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get the number shown x your level x 40G from the bank!                     |
+| 106 | <#= md.VentureCard[105] != 0?":o:":"   " #> | Freebie! Roll the die and get half the number shown of Suit Yourself cards! (Decimals will be rounded down.)     |
+| 107 | <#= md.VentureCard[106] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 30%.                                                |
+| 108 | <#= md.VentureCard[107] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for four times its shop value.                            |
+| 109 | <#= md.VentureCard[108] != 0?":o:":"   " #> | Revaluation venture! You can expand any one of your shops by 75%.                                                |
+| 110 | <#= md.VentureCard[109] != 0?":o:":"   " #> | Special bonus! You receive 77 times the number of shops you own in gold coins from the bank!                     |
+| 111 | <#= md.VentureCard[110] != 0?":o:":"   " #> | Cashback venture! You can sell a shop back to the bank for 500G more than its shop value.                        |
+| 112 | <#= md.VentureCard[111] != 0?":o:":"   " #> | Special bonus! You receive 100 times the number of shops you own in gold coins!                                  |
+| 113 | <#= md.VentureCard[112] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get the number shown x your level x 20G from the bank!                     |
+| 114 | <#= md.VentureCard[113] != 0?":o:":"   " #> | Moneymaking venture! Take your level times 40G from all other players!                                           |
+| 115 | <#= md.VentureCard[114] != 0?":o:":"   " #> | Misadventure! All other players can only move forward 7 on their next turn.                                      |
+| 116 | <#= md.VentureCard[115] != 0?":o:":"   " #> | Moneymaking venture! Roll the die and get 60 times the number shown in gold coins from the player in 1st place!  |
+| 117 | <#= md.VentureCard[116] != 0?":o:":"   " #> | Adventurous turning point! Everyone gets to choose which way to move on their next go.                           |
+| 118 | <#= md.VentureCard[117] != 0?":o:":"   " #> | Lucky venture! You get a really big commission until your next turn!                                             |
+| 119 | <#= md.VentureCard[118] != 0?":o:":"   " #> | Misadventure! You give 20% of your ready cash to the player in last place!                                       |
+| 120 | <#= md.VentureCard[119] != 0?":o:":"   " #> | Misadventure! You drop your wallet and lose 20% of your ready cash!                                              |
+| 121 | <#= md.VentureCard[120] != 0?":o:":"   " #> | Capital venture! You can invest up to 400G of the bank's money in your shops.                                    |
+| 122 | <#= md.VentureCard[121] != 0?":o:":"   " #> | Moneymaking venture! The winning player must pay you 20% of their ready cash!                                    |
+| 123 | <#= md.VentureCard[122] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 and your shops expand by 20%. Roll 2/4/6 and everyone else's shops expand by 5%.     |
+| 124 | <#= md.VentureCard[123] != 0?":o:":"   " #> | Suit venture! Buy a Suit Yourself card for 50G.                                                                  |
+| 125 | <#= md.VentureCard[124] != 0?":o:":"   " #> | Dicey adventure! Roll 1/3/5 to warp to a boon square. Roll 2/4/6 to warp to the arcade.                          |
+| 126 | <#= md.VentureCard[125] != 0?":o:":"   " #> | Revaluation venture! Roll the die and expand your shops by 2% for each number.                                   |
+| 127 | <#= md.VentureCard[126] != 0?":o:":"   " #> | Special arcade adventure! You're invited to play Round the Blocks and Memory Block!                              |
+| 128 | <#= md.VentureCard[127] != 0?":o:":"   " #> | Special bonus! You receive 55 times the number of shops you own in gold coins from the bank!                     |
 
 </details>
 

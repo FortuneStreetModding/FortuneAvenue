@@ -7,6 +7,7 @@ using System.IO;
 using MiscUtil.IO;
 using System.ComponentModel;
 using MiscUtil.Conversion;
+using System.Text.RegularExpressions;
 
 namespace FSEditor.MapDescriptor
 {
@@ -18,16 +19,22 @@ namespace FSEditor.MapDescriptor
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
         public RuleSet RuleSet { get; set; }
+        public long InternalNameAddrSeek { get; set; }
         public UInt32 InternalNameAddr { get; set; }
         public string InternalName { get; set; }
+        public long FrbFile1AddrSeek { get; set; }
         public UInt32 FrbFile1Addr { get; set; }
         public string FrbFile1 { get; set; }
+        public long FrbFile2AddrSeek { get; set; }
         public UInt32 FrbFile2Addr { get; set; }
         public string FrbFile2 { get; set; }
+        public long FrbFile3AddrSeek { get; set; }
         public UInt32 FrbFile3Addr { get; set; }
         public string FrbFile3 { get; set; }
+        public long FrbFile4AddrSeek { get; set; }
         public UInt32 FrbFile4Addr { get; set; }
         public string FrbFile4 { get; set; }
+        public long BackgroundAddrSeek { get; set; }
         public UInt32 BackgroundAddr { get; set; }
         public string Background { get; set; }
         public UInt32 BGMID { get; set; }
@@ -47,12 +54,20 @@ namespace FSEditor.MapDescriptor
         public string Desc_JP { get; set; }
         public string Desc_SU { get; set; }
         public string Desc_UK { get; set; }
-        public byte[] Venture_Cards { get; private set; }
-        public int Venture_Card_Count { get; private set; }
+        public byte[] VentureCard { get; private set; }
+        public int VentureCardActiveCount { get; private set; }
+        public long MapSwitchParamAddrSeek { get; set; }
+        public UInt32 MapSwitchParamAddr { get; set; }
+        public Dictionary<int, OriginPoint> SwitchRotationOriginPoints { get; private set; }
+        public LoopingMode LoopingMode { get; set; }
+        public long LoopingModeParamAddrSeek { get; set; }
+        public UInt32 LoopingModeParamAddr { get; set; }
+        public Single LoopingModeRadius { get; set; }
+        public Single LoopingModeHorizontalPadding { get; set; }
+        public Single LoopingModeVerticalSquareCount { get; set; }
         public UInt32 BaseSalary { get; set; }
         public UInt32 SalaryIncrement { get; set; }
         public UInt32 MaxDiceRoll { get; set; }
-        public LoopingMode LoopingMode { get; set; }
         public UInt32 TourBankruptcyLimit { get; set; }
         public UInt32 TourInitialCash { get; set; }
         public Character TourOpponent1 { get; set; }
@@ -64,10 +79,72 @@ namespace FSEditor.MapDescriptor
 
         public MapDescriptor()
         {
-            Venture_Cards = new byte[130];
+            VentureCard = new byte[130];
+            SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
 
-        public void ReadMapDataFromStream(EndianBinaryReader stream)
+        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress)
+        {
+            SwitchRotationOriginPoints.Clear();
+            // Special case handling: in the original game these values are initialized at run time only. So we need to hardcode them:
+            if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON) // magmageddon
+            {
+                // no points
+            }
+            else if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_COLLOSUS) // collosus
+            {
+                SwitchRotationOriginPoints[0] = new OriginPoint(-288, -32);
+                SwitchRotationOriginPoints[1] = new OriginPoint(288, -32);
+            }
+            else if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_OBSERVATORY) // observatory
+            {
+                SwitchRotationOriginPoints[0] = new OriginPoint(0, 0);
+            }
+            else if (fileAddress >= 0)
+            {
+                stream.Seek(fileAddress, SeekOrigin.Begin);
+                var originPointCount = stream.ReadUInt32();
+                for (int i = 0; i < originPointCount; i++)
+                {
+                    OriginPoint point = new OriginPoint();
+                    point.X = stream.ReadSingle();
+                    var z = stream.ReadSingle(); // ignore Z value
+                    point.Y = stream.ReadSingle();
+                    SwitchRotationOriginPoints[i] = point;
+                }
+            }
+
+        }
+        public void readLoopingModeParams(EndianBinaryReader stream, int fileAddress)
+        {
+            if (fileAddress >= 0)
+            {
+                stream.Seek(fileAddress, SeekOrigin.Begin);
+                LoopingModeRadius = stream.ReadSingle();
+                LoopingModeHorizontalPadding = stream.ReadSingle();
+                LoopingModeVerticalSquareCount = stream.ReadSingle();
+            }
+        }
+
+        public void writeSwitchRotationOriginPoints(EndianBinaryWriter stream)
+        {
+            stream.Write((UInt32)SwitchRotationOriginPoints.Count);
+            for (int i = 0; i <= SwitchRotationOriginPoints.Count; i++)
+            {
+                stream.Write(SwitchRotationOriginPoints[i].X);
+                stream.Write(0);
+                stream.Write(SwitchRotationOriginPoints[i].Y);
+            }
+        }
+
+        public void writeLoopingModeParams(EndianBinaryWriter stream)
+        {
+            stream.Write(LoopingModeRadius);
+            stream.Write(LoopingModeHorizontalPadding);
+            stream.Write(LoopingModeVerticalSquareCount);
+        }
+
+        public void readMapDataFromStream(EndianBinaryReader stream)
         {
             Name_MSG_ID = stream.ReadUInt32();
             BGMID = stream.ReadUInt32();
@@ -79,10 +156,10 @@ namespace FSEditor.MapDescriptor
             FrbFile2Addr = stream.ReadUInt32();
             FrbFile3Addr = stream.ReadUInt32();
             FrbFile4Addr = stream.ReadUInt32();
-            // todo 
-            UInt32 MapSwitchParamAddr = stream.ReadUInt32();
-            UInt32 MapGalaxyParamAddr = stream.ReadUInt32();
+            MapSwitchParamAddr = stream.ReadUInt32();
+            LoopingModeParamAddr = stream.ReadUInt32();
             ID = stream.ReadUInt32();
+            // ignore BG Sequence
             UInt32 BGSequenceAddr = stream.ReadUInt32();
 
             if (ID >= 0 && ID < 18)
@@ -91,7 +168,26 @@ namespace FSEditor.MapDescriptor
             }
         }
 
-        public void ReadMapDefaultsFromStream(EndianBinaryReader stream)
+        public void writeMapData(EndianBinaryWriter stream)
+        {
+            stream.Seek(4, SeekOrigin.Current); // skip StageNameID
+            stream.Write(BGMID);
+            InternalNameAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip InternalNameAddr
+            BackgroundAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip BackgroundAddr
+            stream.Write((UInt32)RuleSet);
+            stream.Write((UInt32)Theme);
+            FrbFile1AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile1Addr
+            FrbFile2AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile2Addr
+            FrbFile3AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile3Addr
+            FrbFile4AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile4Addr
+            MapSwitchParamAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip MapSwitchParam
+            LoopingModeParamAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip LoopingModeParam
+            stream.Seek(4, SeekOrigin.Current); // skip MapOriginID
+            // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
+            stream.Write(Background == "bg004" ? MainDol.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM : (UInt32)0);
+        }
+
+        public void readMapDefaultsFromStream(EndianBinaryReader stream)
         {
             TargetAmount = stream.ReadUInt32();
             TourBankruptcyLimit = stream.ReadUInt32();
@@ -104,23 +200,44 @@ namespace FSEditor.MapDescriptor
             TourGeneralPlayTime = stream.ReadUInt32();
         }
 
-        public void ReadVentureCardTableFromStream(EndianBinaryReader stream)
+        public void writeMapDefaults(EndianBinaryWriter stream)
         {
-            for (int i = 0; i < Venture_Cards.Length; i++)
+            stream.Write(TargetAmount);
+            stream.Write(TourBankruptcyLimit);
+            stream.Write(TourInitialCash);
+            stream.Write((UInt32)TourOpponent1);
+            stream.Write((UInt32)TourOpponent2);
+            stream.Write((UInt32)TourOpponent3);
+            stream.Write(TourClearRank);
+            stream.Write(TourDifficulty);
+            stream.Write(TourGeneralPlayTime);
+        }
+
+        public void readVentureCardTableFromStream(EndianBinaryReader stream)
+        {
+            for (int i = 0; i < VentureCard.Length; i++)
             {
-                Venture_Cards[i] = stream.ReadByte();
+                VentureCard[i] = stream.ReadByte();
             }
-            Venture_Card_Count = 0;
-            for (int i = 0; i < Venture_Cards.Length; i++)
+            VentureCardActiveCount = 0;
+            for (int i = 0; i < VentureCard.Length; i++)
             {
-                if (Venture_Cards[i] != 0)
+                if (VentureCard[i] != 0)
                 {
-                    Venture_Card_Count++;
+                    VentureCardActiveCount++;
                 }
             }
         }
 
-        public string ReadFrbFileInfo(string param_folder)
+        public void writeVentureCardTable(EndianBinaryWriter stream)
+        {
+            for (int i = 0; i < VentureCard.Length; i++)
+            {
+                stream.Write(VentureCard[i]);
+            }
+        }
+
+        public string readFrbFileInfo(string param_folder)
         {
             string warning = "";
             var file = Path.Combine(param_folder, FrbFile1 + ".frb");
@@ -128,21 +245,28 @@ namespace FSEditor.MapDescriptor
             {
                 EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
                 BoardFile board = BoardFile.LoadFromStream(binReader);
-                // TODO: What is unused and what is used? check InitialCash and TargetAmount. Fixate on only the real one
                 MaxDiceRoll = board.BoardInfo.MaxDiceRoll;
                 BaseSalary = board.BoardInfo.BaseSalary;
                 SalaryIncrement = board.BoardInfo.SalaryIncrement;
                 InitialCash = board.BoardInfo.InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
-                    warning += "[" + ID + "]: FRB target amount is " + board.BoardInfo.TargetAmount + " but DOL target amount is " + TargetAmount + Environment.NewLine;
-                    warning += "The DOL target amount will be used." + Environment.NewLine;
+                    warning += "[" + ID + "] " + Name_EN + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect." + Environment.NewLine;
                 }
                 LoopingMode = board.BoardInfo.GalaxyStatus;
-                // TODO: Check conformity with MapGalaxyParamAddr
-                if (LoopingMode != 0)
+                if (LoopingMode != LoopingMode.None)
                 {
-
+                    if (LoopingModeRadius == 0 || LoopingModeVerticalSquareCount == 0)
+                    {
+                        warning += "[" + ID + "] " + Name_EN + ": frb has looping enabled, but looping parameters are missing in the md." + Environment.NewLine;
+                    }
+                }
+                else if (LoopingMode == LoopingMode.None)
+                {
+                    if (LoopingModeRadius != 0 || LoopingModeHorizontalPadding != 0 || LoopingModeVerticalSquareCount != 0)
+                    {
+                        warning += "[" + ID + "] " + Name_EN + ": frb has looping disabled. The looping parameters defined in the md will have no effect." + Environment.NewLine;
+                    }
                 }
             }
             // check the other frb files for validity
@@ -185,7 +309,7 @@ namespace FSEditor.MapDescriptor
             BGMTable,
             VentureCardTable
         }
-        public void ReadMapDescriptorFromFile(string fileName)
+        public void readMapDescriptorFromFile(string fileName)
         {
             string[] lines = File.ReadAllLines(fileName);
             MapDescriptor mapDescriptor = new MapDescriptor();
@@ -265,7 +389,7 @@ namespace FSEditor.MapDescriptor
                         if (flaggedValueOrNull != null)
                         {
                             var index = uint.Parse(flaggedValueOrNull);
-                            Venture_Cards[index] = 1;
+                            VentureCard[index] = 1;
                         }
                     }
                     break;
@@ -274,13 +398,23 @@ namespace FSEditor.MapDescriptor
 
         private void setProperty(KeyValuePair<string, string> keyValuePair)
         {
-            switch (keyValuePair.Key.Replace(" ", "").Replace("(", "").Replace(")", "").ToLower())
+            var key = keyValuePair.Key.Replace(" ", "").Replace("(", "").Replace(")", "").ToLower();
+            switch (key)
             {
+                case "radius":
+                    LoopingModeRadius = Single.Parse(keyValuePair.Value);
+                    break;
+                case "horizontalpadding":
+                    LoopingModeHorizontalPadding = Single.Parse(keyValuePair.Value);
+                    break;
+                case "verticalsquarecount":
+                    LoopingModeVerticalSquareCount = Single.Parse(keyValuePair.Value);
+                    break;
                 case "tourbankruptcylimit":
-                    TourBankruptcyLimit = uint.Parse(keyValuePair.Value);
+                    TourBankruptcyLimit = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "tourinitialcash":
-                    TourInitialCash = uint.Parse(keyValuePair.Value);
+                    TourInitialCash = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "touropponent1":
                     TourOpponent1 = (Character)Enum.Parse(typeof(Character), keyValuePair.Value.Replace(" ", ""), true);
@@ -292,28 +426,28 @@ namespace FSEditor.MapDescriptor
                     TourOpponent3 = (Character)Enum.Parse(typeof(Character), keyValuePair.Value.Replace(" ", ""), true);
                     break;
                 case "tourclearrank":
-                    TourClearRank = uint.Parse(keyValuePair.Value);
+                    TourClearRank = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "tourdifficulty":
-                    TourDifficulty = uint.Parse(keyValuePair.Value);
+                    TourDifficulty = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "tourgeneralplaytime":
-                    TourGeneralPlayTime = uint.Parse(keyValuePair.Value);
+                    TourGeneralPlayTime = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "initialcash":
-                    InitialCash = uint.Parse(keyValuePair.Value);
+                    InitialCash = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "targetamount":
-                    TargetAmount = uint.Parse(keyValuePair.Value);
+                    TargetAmount = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "basesalary":
-                    BaseSalary = uint.Parse(keyValuePair.Value);
+                    BaseSalary = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "salaryincrement":
-                    SalaryIncrement = uint.Parse(keyValuePair.Value);
+                    SalaryIncrement = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "maximumdiceroll":
-                    MaxDiceRoll = uint.Parse(keyValuePair.Value);
+                    MaxDiceRoll = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "loopingmode":
                     LoopingMode = (LoopingMode)Enum.Parse(typeof(LoopingMode), keyValuePair.Value.Replace(" ", ""), true);
@@ -366,6 +500,24 @@ namespace FSEditor.MapDescriptor
                 case "descjp":
                     Desc_JP = keyValuePair.Value;
                     break;
+            }
+            if (key.StartsWith("rotationoriginpoint"))
+            {
+                var number = Regex.Match(key, @"\d+").Value;
+                int i = Int32.Parse(number) - 1;
+                Single value = Single.Parse(keyValuePair.Value);
+                if (SwitchRotationOriginPoints[i] == null)
+                {
+                    SwitchRotationOriginPoints[i] = new OriginPoint();
+                }
+                if (key.Contains("x"))
+                {
+                    SwitchRotationOriginPoints[i].X = value;
+                }
+                else if (key.Contains("y"))
+                {
+                    SwitchRotationOriginPoints[i].Y = value;
+                }
             }
         }
 
@@ -482,15 +634,20 @@ namespace FSEditor.MapDescriptor
             Desc_SU = mapDescriptor.Desc_SU;
             Desc_UK = mapDescriptor.Desc_UK;
 
-            for (int i = 0; i < Venture_Cards.Length; i++)
+            for (int i = 0; i < VentureCard.Length; i++)
             {
-                Venture_Cards[i] = mapDescriptor.Venture_Cards[i];
+                VentureCard[i] = mapDescriptor.VentureCard[i];
             }
 
             BaseSalary = mapDescriptor.BaseSalary;
             SalaryIncrement = mapDescriptor.SalaryIncrement;
             MaxDiceRoll = mapDescriptor.MaxDiceRoll;
             LoopingMode = mapDescriptor.LoopingMode;
+            LoopingModeRadius = mapDescriptor.LoopingModeRadius;
+            LoopingModeHorizontalPadding = mapDescriptor.LoopingModeHorizontalPadding;
+            LoopingModeVerticalSquareCount = mapDescriptor.LoopingModeVerticalSquareCount;
+
+            SwitchRotationOriginPoints = mapDescriptor.SwitchRotationOriginPoints;
 
             TourBankruptcyLimit = mapDescriptor.TourBankruptcyLimit;
             TourInitialCash = mapDescriptor.TourInitialCash;
@@ -507,5 +664,7 @@ namespace FSEditor.MapDescriptor
             MapDescriptorTemplate t = new MapDescriptorTemplate(this);
             return t.TransformText().TrimStart();
         }
+
+
     }
 }

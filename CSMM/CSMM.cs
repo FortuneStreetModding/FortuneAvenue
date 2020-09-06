@@ -104,7 +104,7 @@ namespace CustomStreetManager
                 using (var stream = File.OpenRead(fileSet.main_dol))
                 {
                     MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
-                    mapDescriptors = mainDol.ReadMainDol(binReader);
+                    mapDescriptors = mainDol.readMainDol(binReader);
 
                     progressBar.SetProgress(60, "Read localization files...");
                     UI_Message en = new UI_Message(fileSet.ui_message_en_csv);
@@ -132,7 +132,7 @@ namespace CustomStreetManager
                         mapDescriptor.Desc_JP = jp.get(mapDescriptor.Desc_MSG_ID);
                         mapDescriptor.Desc_UK = uk.get(mapDescriptor.Desc_MSG_ID);
 
-                        warnings += mapDescriptor.ReadFrbFileInfo(fileSet.param_folder);
+                        warnings += mapDescriptor.readFrbFileInfo(fileSet.param_folder);
                     }
                 }
                 progressBar.SetProgress(80, "Populate UI...");
@@ -348,7 +348,7 @@ namespace CustomStreetManager
                         File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile4 + ".frb"), fileNameFrb4);
                         extractedFiles += fileNameFrb4 + Environment.NewLine;
                     }
-                    progressBar.SetProgress(100, "Done. Extracted Files:");
+                    progressBar.SetProgress(100, "Done. Generated md file and extracted frb file(s):");
                     progressBar.SetProgressBarText(extractedFiles);
                 }
             }
@@ -374,11 +374,11 @@ namespace CustomStreetManager
 
                     var mapDescriptorImportFile = openFileDialog1.FileName;
                     var dir = Path.GetDirectoryName(openFileDialog1.FileName);
-                    mapDescriptorImport.ReadMapDescriptorFromFile(mapDescriptorImportFile);
+                    mapDescriptorImport.readMapDescriptorFromFile(mapDescriptorImportFile);
                     importedFiles += mapDescriptorImportFile + Environment.NewLine;
 
                     progressBar.SetProgress(30, "Read additional data from frb file(s)...");
-                    mapDescriptorImport.ReadFrbFileInfo(dir);
+                    mapDescriptorImport.readFrbFileInfo(dir);
 
                     progressBar.SetProgress(60, "Copy frb file(s) to tmp...");
 
@@ -420,7 +420,7 @@ namespace CustomStreetManager
                     Go.Enabled = true;
                     updateDataGridData(null, null);
 
-                    progressBar.SetProgress(100, "Done. Imported Files:");
+                    progressBar.SetProgress(100, "Done. Following files have be processed and are ready to be injected:");
                     progressBar.SetProgressBarText(importedFiles);
                 }
                 catch (Exception e)
