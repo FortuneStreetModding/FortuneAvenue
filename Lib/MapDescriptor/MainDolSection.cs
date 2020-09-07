@@ -8,7 +8,7 @@ namespace FSEditor.MapDescriptor
 {
     public class MainDolSection
     {
-        public string section { get; set; }
+        public string sectionName { get; set; }
         public long offsetBeg { get; set; }
         public long offsetEnd { get; set; }
         public long fileDelta { get; set; }

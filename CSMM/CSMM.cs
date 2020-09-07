@@ -12,6 +12,8 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Drawing;
+using MiscUtil.IO;
+using MiscUtil.Conversion;
 
 namespace CustomStreetManager
 {
@@ -43,12 +45,26 @@ namespace CustomStreetManager
 
         private void Go_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show("Proceeding will inject the imported map descriptors the input ISO/WBFS file. Please make sure to have a backup.", "Start Injection", MessageBoxButtons.OKCancel);
+            DialogResult dialogResult = MessageBox.Show("Proceeding here will inject the imported map descriptors into the input ISO/WBFS file. Please make sure to have a backup.", "Start Injection", MessageBoxButtons.OKCancel);
             if (dialogResult == DialogResult.OK)
             {
-                ProgressBar instance = new ProgressBar();
-                instance.Show();
+                //ProgressBar instance = new ProgressBar();
+                //instance.Show();
 
+                var filename = setInputISOLocation.Text;
+
+                // expand dol if not already expanded
+                /*if (mainDol.toFileAddress(0x80001800) == -1)
+                {
+                    WitWrapper.createNewTextSection(fileSet.main_dol, 0x80001800, 0x1800);
+                    mainDol.setSections(WitWrapper.readSections(fileSet.main_dol));
+                }*/
+
+                using (Stream baseStream = File.Open(fileSet.main_dol, FileMode.Open))
+                {
+                    EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
+                    mainDol.writeMainDol(stream, mapDescriptors);
+                }
             }
         }
 

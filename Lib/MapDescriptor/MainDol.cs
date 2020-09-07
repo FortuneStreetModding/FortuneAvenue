@@ -11,7 +11,18 @@ namespace FSEditor.MapDescriptor
 {
     public class MainDol
     {
-        private readonly List<MainDolSection> sections;
+        private List<MainDolSection> sections;
+
+        public static readonly UInt32 UNUSED_SPACE_1_START_VIRTUAL = 0x80428978;
+        public static readonly UInt32 UNUSED_SPACE_1_END_VIRTUAL = 0x80428e4F;
+        public static readonly UInt32 UNUSED_SPACE_2_START_VIRTUAL = 0x8042bc78;
+        public static readonly UInt32 UNUSED_SPACE_2_END_VIRTUAL = 0x8042c23f;
+        public static readonly UInt32 UNUSED_SPACE_3_START_VIRTUAL = 0x8042dfc0;
+        public static readonly UInt32 UNUSED_SPACE_3_END_VIRTUAL = 0x8042e22f;
+        public static readonly UInt32 UNUSED_SPACE_4_START_VIRTUAL = 0x8042ef30;
+        public static readonly UInt32 UNUSED_SPACE_4_END_VIRTUAL = 0x8042f7ef;
+
+        public static readonly UInt32 NOP = 0x60000000;
 
         public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON = 0x806b8df0;
         public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_COLLOSUS = 0x8047d598;
@@ -28,12 +39,31 @@ namespace FSEditor.MapDescriptor
         private int positionMapDataTable;
         private int positionVentureCardTable;
 
+        private UInt32 unusedSpacePositionVirtual = UNUSED_SPACE_1_START_VIRTUAL;
+
         public MainDol(List<MainDolSection> sections)
         {
             this.sections = sections;
         }
 
-        private int toFileAddress(uint virtualAddress)
+        public void setSections(List<MainDolSection> sections)
+        {
+            this.sections = sections;
+        }
+
+        public bool sectionAvailable(string sectionName)
+        {
+            foreach (MainDolSection section in sections)
+            {
+                if (String.Equals(section.sectionName, sectionName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public int toFileAddress(uint virtualAddress)
         {
             foreach (MainDolSection section in sections)
             {
@@ -45,7 +75,7 @@ namespace FSEditor.MapDescriptor
             return -1;
         }
 
-        private int toVirtualAddress(int fileAddress)
+        public int toVirtualAddress(int fileAddress)
         {
             foreach (MainDolSection section in sections)
             {
@@ -62,11 +92,11 @@ namespace FSEditor.MapDescriptor
             binReader.Seek(0, SeekOrigin.Begin);
             byte[] buff = StreamUtil.ReadFully(binReader.BaseStream);
 
-            byte[] pattern = HexUtil.HexStringToByteArray(KEYWORD_START_MAP_DEFAULTS_TABLE);
+            byte[] pattern = HexUtil.hexStringToByteArray(KEYWORD_START_MAP_DEFAULTS_TABLE);
             positionMapDefaultTable = search(buff, pattern) + pattern.Length;
-            pattern = HexUtil.HexStringToByteArray(KEYWORD_START_MAP_DATA_TABLE);
+            pattern = HexUtil.hexStringToByteArray(KEYWORD_START_MAP_DATA_TABLE);
             positionMapDataTable = search(buff, pattern) + pattern.Length;
-            pattern = HexUtil.HexStringToByteArray(KEYWORD_VENTURE_CARD_TABLE);
+            pattern = HexUtil.hexStringToByteArray(KEYWORD_VENTURE_CARD_TABLE);
             positionVentureCardTable = search(buff, pattern) + pattern.Length;
         }
 
@@ -77,7 +107,7 @@ namespace FSEditor.MapDescriptor
             {
                 binReader.Seek(fileAddress, SeekOrigin.Begin);
                 byte[] buff = binReader.ReadBytes(32);
-                return HexUtil.ByteArrayToString(buff);
+                return HexUtil.byteArrayToString(buff);
             }
             else
             {
@@ -127,13 +157,136 @@ namespace FSEditor.MapDescriptor
 
         public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors)
         {
-            stream.Seek(positionMapDataTable, SeekOrigin.Begin);
-            if(mapDescriptors.Count != 48)
+            if (mapDescriptors.Count != 48)
             {
                 throw new ArgumentException("length of map descriptor list is not 48.");
             }
-            
+
+            // HACK: remove the use of Map Difficulty and Map General Play Time to free up some space
+            /* stream.Seek(toFileAddress(0x801fd9b8), SeekOrigin.Begin);
+            stream.Write(NOP);
+            stream.Seek(toFileAddress(0x80187168), SeekOrigin.Begin);
+            stream.Write(NOP);
+            stream.Seek(toFileAddress(0x801fd8b0), SeekOrigin.Begin);
+            stream.Write(NOP);
+            stream.Seek(toFileAddress(0x801fd954), SeekOrigin.Begin);
+            stream.Write(NOP);
+            */
+
+            stream.Seek(positionMapDataTable, SeekOrigin.Begin);
+            for (int i = 0; i < 48; i++)
+            {
+                mapDescriptors[i].writeMapData(stream);
+            }
+            foreach (MapDescriptor mapDescriptor in mapDescriptors)
+            {
+                allocateUnusedSpace(mapDescriptor.InternalName.Length + 1, mapDescriptor.InternalNameAddrFilePos, stream);
+                stream.Write(mapDescriptor.InternalName);
+                stream.Write(0);
+                allocateUnusedSpace(mapDescriptor.Background.Length + 1, mapDescriptor.BackgroundAddrFilePos, stream);
+                stream.Write(mapDescriptor.Background);
+                stream.Write(0);
+                allocateUnusedSpace(mapDescriptor.FrbFile1.Length + 1, mapDescriptor.FrbFile1AddrFilePos, stream);
+                stream.Write(mapDescriptor.FrbFile1);
+                stream.Write(0);
+                if (string.IsNullOrEmpty(mapDescriptor.FrbFile2))
+                {
+                    stream.Seek(mapDescriptor.FrbFile2AddrFilePos, SeekOrigin.Begin);
+                    stream.Write(0);
+                }
+                else
+                {
+                    allocateUnusedSpace(mapDescriptor.FrbFile2.Length + 1, mapDescriptor.FrbFile2AddrFilePos, stream);
+                    stream.Write(mapDescriptor.FrbFile2);
+                }
+                if (string.IsNullOrEmpty(mapDescriptor.FrbFile3))
+                {
+                    stream.Seek(mapDescriptor.FrbFile3AddrFilePos, SeekOrigin.Begin);
+                    stream.Write(0);
+                }
+                else
+                {
+                    allocateUnusedSpace(mapDescriptor.FrbFile3.Length + 1, mapDescriptor.FrbFile3AddrFilePos, stream);
+                    stream.Write(mapDescriptor.FrbFile3);
+                }
+                if (string.IsNullOrEmpty(mapDescriptor.FrbFile4))
+                {
+                    stream.Seek(mapDescriptor.FrbFile4AddrFilePos, SeekOrigin.Begin);
+                    stream.Write(0);
+                }
+                else
+                {
+                    allocateUnusedSpace(mapDescriptor.FrbFile4.Length + 1, mapDescriptor.FrbFile4AddrFilePos, stream);
+                    stream.Write(mapDescriptor.FrbFile4);
+                }
+                if (mapDescriptor.LoopingMode == LoopingMode.None)
+                {
+                    stream.Seek(mapDescriptor.LoopingModeParamAddrFilePos, SeekOrigin.Begin);
+                    stream.Write(0);
+                }
+                else
+                {
+                    allocateUnusedSpace(mapDescriptor.getLoopingModeParamsSizeInBytes(), mapDescriptor.LoopingModeParamAddrFilePos, stream);
+                    mapDescriptor.writeLoopingModeParams(stream);
+                }
+                if (mapDescriptor.SwitchRotationOriginPoints.Count == 0)
+                {
+                    stream.Seek(mapDescriptor.MapSwitchParamAddrFilePos, SeekOrigin.Begin);
+                    stream.Write(0);
+                }
+                else
+                {
+                    allocateUnusedSpace(mapDescriptor.getSwitchRotationOriginPointsSizeInBytes(), mapDescriptor.MapSwitchParamAddrFilePos, stream);
+                    mapDescriptor.writeSwitchRotationOriginPoints(stream);
+                }
+            }
+
+            stream.Seek(positionMapDefaultTable, SeekOrigin.Begin);
+            for (int i = 0; i < 48; i++)
+            {
+                mapDescriptors[i].writeMapDefaults(stream);
+            }
+
+            stream.Seek(positionVentureCardTable, SeekOrigin.Begin);
+            for (int i = 0; i < 42; i++)
+            {
+                mapDescriptors[i].writeVentureCardTable(stream);
+            }
+
             return mapDescriptors;
+        }
+
+        private void allocateUnusedSpace(int amountBytes, int pointerFilePosition, EndianBinaryWriter stream)
+        {
+            UInt32 virtualAddr = unusedSpacePositionVirtual;
+            unusedSpacePositionVirtual += (UInt32)amountBytes;
+
+            if (unusedSpacePositionVirtual > UNUSED_SPACE_4_END_VIRTUAL)
+            {
+                throw new InsufficientMemoryException("There is not enough free space in the main.dol available.");
+            }
+            else if (unusedSpacePositionVirtual > UNUSED_SPACE_3_END_VIRTUAL)
+            {
+                unusedSpacePositionVirtual = UNUSED_SPACE_4_START_VIRTUAL;
+                virtualAddr = unusedSpacePositionVirtual;
+                unusedSpacePositionVirtual += (UInt32)amountBytes;
+            }
+            else if (unusedSpacePositionVirtual > UNUSED_SPACE_2_END_VIRTUAL)
+            {
+                unusedSpacePositionVirtual = UNUSED_SPACE_3_START_VIRTUAL;
+                virtualAddr = unusedSpacePositionVirtual;
+                unusedSpacePositionVirtual += (UInt32)amountBytes;
+            }
+            else if (unusedSpacePositionVirtual > UNUSED_SPACE_1_END_VIRTUAL)
+            {
+                unusedSpacePositionVirtual = UNUSED_SPACE_2_START_VIRTUAL;
+                virtualAddr = unusedSpacePositionVirtual;
+                unusedSpacePositionVirtual += (UInt32)amountBytes;
+            }
+
+            stream.Seek(pointerFilePosition, SeekOrigin.Begin);
+            stream.Write(virtualAddr);
+            stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
         }
 
         private int search(byte[] src, byte[] pattern)

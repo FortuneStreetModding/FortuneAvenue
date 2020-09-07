@@ -19,22 +19,22 @@ namespace FSEditor.MapDescriptor
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
         public RuleSet RuleSet { get; set; }
-        public long InternalNameAddrSeek { get; set; }
+        public int InternalNameAddrFilePos { get; set; }
         public UInt32 InternalNameAddr { get; set; }
         public string InternalName { get; set; }
-        public long FrbFile1AddrSeek { get; set; }
+        public int FrbFile1AddrFilePos { get; set; }
         public UInt32 FrbFile1Addr { get; set; }
         public string FrbFile1 { get; set; }
-        public long FrbFile2AddrSeek { get; set; }
+        public int FrbFile2AddrFilePos { get; set; }
         public UInt32 FrbFile2Addr { get; set; }
         public string FrbFile2 { get; set; }
-        public long FrbFile3AddrSeek { get; set; }
+        public int FrbFile3AddrFilePos { get; set; }
         public UInt32 FrbFile3Addr { get; set; }
         public string FrbFile3 { get; set; }
-        public long FrbFile4AddrSeek { get; set; }
+        public int FrbFile4AddrFilePos { get; set; }
         public UInt32 FrbFile4Addr { get; set; }
         public string FrbFile4 { get; set; }
-        public long BackgroundAddrSeek { get; set; }
+        public int BackgroundAddrFilePos { get; set; }
         public UInt32 BackgroundAddr { get; set; }
         public string Background { get; set; }
         public UInt32 BGMID { get; set; }
@@ -56,11 +56,11 @@ namespace FSEditor.MapDescriptor
         public string Desc_UK { get; set; }
         public byte[] VentureCard { get; private set; }
         public int VentureCardActiveCount { get; private set; }
-        public long MapSwitchParamAddrSeek { get; set; }
+        public int MapSwitchParamAddrFilePos { get; set; }
         public UInt32 MapSwitchParamAddr { get; set; }
         public Dictionary<int, OriginPoint> SwitchRotationOriginPoints { get; private set; }
         public LoopingMode LoopingMode { get; set; }
-        public long LoopingModeParamAddrSeek { get; set; }
+        public int LoopingModeParamAddrFilePos { get; set; }
         public UInt32 LoopingModeParamAddr { get; set; }
         public Single LoopingModeRadius { get; set; }
         public Single LoopingModeHorizontalPadding { get; set; }
@@ -129,7 +129,7 @@ namespace FSEditor.MapDescriptor
         public void writeSwitchRotationOriginPoints(EndianBinaryWriter stream)
         {
             stream.Write((UInt32)SwitchRotationOriginPoints.Count);
-            for (int i = 0; i <= SwitchRotationOriginPoints.Count; i++)
+            for (int i = 0; i < SwitchRotationOriginPoints.Count; i++)
             {
                 stream.Write(SwitchRotationOriginPoints[i].X);
                 stream.Write(0);
@@ -137,11 +137,21 @@ namespace FSEditor.MapDescriptor
             }
         }
 
+        public int getSwitchRotationOriginPointsSizeInBytes()
+        {
+            return 4 + SwitchRotationOriginPoints.Count * 3 * 4;
+        }
+
         public void writeLoopingModeParams(EndianBinaryWriter stream)
         {
             stream.Write(LoopingModeRadius);
             stream.Write(LoopingModeHorizontalPadding);
             stream.Write(LoopingModeVerticalSquareCount);
+        }
+
+        public int getLoopingModeParamsSizeInBytes()
+        {
+            return 3 * 4;
         }
 
         public void readMapDataFromStream(EndianBinaryReader stream)
@@ -172,16 +182,24 @@ namespace FSEditor.MapDescriptor
         {
             stream.Seek(4, SeekOrigin.Current); // skip StageNameID
             stream.Write(BGMID);
-            InternalNameAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip InternalNameAddr
-            BackgroundAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip BackgroundAddr
+            InternalNameAddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip InternalNameAddr
+            BackgroundAddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip BackgroundAddr
             stream.Write((UInt32)RuleSet);
             stream.Write((UInt32)Theme);
-            FrbFile1AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile1Addr
-            FrbFile2AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile2Addr
-            FrbFile3AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile3Addr
-            FrbFile4AddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile4Addr
-            MapSwitchParamAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip MapSwitchParam
-            LoopingModeParamAddrSeek = stream.BaseStream.Position; stream.Seek(4, SeekOrigin.Current); // remember seek position, skip LoopingModeParam
+            FrbFile1AddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile1Addr
+            FrbFile2AddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile2Addr
+            FrbFile3AddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile3Addr
+            FrbFile4AddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile4Addr
+            MapSwitchParamAddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip MapSwitchParam
+            LoopingModeParamAddrFilePos = (int)stream.BaseStream.Position; 
+            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip LoopingModeParam
             stream.Seek(4, SeekOrigin.Current); // skip MapOriginID
             // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
             stream.Write(Background == "bg004" ? MainDol.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM : (UInt32)0);

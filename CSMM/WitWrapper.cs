@@ -167,11 +167,11 @@ namespace CustomStreetManager
                         MainDolSection section = new MainDolSection();
                         string unused = columns[0];
                         string[] offsets = columns[1].Split(new string[] { ".." }, StringSplitOptions.None);
-                        section.offsetBeg = endianBitConverter.ToUInt32(HexUtil.HexStringToByteArray(offsets[0]), 0);
-                        section.offsetEnd = endianBitConverter.ToUInt32(HexUtil.HexStringToByteArray(offsets[1]), 0);
+                        section.offsetBeg = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(offsets[0]), 0);
+                        section.offsetEnd = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(offsets[1]), 0);
                         string size = columns[2];
-                        section.fileDelta = endianBitConverter.ToUInt32(HexUtil.HexStringToByteArray(columns[3]), 0);
-                        section.section = columns[4].Trim();
+                        section.fileDelta = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(columns[3]), 0);
+                        section.sectionName = columns[4].Trim();
                         sections.Add(section);
                     }
                 }
@@ -179,6 +179,12 @@ namespace CustomStreetManager
             }
 
             return sections;
+        }
+
+        public static void createNewTextSection(string inputFile, UInt32 virtualAddress, UInt32 size)
+        {
+            string arguments = "DOLPATCH \"" + inputFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
+            string output = callWit(arguments);
         }
     }
 }

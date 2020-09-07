@@ -9,7 +9,7 @@ namespace MiscUtil.Conversion
     public class HexUtil
     {
 
-        public static byte[] HexStringToByteArray(string hex)
+        public static byte[] hexStringToByteArray(string hex)
         {
             hex = hex.Replace(" ", "");
             return Enumerable.Range(0, hex.Length)
@@ -18,7 +18,7 @@ namespace MiscUtil.Conversion
                              .ToArray();
         }
 
-        public static string ByteArrayToString(byte[] data)
+        public static string byteArrayToString(byte[] data)
         {
             int inx = Array.FindIndex(data, 0, (x) => x == 0);
             if (inx >= 0)
