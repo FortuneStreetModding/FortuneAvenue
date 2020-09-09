@@ -60,12 +60,32 @@ namespace CustomStreetManager
                     mainDol.setSections(WitWrapper.readSections(fileSet.main_dol));
                 }*/
 
-                using (Stream baseStream = File.Open(fileSet.main_dol, FileMode.Open))
+                var tempMainDol = fileSet.main_dol + ".tmp";
+                File.Copy(fileSet.main_dol, tempMainDol, true);
+
+                try
                 {
-                    EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
-                    mainDol.writeMainDol(stream, mapDescriptors);
+                    using (Stream baseStream = File.Open(tempMainDol, FileMode.Open))
+                    {
+                        EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
+                        mainDol.writeMainDol(stream, mapDescriptors);
+                    }
+                    // everything went through successfully, copy the temp file
+                    File.Copy(tempMainDol, fileSet.main_dol, true);
+
+                    
                 }
+                catch (Exception e2)
+                {
+
+                }
+
             }
+        }
+
+        private void writeLocalization()
+        {
+
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
