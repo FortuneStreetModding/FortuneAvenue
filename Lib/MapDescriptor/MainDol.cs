@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,6 +39,7 @@ namespace FSEditor.MapDescriptor
         private int positionMapDataTable;
         private int positionVentureCardTable;
 
+        private Dictionary<byte[], UInt32> reuseValues = new Dictionary<byte[], UInt32>(new ByteArrayComparer());
         private UInt32 unusedSpacePositionVirtual = UNUSED_SPACE_1_START_VIRTUAL;
 
         public MainDol(List<MainDolSection> sections)
@@ -180,15 +181,27 @@ namespace FSEditor.MapDescriptor
             }
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
-                allocateUnusedSpace(mapDescriptor.InternalName.Length + 1, mapDescriptor.InternalNameAddrFilePos, stream);
-                stream.Write(mapDescriptor.InternalName);
-                stream.Write(0);
-                allocateUnusedSpace(mapDescriptor.Background.Length + 1, mapDescriptor.BackgroundAddrFilePos, stream);
-                stream.Write(mapDescriptor.Background);
-                stream.Write(0);
-                allocateUnusedSpace(mapDescriptor.FrbFile1.Length + 1, mapDescriptor.FrbFile1AddrFilePos, stream);
-                stream.Write(mapDescriptor.FrbFile1);
-                stream.Write(0);
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                    s.Write(mapDescriptor.InternalName);
+                    s.Write((byte)0);
+                    allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.InternalNameAddrFilePos, stream);
+                }
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                    s.Write(mapDescriptor.Background);
+                    s.Write((byte)0);
+                    allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.BackgroundAddrFilePos, stream);
+                }
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                    s.Write(mapDescriptor.FrbFile1);
+                    s.Write((byte)0);
+                    allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.FrbFile1AddrFilePos, stream);
+                }
                 if (string.IsNullOrEmpty(mapDescriptor.FrbFile2))
                 {
                     stream.Seek(mapDescriptor.FrbFile2AddrFilePos, SeekOrigin.Begin);
@@ -196,8 +209,13 @@ namespace FSEditor.MapDescriptor
                 }
                 else
                 {
-                    allocateUnusedSpace(mapDescriptor.FrbFile2.Length + 1, mapDescriptor.FrbFile2AddrFilePos, stream);
-                    stream.Write(mapDescriptor.FrbFile2);
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                        s.Write(mapDescriptor.FrbFile2);
+                        s.Write((byte)0);
+                        allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.FrbFile2AddrFilePos, stream);
+                    }
                 }
                 if (string.IsNullOrEmpty(mapDescriptor.FrbFile3))
                 {
@@ -206,8 +224,13 @@ namespace FSEditor.MapDescriptor
                 }
                 else
                 {
-                    allocateUnusedSpace(mapDescriptor.FrbFile3.Length + 1, mapDescriptor.FrbFile3AddrFilePos, stream);
-                    stream.Write(mapDescriptor.FrbFile3);
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                        s.Write(mapDescriptor.FrbFile3);
+                        s.Write((byte)0);
+                        allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.FrbFile3AddrFilePos, stream);
+                    }
                 }
                 if (string.IsNullOrEmpty(mapDescriptor.FrbFile4))
                 {
@@ -216,8 +239,13 @@ namespace FSEditor.MapDescriptor
                 }
                 else
                 {
-                    allocateUnusedSpace(mapDescriptor.FrbFile4.Length + 1, mapDescriptor.FrbFile4AddrFilePos, stream);
-                    stream.Write(mapDescriptor.FrbFile4);
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                        s.Write(mapDescriptor.FrbFile4);
+                        s.Write((byte)0);
+                        allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.FrbFile4AddrFilePos, stream);
+                    }
                 }
                 if (mapDescriptor.LoopingMode == LoopingMode.None)
                 {
@@ -226,8 +254,12 @@ namespace FSEditor.MapDescriptor
                 }
                 else
                 {
-                    allocateUnusedSpace(mapDescriptor.getLoopingModeParamsSizeInBytes(), mapDescriptor.LoopingModeParamAddrFilePos, stream);
-                    mapDescriptor.writeLoopingModeParams(stream);
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                        mapDescriptor.writeLoopingModeParams(s);
+                        allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.FrbFile4AddrFilePos, stream);
+                    }
                 }
                 if (mapDescriptor.SwitchRotationOriginPoints.Count == 0)
                 {
@@ -236,8 +268,13 @@ namespace FSEditor.MapDescriptor
                 }
                 else
                 {
-                    allocateUnusedSpace(mapDescriptor.getSwitchRotationOriginPointsSizeInBytes(), mapDescriptor.MapSwitchParamAddrFilePos, stream);
-                    mapDescriptor.writeSwitchRotationOriginPoints(stream);
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                        mapDescriptor.writeSwitchRotationOriginPoints(s);
+                        mapDescriptor.writeLoopingModeParams(s);
+                        allocateUnusedSpace(memoryStream.ToArray(), mapDescriptor.FrbFile4AddrFilePos, stream);
+                    }
                 }
             }
 
@@ -253,40 +290,77 @@ namespace FSEditor.MapDescriptor
                 mapDescriptors[i].writeVentureCardTable(stream);
             }
 
+            nullTheFreeSpace(stream);
+
             return mapDescriptors;
         }
 
-        private void allocateUnusedSpace(int amountBytes, int pointerFilePosition, EndianBinaryWriter stream)
+        private void allocateUnusedSpace(byte[] bytes, int pointerFilePosition, EndianBinaryWriter stream)
+        {
+            if (reuseValues.ContainsKey(bytes))
+            {
+                stream.Seek(pointerFilePosition, SeekOrigin.Begin);
+                stream.Write(reuseValues[bytes]);
+            }
+            else
+            {
+                UInt32 virtualAddr = unusedSpacePositionVirtual;
+                unusedSpacePositionVirtual += (UInt32)bytes.Length;
+
+                if (unusedSpacePositionVirtual > UNUSED_SPACE_4_END_VIRTUAL)
+                {
+                    throw new InsufficientMemoryException("There is not enough free space in the main.dol available.");
+                }
+                else if (unusedSpacePositionVirtual > UNUSED_SPACE_3_END_VIRTUAL)
+                {
+                    unusedSpacePositionVirtual = UNUSED_SPACE_4_START_VIRTUAL;
+                    virtualAddr = unusedSpacePositionVirtual;
+                    unusedSpacePositionVirtual += (UInt32)bytes.Length;
+                }
+                else if (unusedSpacePositionVirtual > UNUSED_SPACE_2_END_VIRTUAL)
+                {
+                    unusedSpacePositionVirtual = UNUSED_SPACE_3_START_VIRTUAL;
+                    virtualAddr = unusedSpacePositionVirtual;
+                    unusedSpacePositionVirtual += (UInt32)bytes.Length;
+                }
+                else if (unusedSpacePositionVirtual > UNUSED_SPACE_1_END_VIRTUAL)
+                {
+                    unusedSpacePositionVirtual = UNUSED_SPACE_2_START_VIRTUAL;
+                    virtualAddr = unusedSpacePositionVirtual;
+                    unusedSpacePositionVirtual += (UInt32)bytes.Length;
+                }
+
+                stream.Seek(pointerFilePosition, SeekOrigin.Begin);
+                stream.Write(virtualAddr);
+                stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
+                stream.Write(bytes);
+                reuseValues.Add(bytes, virtualAddr);
+            }
+        }
+
+        private void nullTheFreeSpace(EndianBinaryWriter stream)
         {
             UInt32 virtualAddr = unusedSpacePositionVirtual;
-            unusedSpacePositionVirtual += (UInt32)amountBytes;
-
-            if (unusedSpacePositionVirtual > UNUSED_SPACE_4_END_VIRTUAL)
-            {
-                throw new InsufficientMemoryException("There is not enough free space in the main.dol available.");
-            }
-            else if (unusedSpacePositionVirtual > UNUSED_SPACE_3_END_VIRTUAL)
-            {
-                unusedSpacePositionVirtual = UNUSED_SPACE_4_START_VIRTUAL;
-                virtualAddr = unusedSpacePositionVirtual;
-                unusedSpacePositionVirtual += (UInt32)amountBytes;
-            }
-            else if (unusedSpacePositionVirtual > UNUSED_SPACE_2_END_VIRTUAL)
-            {
-                unusedSpacePositionVirtual = UNUSED_SPACE_3_START_VIRTUAL;
-                virtualAddr = unusedSpacePositionVirtual;
-                unusedSpacePositionVirtual += (UInt32)amountBytes;
-            }
-            else if (unusedSpacePositionVirtual > UNUSED_SPACE_1_END_VIRTUAL)
-            {
-                unusedSpacePositionVirtual = UNUSED_SPACE_2_START_VIRTUAL;
-                virtualAddr = unusedSpacePositionVirtual;
-                unusedSpacePositionVirtual += (UInt32)amountBytes;
-            }
-
-            stream.Seek(pointerFilePosition, SeekOrigin.Begin);
-            stream.Write(virtualAddr);
             stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
+            if (virtualAddr < UNUSED_SPACE_1_END_VIRTUAL)
+            {
+                stream.Write(new byte[UNUSED_SPACE_1_END_VIRTUAL - virtualAddr]);
+                stream.Seek(toFileAddress(UNUSED_SPACE_2_START_VIRTUAL), SeekOrigin.Begin);
+            }
+            if (virtualAddr < UNUSED_SPACE_2_END_VIRTUAL)
+            {
+                stream.Write(new byte[UNUSED_SPACE_2_END_VIRTUAL - virtualAddr]);
+                stream.Seek(toFileAddress(UNUSED_SPACE_3_START_VIRTUAL), SeekOrigin.Begin);
+            }
+            if (virtualAddr < UNUSED_SPACE_3_END_VIRTUAL)
+            {
+                stream.Write(new byte[UNUSED_SPACE_3_END_VIRTUAL - virtualAddr]);
+                stream.Seek(toFileAddress(UNUSED_SPACE_4_START_VIRTUAL), SeekOrigin.Begin);
+            }
+            if (virtualAddr < UNUSED_SPACE_4_END_VIRTUAL)
+            {
+                stream.Write(new byte[UNUSED_SPACE_4_END_VIRTUAL - virtualAddr]);
+            }
         }
 
         private int search(byte[] src, byte[] pattern)

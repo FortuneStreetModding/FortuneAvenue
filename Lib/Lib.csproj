@@ -61,6 +61,7 @@
     <Compile Include="FSData\OriginPoint.cs" />
     <Compile Include="FSData\LoopingMode.cs" />
     <Compile Include="FSData\Character.cs" />
+    <Compile Include="MapDescriptor\ByteArrayComparer.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplate.cs">
       <AutoGen>True</AutoGen>
