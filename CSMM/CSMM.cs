@@ -14,6 +14,7 @@ using System.Text;
 using System.Drawing;
 using MiscUtil.IO;
 using MiscUtil.Conversion;
+using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
@@ -22,6 +23,7 @@ namespace CustomStreetManager
         private FileSet fileSet;
         private List<MapDescriptor> mapDescriptors;
         private MainDol mainDol;
+        Task<string> extractIsoTask;
 
         public CSMM()
         {
@@ -43,15 +45,28 @@ namespace CustomStreetManager
             Go.Enabled = false;
         }
 
-        private void Go_Click(object sender, EventArgs e)
+        private async void Go_Click(object sender, EventArgs e)
         {
+            var inputfilename = setInputISOLocation.Text;
+            var outputFilename = setOutputPathLabel.Text;
+
+            if (String.IsNullOrWhiteSpace(outputFilename) || outputFilename.ToLower() == "none")
+            {
+                MessageBox.Show("Please set the output file.");
+                return;
+            }
+            if (extractIsoTask == null)
+            {
+                MessageBox.Show("Error: Async extractIsoTask is null");
+            }
+
             DialogResult dialogResult = MessageBox.Show("Proceeding here will inject the imported map descriptors into the input ISO/WBFS file. Please make sure to have a backup.", "Start Injection", MessageBoxButtons.OKCancel);
             if (dialogResult == DialogResult.OK)
             {
-                //ProgressBar instance = new ProgressBar();
-                //instance.Show();
 
-                var filename = setInputISOLocation.Text;
+
+                ProgressBar progressBar = new ProgressBar();
+                progressBar.Show();
 
                 // expand dol if not already expanded
                 /*if (mainDol.toFileAddress(0x80001800) == -1)
@@ -63,21 +78,42 @@ namespace CustomStreetManager
                 var tempMainDol = fileSet.main_dol + ".tmp";
                 File.Copy(fileSet.main_dol, tempMainDol, true);
 
+                var info = "";
                 try
                 {
+                    progressBar.SetProgress(20, "Writing data to main.dol...");
                     using (Stream baseStream = File.Open(tempMainDol, FileMode.Open))
                     {
                         EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
                         mainDol.writeMainDol(stream, mapDescriptors);
+
+                        progressBar.SetProgress(20, "Done.");
+
+                        info += "Amount of free space used: " + mainDol.totalBytesWritten + " bytes" + Environment.NewLine;
+                        info += "Amount of free space left: " + mainDol.totalBytesLeft + " bytes" + Environment.NewLine;
                     }
                     // everything went through successfully, copy the temp file
                     File.Copy(tempMainDol, fileSet.main_dol, true);
+                    File.Delete(tempMainDol);
 
-                    
+                    // check if iso has been extracted already
+                    progressBar.SetProgress(40, "Extracting ISO/WBFS file...");
+                    string result = await extractIsoTask;
+
+                    progressBar.SetProgress(60, "Copying the modified files to be packed into the image...");
+                    WitWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
+
+                    progressBar.SetProgress(80, "Packing ISO/WBFS file...");
+                    WitWrapper.packFullIso(inputfilename, outputFilename);
+
+                    progressBar.SetProgress(100, "Done.");
+                    progressBar.SetProgressBarText(info);
                 }
                 catch (Exception e2)
                 {
-
+                    progressBar.SetProgressBarText(e2.Message);
+                    progressBar.EnableButton();
+                    Console.Error.WriteLine(e2.ToString());
                 }
 
             }
@@ -98,9 +134,9 @@ namespace CustomStreetManager
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to Button2.
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.Filter = "ISO Image|*.iso";
-            saveFileDialog1.Title = "Where should I save the patched ISO?";
-            saveFileDialog1.FileName = "UpdatedISOFile";
+            saveFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
+            saveFileDialog1.Title = "Where shall the patches ISO/WBFS be saved?";
+            saveFileDialog1.FileName = "Patched File";
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -139,7 +175,7 @@ namespace CustomStreetManager
                 progressBar.SetProgress(40, "Read data from main.dol file...");
                 using (var stream = File.OpenRead(fileSet.main_dol))
                 {
-                    MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
+                    EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
                     mapDescriptors = mainDol.readMainDol(binReader);
 
                     progressBar.SetProgress(60, "Read localization files...");
@@ -187,6 +223,7 @@ namespace CustomStreetManager
                 {
                     progressBar.Close();
                 }
+                extractIsoTask = WitWrapper.extractFullIsoAsync(setInputISOLocation.Text);
             }
             catch (Exception e2)
             {

@@ -76,6 +76,9 @@ namespace FSEditor.MapDescriptor
         public UInt32 TourClearRank { get; set; }
         public UInt32 TourDifficulty { get; set; }
         public UInt32 TourGeneralPlayTime { get; set; }
+        public int MapIconAddrFilePos { get; set; }
+        public UInt32 MapIconAddr { get; set; }
+        public string MapIcon { get; internal set; }
 
         public MapDescriptor()
         {

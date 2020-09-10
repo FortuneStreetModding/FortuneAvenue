@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Windows.Forms;
 using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
+using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
@@ -79,10 +80,14 @@ namespace CustomStreetManager
             }
         }
 
-        public static string callWit(string arguments)
+        public static async Task<string> callWitAsync(string arguments)
         {
             makeSureWitInstalled();
+            return await Task.Run(() => callWitSync(arguments));
+        }
 
+        private static string callWitSync(string arguments)
+        {
             string witFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wit.exe");
             ProcessStartInfo psi = new ProcessStartInfo(witFilePath, arguments);
             psi.CreateNoWindow = true;
@@ -95,7 +100,7 @@ namespace CustomStreetManager
             using (Process process = Process.Start(psi))
             {
                 process.WaitForExit();
-                if (process.ExitCode != 0)
+                if (process.ExitCode != 0 && process.ExitCode != 64)
                 {
                     string error;
                     using (StreamReader reader = process.StandardError)
@@ -113,6 +118,24 @@ namespace CustomStreetManager
             return result;
         }
 
+        internal static void copyRelevantFilesForPacking(FileSet fileSet, string inputFile)
+        {
+            string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
+            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile), "DATA");
+            var sourcePath = tmpDirectory;
+            var destinationPath = tmpExtract;
+
+            //Now Create all of the directories
+            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*",
+                SearchOption.AllDirectories))
+                Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
+
+            //Copy all the files & Replaces any files with the same name
+            foreach (string newPath in Directory.GetFiles(sourcePath, "*.*",
+                SearchOption.AllDirectories))
+                File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
+        }
+
         public static FileSet extractFiles(string inputFile)
         {
             string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
@@ -122,7 +145,7 @@ namespace CustomStreetManager
             }
 
             string arguments = "COPY --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
-            callWit(arguments);
+            callWitSync(arguments);
 
             FileSet fileSet = new FileSet();
             fileSet.main_dol = Path.Combine(tmpDirectory, "sys", "main.dol");
@@ -137,10 +160,24 @@ namespace CustomStreetManager
             return fileSet;
         }
 
+        public static Task<string> extractFullIsoAsync(string inputFile)
+        {
+            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
+            string arguments = "COPY --fst --preserve --update \"" + inputFile + "\" \"" + tmpExtract + "\"";
+            return callWitAsync(arguments);
+        }
+
+        public static string packFullIso(string inputFile, string outputFile)
+        {
+            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
+            string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite";
+            return callWitSync(arguments);
+        }
+
         public static List<MainDolSection> readSections(string inputFile)
         {
             string arguments = "DUMP -l \"" + inputFile + "\"";
-            string witSectionDump = callWit(arguments);
+            string witSectionDump = callWitSync(arguments);
 
             List<MainDolSection> sections = new List<MainDolSection>();
 
@@ -177,14 +214,13 @@ namespace CustomStreetManager
                 }
 
             }
-
             return sections;
         }
 
         public static void createNewTextSection(string inputFile, UInt32 virtualAddress, UInt32 size)
         {
             string arguments = "DOLPATCH \"" + inputFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
-            string output = callWit(arguments);
+            string output = callWitSync(arguments);
         }
     }
 }

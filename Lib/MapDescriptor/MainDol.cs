@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,9 +38,12 @@ namespace FSEditor.MapDescriptor
         private int positionMapDefaultTable;
         private int positionMapDataTable;
         private int positionVentureCardTable;
+        public static readonly uint TABLE_MAP_ICON_VIRTUAL = 0x8047f5c0;
 
-        private Dictionary<byte[], UInt32> reuseValues = new Dictionary<byte[], UInt32>(new ByteArrayComparer());
-        private UInt32 unusedSpacePositionVirtual = UNUSED_SPACE_1_START_VIRTUAL;
+        private Dictionary<byte[], UInt32> reuseValues;
+        private UInt32 unusedSpacePositionVirtual;
+        public int totalBytesWritten;
+        public int totalBytesLeft;
 
         public MainDol(List<MainDolSection> sections)
         {
@@ -138,6 +141,11 @@ namespace FSEditor.MapDescriptor
                 mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, binReader);
                 mapDescriptor.readRotationOriginPoints(binReader, toFileAddress(mapDescriptor.MapSwitchParamAddr));
                 mapDescriptor.readLoopingModeParams(binReader, toFileAddress(mapDescriptor.LoopingModeParamAddr));
+
+                UInt32 mapIconPos = TABLE_MAP_ICON_VIRTUAL + 4 * mapDescriptor.ID;
+                binReader.Seek(toFileAddress(mapIconPos), SeekOrigin.Begin);
+                UInt32 mapIconAddr = binReader.ReadUInt32();
+                mapDescriptor.MapIcon = resolveAddressToString(mapIconAddr, binReader);
             }
             binReader.Seek(positionMapDefaultTable, SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
@@ -162,6 +170,13 @@ namespace FSEditor.MapDescriptor
             {
                 throw new ArgumentException("length of map descriptor list is not 48.");
             }
+
+            // reset writing state
+            reuseValues = new Dictionary<byte[], UInt32>(new ByteArrayComparer());
+            unusedSpacePositionVirtual = UNUSED_SPACE_1_START_VIRTUAL;
+            totalBytesWritten = 0;
+            totalBytesLeft = 0;
+
 
             // HACK: remove the use of Map Difficulty and Map General Play Time to free up some space
             /* stream.Seek(toFileAddress(0x801fd9b8), SeekOrigin.Begin);
@@ -290,6 +305,29 @@ namespace FSEditor.MapDescriptor
                 mapDescriptors[i].writeVentureCardTable(stream);
             }
 
+            // custom map icon hack
+            /*stream.Seek(toFileAddress(0x8021e77c), SeekOrigin.Begin);
+            stream.Write(0x4bff3629);
+            stream.Seek(toFileAddress(0x8021e790), SeekOrigin.Begin);
+            stream.Write(0x7c1df000);
+            stream.Seek(toFileAddress(0x8021e8a4), SeekOrigin.Begin);
+            stream.Write(0x4bff3629);
+            stream.Seek(toFileAddress(0x8021e8b8), SeekOrigin.Begin);
+            stream.Write(0x7c1df000);*/
+
+            Dictionary<string, string> mapIcons = new Dictionary<string, string>();
+            HashSet<string> allMapIcons = new HashSet<string>();
+            for (int i = 0; i < 48; i++)
+            {
+                allMapIcons.Add(mapDescriptors[i].MapIcon);
+            }
+            foreach (string mapIcon in allMapIcons)
+            {
+                // allocateUnusedSpace(mapIcon.Length + 1, , stream);
+                // stream.Write(mapIcon);
+                // stream.Write(0);
+            }
+
             nullTheFreeSpace(stream);
 
             return mapDescriptors;
@@ -334,6 +372,7 @@ namespace FSEditor.MapDescriptor
                 stream.Write(virtualAddr);
                 stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
                 stream.Write(bytes);
+                totalBytesWritten += bytes.Length;
                 reuseValues.Add(bytes, virtualAddr);
             }
         }
@@ -342,24 +381,33 @@ namespace FSEditor.MapDescriptor
         {
             UInt32 virtualAddr = unusedSpacePositionVirtual;
             stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
+            byte[] nullBytes;
             if (virtualAddr < UNUSED_SPACE_1_END_VIRTUAL)
             {
-                stream.Write(new byte[UNUSED_SPACE_1_END_VIRTUAL - virtualAddr]);
+                nullBytes = new byte[UNUSED_SPACE_1_END_VIRTUAL - virtualAddr];
+                stream.Write(nullBytes);
                 stream.Seek(toFileAddress(UNUSED_SPACE_2_START_VIRTUAL), SeekOrigin.Begin);
+                totalBytesLeft += nullBytes.Length;
             }
             if (virtualAddr < UNUSED_SPACE_2_END_VIRTUAL)
             {
-                stream.Write(new byte[UNUSED_SPACE_2_END_VIRTUAL - virtualAddr]);
+                nullBytes = new byte[UNUSED_SPACE_2_END_VIRTUAL - virtualAddr];
+                stream.Write(nullBytes);
                 stream.Seek(toFileAddress(UNUSED_SPACE_3_START_VIRTUAL), SeekOrigin.Begin);
+                totalBytesLeft += nullBytes.Length;
             }
             if (virtualAddr < UNUSED_SPACE_3_END_VIRTUAL)
             {
-                stream.Write(new byte[UNUSED_SPACE_3_END_VIRTUAL - virtualAddr]);
+                nullBytes = new byte[UNUSED_SPACE_3_END_VIRTUAL - virtualAddr];
+                stream.Write(nullBytes);
                 stream.Seek(toFileAddress(UNUSED_SPACE_4_START_VIRTUAL), SeekOrigin.Begin);
+                totalBytesLeft += nullBytes.Length;
             }
             if (virtualAddr < UNUSED_SPACE_4_END_VIRTUAL)
             {
-                stream.Write(new byte[UNUSED_SPACE_4_END_VIRTUAL - virtualAddr]);
+                nullBytes = new byte[UNUSED_SPACE_4_END_VIRTUAL - virtualAddr];
+                stream.Write(nullBytes);
+                totalBytesLeft += nullBytes.Length;
             }
         }
 
