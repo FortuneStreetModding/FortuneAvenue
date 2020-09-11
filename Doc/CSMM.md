@@ -15,7 +15,9 @@ Editting the values in the UI is not possible. If you want to modify a map you n
 
 ## Map Descriptor
 
-The map descriptor md file defines the data that is to be written into the WBFS/ISO file. It is also a markdown file at the same time and as such can easily be viewed within github. 
+The map descriptor md file defines the data that is to be written into the WBFS/ISO file. It is also a markdown file at the same time and as such can easily be viewed within github. Check the map templates to see how such a markdown file is structured:
+- [Template Map Good Egg Galaxy](https://github.com/FortuneStreetModding/CommunityMaps/tree/master/TemplateMap_Colony)
+- [Template Map Colossus](https://github.com/FortuneStreetModding/CommunityMaps/tree/master/TemplateMap_Colossus)
 
 The structure is as follows:
 - The first heading is always the English name of the map. The section contents is the English description of the map.
@@ -25,4 +27,4 @@ The structure is as follows:
 
 ## Cache
 
-When opening an input WBFS/ISO file, CSMM will extract its contents in the background. Once this process is finished, you can see a new folder residing in the same directory as Fortune Avenue. The name of the folder will be the same as the WBFS/ISO you selected. This cache will be kept and reused by CSMM for the case that the same WBFS/ISO will be patched again. 
+When opening an input WBFS/ISO file, CSMM will extract its contents and you can see a new folder residing in the same directory as Fortune Avenue. The name of the folder will be the same as the WBFS/ISO you selected. This cache will be kept and reused by CSMM for the case that the same WBFS/ISO will be patched again. 
