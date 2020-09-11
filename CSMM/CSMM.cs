@@ -25,7 +25,6 @@ namespace CustomStreetManager
         private List<MapDescriptor> mapDescriptors;
         private MainDol mainDol;
         private Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
-        Task<int> extractIsoTask;
 
         public CSMM()
         {
@@ -57,8 +56,11 @@ namespace CustomStreetManager
                 MessageBox.Show("Please set the output file.");
                 return;
             }
+            var tokenSource2 = new CancellationTokenSource();
+            CancellationToken ct = tokenSource2.Token;
+
             ProgressBar progressBar = new ProgressBar();
-            progressBar.Show();
+            progressBar.Show(this);
 
             // expand dol if not already expanded
             /*if (mainDol.toFileAddress(0x80001800) == -1)
@@ -70,7 +72,6 @@ namespace CustomStreetManager
             var tempMainDol = fileSet.main_dol + ".tmp";
             File.Copy(fileSet.main_dol, tempMainDol, true);
 
-            progressBar.textArea.Text = "";
             try
             {
                 progressBar.SetProgress(0, "Writing data to main.dol...");
@@ -80,9 +81,8 @@ namespace CustomStreetManager
                     EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
                     mainDol.writeMainDol(stream, mapDescriptors);
 
-                    progressBar.textArea.Text += "Amount of free space used in main.dol: " + mainDol.totalBytesWritten + " bytes" + Environment.NewLine;
-                    progressBar.textArea.Text += "Amount of free space left in main.dol: " + mainDol.totalBytesLeft + " bytes" + Environment.NewLine;
-                    progressBar.textArea.Update();
+                    progressBar.appendText("Amount of free space used in main.dol: " + mainDol.totalBytesWritten + " bytes" + Environment.NewLine);
+                    progressBar.appendText("Amount of free space left in main.dol: " + mainDol.totalBytesLeft + " bytes" + Environment.NewLine);
                 }
                 // everything went through successfully, copy the temp file
                 File.Copy(tempMainDol, fileSet.main_dol, true);
@@ -97,37 +97,24 @@ namespace CustomStreetManager
                     ui_message.writeToFile(fileSet_ui_message_csv);
                 }
 
-                int errorCode = 0;
-                // check if iso has been extracted already
-                if (extractIsoTask != null)
-                {
-                    progressBar.SetProgress(10, "Extracting ISO/WBFS file...");
-                    errorCode = await extractIsoTask;
-                    if (errorCode != 0)
-                    {
-                        throw new ApplicationException("Wit extraction job returned non-zero exit code: " + errorCode);
-                    }
-                }
-
-                progressBar.SetProgress(25, "Copying the modified files to be packed into the image...");
+                progressBar.SetProgress(10, "Copying the modified files to be packed into the image...");
                 WitWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
 
-                progressBar.SetProgress(30, "Packing ISO/WBFS file...");
-                errorCode = await WitWrapper.packFullIso(inputfilename, outputFilename, progressBar.update, 30, 100);
-                if (errorCode != 0)
-                {
-                    throw new ApplicationException("Wit packing job returned non-zero exit code: " + errorCode);
-                }
+                progressBar.SetProgress(15, "Packing ISO/WBFS file...");
 
+                await WitWrapper.packFullIso(inputfilename, outputFilename, ct, progressBar.update, 15, 100);
                 progressBar.SetProgress(100, "Done.");
             }
             catch (Exception e2)
             {
-                progressBar.textArea.Text += e2.Message;
-                progressBar.textArea.Text += Environment.NewLine + Environment.NewLine + e2.ToString();
-                progressBar.textArea.Update();
+                progressBar.appendText(e2.Message);
+                progressBar.appendText(Environment.NewLine + Environment.NewLine + e2.ToString());
                 progressBar.EnableButton();
                 Console.Error.WriteLine(e2.ToString());
+            }
+            finally
+            {
+                tokenSource2.Dispose();
             }
         }
 
@@ -212,56 +199,65 @@ namespace CustomStreetManager
             return warnings;
         }
 
-        private void ReloadWbfsIsoFile()
+        private async void ReloadWbfsIsoFile()
         {
+            WitWrapper.makeSureWitInstalled();
+
             ProgressBar progressBar = new ProgressBar();
-            progressBar.Show();
+            progressBar.Show(this);
             progressBar.SetProgress(0, "Extract relevant files from iso/wbfs...");
 
             if (setInputISOLocation.Text == "None")
             {
-                progressBar.textArea.Text += "Can't load wbfs or iso file as the input file name is not set.";
+                progressBar.appendText("Can't load wbfs or iso file as the input file name is not set.");
                 progressBar.EnableButton();
                 return;
             }
+            var tokenSource2 = new CancellationTokenSource();
+            CancellationToken ct = tokenSource2.Token;
 
             try
             {
-                fileSet = WitWrapper.extractFiles(setInputISOLocation.Text);
+                fileSet = await WitWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 10);
 
-                progressBar.SetProgress(20, "Detect the sections in main.dol file...");
-                List<MainDolSection> sections = WitWrapper.readSections(fileSet.main_dol);
+                progressBar.SetProgress(10, "Detect the sections in main.dol file...");
+                List<MainDolSection> sections = await WitWrapper.readSections(fileSet.main_dol, ct, progressBar.update, 10, 20);
                 mainDol = new MainDol(sections);
 
-                progressBar.SetProgress(40, "Read data from main.dol file...");
+                progressBar.SetProgress(25, "Read data from main.dol file...");
                 using (var stream = File.OpenRead(fileSet.main_dol))
                 {
                     EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
                     mapDescriptors = mainDol.readMainDol(binReader);
 
-                    progressBar.SetProgress(60, "Read localization files...");
-                    progressBar.textArea.Text += reloadUIMessages(mapDescriptors);
-                    progressBar.textArea.Update();
+                    progressBar.SetProgress(30, "Read localization files...");
+                    progressBar.appendText(reloadUIMessages(mapDescriptors));
                 }
-                progressBar.SetProgress(80, "Populate UI...");
+                progressBar.SetProgress(35, "Populate UI...");
 
                 Go.Enabled = false;
                 BindingSource bs = new BindingSource();
                 bs.DataSource = mapDescriptors;
                 dataGridView1.DataSource = bs;
 
-                progressBar.SetProgress(100, "Loaded successfully.");
+                progressBar.SetProgress(40, "Extract WBFS/ISO async...");
 
-                extractIsoTask = WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, null, 0, 0);
+                await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 40, 100);
+
+                progressBar.SetProgress(100, "Loaded successfully.");
             }
             catch (Exception e2)
             {
                 reset();
 
-                progressBar.textArea.Text += e2.Message;
+                progressBar.appendText(e2.Message);
                 progressBar.EnableButton();
 
                 Console.Error.WriteLine(e2.ToString());
+            }
+            finally
+            {
+                tokenSource2.Dispose();
             }
             updateDataGridData(null, null);
         }
@@ -424,7 +420,7 @@ namespace CustomStreetManager
                 }
 
                 ProgressBar progressBar = new ProgressBar();
-                progressBar.Show();
+                progressBar.Show(this);
                 progressBar.SetProgress(0, "Generating Map Descriptor File...");
 
                 string extractedFiles = "";
@@ -455,7 +451,7 @@ namespace CustomStreetManager
                     extractedFiles += fileNameFrb4 + Environment.NewLine;
                 }
                 progressBar.SetProgress(100, "Done. Generated md file and extracted frb file(s):");
-                progressBar.textArea.Text += extractedFiles;
+                progressBar.appendText(extractedFiles);
             }
         }
 
@@ -468,7 +464,7 @@ namespace CustomStreetManager
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
                 ProgressBar progressBar = new ProgressBar();
-                progressBar.Show();
+                progressBar.Show(this);
                 try
                 {
                     MapDescriptor mapDescriptorImport = new MapDescriptor();
@@ -481,10 +477,10 @@ namespace CustomStreetManager
 
                     if (mapDescriptorImport.VentureCardActiveCount != 64)
                     {
-                        progressBar.textArea.Text += "Warning: The venture card count needs to be 64 or the game will choose a default venture card table." + Environment.NewLine;
+                        progressBar.appendText("Warning: The venture card count needs to be 64 or the game will choose a default venture card table." + Environment.NewLine);
                     }
 
-                    progressBar.textArea.Text += "Imported " + mapDescriptorImportFile + Environment.NewLine;
+                    progressBar.appendText("Imported " + mapDescriptorImportFile + Environment.NewLine);
 
                     progressBar.SetProgress(20, "Read additional data from frb file(s)...");
                     mapDescriptorImport.readFrbFileInfo(dir);
@@ -496,7 +492,7 @@ namespace CustomStreetManager
                     var importFile = Path.Combine(dir, frbFileName + ".frb");
                     var importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                     File.Copy(importFile, importFileTmp, true);
-                    progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
+                    progressBar.appendText("Imported " + importFile + Environment.NewLine);
 
                     frbFileName = mapDescriptorImport.FrbFile2;
                     if (frbFileName != null)
@@ -504,7 +500,7 @@ namespace CustomStreetManager
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                         File.Copy(importFile, importFileTmp, true);
-                        progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
+                        progressBar.appendText("Imported " + importFile + Environment.NewLine);
                     }
                     frbFileName = mapDescriptorImport.FrbFile3;
                     if (frbFileName != null)
@@ -512,7 +508,7 @@ namespace CustomStreetManager
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                         File.Copy(importFile, importFileTmp, true);
-                        progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
+                        progressBar.appendText("Imported " + importFile + Environment.NewLine);
                     }
                     frbFileName = mapDescriptorImport.FrbFile4;
                     if (frbFileName != null)
@@ -520,7 +516,7 @@ namespace CustomStreetManager
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                         File.Copy(importFile, importFileTmp, true);
-                        progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
+                        progressBar.appendText("Imported " + importFile + Environment.NewLine);
                     }
                     progressBar.SetProgress(80, "Update UI...");
                     mapDescriptor.set(mapDescriptorImport);
@@ -532,7 +528,7 @@ namespace CustomStreetManager
                 }
                 catch (Exception e)
                 {
-                    progressBar.textArea.Text += e.Message;
+                    progressBar.appendText(e.Message);
                     progressBar.EnableButton();
                     Console.Error.WriteLine(e.ToString());
                 }

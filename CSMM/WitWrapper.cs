@@ -11,6 +11,7 @@ using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace CustomStreetManager
 {
@@ -57,7 +58,7 @@ namespace CustomStreetManager
             File.Delete(zipFilePath);
         }
 
-        private static void makeSureWitInstalled()
+        public static void makeSureWitInstalled()
         {
             if (!witExists())
             {
@@ -81,24 +82,26 @@ namespace CustomStreetManager
             }
         }
 
-        private static Task<int> callWitAsync(string arguments, Action<int, string, string> update, int progressMin, int progressMax)
+        private static async Task<string> callWit(string arguments, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             makeSureWitInstalled();
 
             ProcessStartInfo psi = prepareCallWit(arguments);
 
-            return callWitAsync_(psi, update, progressMin, progressMax);
-        }
-
-        private static async Task<int> callWitAsync_(ProcessStartInfo psi, Action<int, string, string> update, int progressMin, int progressMax)
-        {
             var exitCode = 0;
+            string output = "";
+            string error = "";
             using (Process process = Process.Start(psi))
             {
                 var stdOut = process.StandardOutput;
                 var stdErr = process.StandardError;
                 while (!process.HasExited)
                 {
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        process.Kill();
+                        break;
+                    }
                     string line = stdOut.ReadLine();
                     while (line != null)
                     {
@@ -107,10 +110,6 @@ namespace CustomStreetManager
                         {
                             var percentage = match.Groups[1].Value;
                             float number = int.Parse(percentage) / 100.0f;
-                            if(number < 0 ||number > 100)
-                            {
-                                Console.WriteLine("What");
-                            }
                             update?.Invoke((int)lerp(progressMin, progressMax, number), line, null);
                         } else
                         {
@@ -118,6 +117,7 @@ namespace CustomStreetManager
                         }
                         
                         Console.Out.WriteLine(line);
+                        output += line + Environment.NewLine;
                         line = stdOut.ReadLine();
                     }
                     line = stdErr.ReadLine();
@@ -125,45 +125,24 @@ namespace CustomStreetManager
                     {
                         update?.Invoke(-1, null, line);
                         Console.Error.WriteLine(line);
-                        line = stdErr.ReadLine();
+                        error += line + Environment.NewLine;
                     }
                     await Task.Delay(100);
                 }
                 exitCode = process.ExitCode;
             }
-            return exitCode;
+
+            if(exitCode != 0)
+            {
+                throw new ApplicationException("WIT returned non-zero exit code: " + exitCode + ". Output: " + error);
+            }
+
+            return output;
         }
 
         static float lerp(float v0, float v1, float t)
         {
             return (1 - t) * v0 + t * v1;
-        }
-
-        private static string callWitSync(string arguments)
-        {
-            makeSureWitInstalled();
-            ProcessStartInfo psi = prepareCallWit(arguments);
-
-            string result = "";
-            using (Process process = Process.Start(psi))
-            {
-                process.WaitForExit();
-                if (process.ExitCode != 0)
-                {
-                    string error;
-                    using (StreamReader reader = process.StandardError)
-                    {
-                        error = reader.ReadToEnd();
-                    }
-                    throw new InvalidOperationException("WIT returned non-zero exit code: " + process.ExitCode + ". Output: " + error);
-                }
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    result = reader.ReadToEnd();
-                }
-            }
-            Console.Write(result);
-            return result;
         }
 
         private static ProcessStartInfo prepareCallWit(string arguments)
@@ -196,7 +175,7 @@ namespace CustomStreetManager
                 File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
         }
 
-        public static FileSet extractFiles(string inputFile)
+        public static async Task<FileSet> extractFiles(string inputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
             if (Directory.Exists(tmpDirectory))
@@ -205,7 +184,7 @@ namespace CustomStreetManager
             }
 
             string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
-            callWitSync(arguments);
+            await callWit(arguments, cancelToken, update, progressMin, progressMax);
 
             FileSet fileSet = new FileSet();
             fileSet.main_dol = Path.Combine(tmpDirectory, "sys", "main.dol");
@@ -220,28 +199,28 @@ namespace CustomStreetManager
             return fileSet;
         }
 
-        public static Task<int> extractFullIsoAsync(string inputFile, Action<int, string, string> update, int progressMin, int progressMax)
+        public static async Task<string> extractFullIsoAsync(string inputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
             if (!Directory.Exists(tmpExtract))
             {
                 string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + tmpExtract + "\"";
-                return callWitAsync(arguments, update, progressMin, progressMax);
+                return await callWit(arguments, cancelToken, update, progressMin, progressMax);
             }
             return null;
         }
 
-        public static Task<int> packFullIso(string inputFile, string outputFile, Action<int, string, string> update, int progressMin, int progressMax)
+        public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
             string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
-            return callWitAsync(arguments, update, progressMin, progressMax);
+            return await callWit(arguments, cancelToken, update, progressMin, progressMax);
         }
 
-        public static List<MainDolSection> readSections(string inputFile)
+        public static async Task<List<MainDolSection>> readSections(string inputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string arguments = "DUMP -l \"" + inputFile + "\"";
-            string witSectionDump = callWitSync(arguments);
+            string witSectionDump = await callWit(arguments, cancelToken, update, progressMin, progressMax);
 
             List<MainDolSection> sections = new List<MainDolSection>();
 
@@ -281,16 +260,16 @@ namespace CustomStreetManager
             return sections;
         }
 
-        public static void createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size)
+        public static async Task<string> createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string arguments = "DOLPATCH \"" + mainDolFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
-            string output = callWitSync(arguments);
+            return await callWit(arguments, cancelToken, update, progressMin, progressMax);
         }
 
-        public static string applyPatch(string mainDolFile, string xmlPatchFile)
+        public static async Task<string> applyPatch(string mainDolFile, string xmlPatchFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string arguments = "DOLPATCH \"" + mainDolFile + "\" xml=\""+xmlPatchFile+"\"";
-            return callWitSync(arguments);
+            return await callWit(arguments, cancelToken, update, progressMin, progressMax);
         }
     }
 }

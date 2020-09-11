@@ -26,6 +26,7 @@ namespace CustomStreetManager
         public void SetProgressBarLabel(string text)
         {
             progressLabel.Text = text;
+            progressLabel.Update();
         }
 
         public void SetProgressBarValue(int num)
@@ -60,13 +61,22 @@ namespace CustomStreetManager
             }
             if (standardOutput != null)
             {
-                textArea.Text += standardOutput;
+                textBox.AppendText(standardOutput + Environment.NewLine);
             }
             if (errorOutput != null)
             {
-                textArea.Text += errorOutput;
+                textBox.AppendText(errorOutput + Environment.NewLine);
             }
-            textArea.Update();
+            Update();
+        }
+
+        public void appendText(string text)
+        {
+            textBox.AppendText(text);
+        }
+
+        private void ProgressBar_FormClosed(object sender, FormClosedEventArgs e)
+        {
         }
     }
 }

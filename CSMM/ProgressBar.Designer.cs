@@ -31,7 +31,7 @@
             this.mapReplaceProgressBar = new System.Windows.Forms.ProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
             this.progressLabel = new System.Windows.Forms.Label();
-            this.textArea = new System.Windows.Forms.TextBox();
+            this.textBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // mapReplaceProgressBar
@@ -51,13 +51,13 @@
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.cancelButton.Enabled = false;
             this.cancelButton.Location = new System.Drawing.Point(104, 179);
             this.cancelButton.Margin = new System.Windows.Forms.Padding(1);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(212, 32);
             this.cancelButton.TabIndex = 1;
             this.cancelButton.Text = "Close";
-            this.cancelButton.Enabled = false;
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
@@ -72,14 +72,14 @@
             this.progressLabel.Text = "label1";
             this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // textBox1
+            // textBox
             // 
-            this.textArea.Location = new System.Drawing.Point(13, 51);
-            this.textArea.Multiline = true;
-            this.textArea.Name = "textBox1";
-            this.textArea.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textArea.Size = new System.Drawing.Size(396, 72);
-            this.textArea.TabIndex = 3;
+            this.textBox.Location = new System.Drawing.Point(13, 51);
+            this.textBox.Multiline = true;
+            this.textBox.Name = "textBox";
+            this.textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox.Size = new System.Drawing.Size(396, 72);
+            this.textBox.TabIndex = 3;
             // 
             // ProgressBar
             // 
@@ -87,7 +87,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(421, 221);
-            this.Controls.Add(this.textArea);
+            this.Controls.Add(this.textBox);
             this.Controls.Add(this.progressLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.mapReplaceProgressBar);
@@ -98,7 +98,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Updating ISO";
-            this.TopMost = true;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ProgressBar_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -109,6 +109,6 @@
         private System.Windows.Forms.ProgressBar mapReplaceProgressBar;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Label progressLabel;
-        public System.Windows.Forms.TextBox textArea;
+        private System.Windows.Forms.TextBox textBox;
     }
 }
