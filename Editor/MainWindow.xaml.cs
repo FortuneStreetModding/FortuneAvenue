@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using FSEditor.FSData;
 using System.IO;
 using System.Linq;
+using CustomStreetManager;
 
 namespace Editor
 {
@@ -174,13 +175,13 @@ namespace Editor
 
             switch (board.BoardInfo.GalaxyStatus)
             {
-                case 0:
+                case LoopingMode.None:
                     this.GalaxyNLoop.IsChecked = true;
                     break;
-                case 1:
+                case LoopingMode.Both:
                     this.GalaxyVHLoop.IsChecked = true;
                     break;
-                case 2:
+                case LoopingMode.Vertical:
                     this.GalaxyVLoop.IsChecked = true;
                     break;
                 default:
@@ -770,15 +771,15 @@ namespace Editor
 
             if ((bool)this.GalaxyNLoop.IsChecked)
             {
-                board.BoardInfo.GalaxyStatus = 0;
+                board.BoardInfo.GalaxyStatus = LoopingMode.None;
             }
             else if ((bool)this.GalaxyVLoop.IsChecked)
             {
-                board.BoardInfo.GalaxyStatus = 2;
+                board.BoardInfo.GalaxyStatus = LoopingMode.Vertical;
             }
             else if ((bool)this.GalaxyVHLoop.IsChecked)
             {
-                board.BoardInfo.GalaxyStatus = 1;
+                board.BoardInfo.GalaxyStatus = LoopingMode.Both;
             }
         }
 
@@ -843,6 +844,12 @@ namespace Editor
                 double yield = (double)price / (double)value;
                 PriceRatio.Text = yield.ToString("0.00");
             }
+        }
+
+        private void openCSMM(object sender, RoutedEventArgs e)
+        {
+            CSMM f2 = new CSMM();
+            f2.Show();
         }
     }
 }

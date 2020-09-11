@@ -1,11 +1,5 @@
-
-/Editor/bin/Release/*
-/Editor/bin/Debug/*
-/Editor/obj/Release/*
-/Editor/obj/Debug/*
-/Lib/bin/Release/*
-/Lib/bin/Debug/*
-/Lib/obj/Release/*
-/Lib/obj/Debug/*
+bin
+obj
 *.suo
 *.user
+MapDescriptorTemplate.cs
