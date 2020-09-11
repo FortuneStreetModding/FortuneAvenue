@@ -30,7 +30,7 @@
         <KeyBinding Key="N" Modifiers="Control" Command="New"/>
         <KeyBinding Key="O" Modifiers="Control" Command="Open"/>
         <KeyBinding Key="S" Modifiers="Control" Command="Save"/>
-        <KeyBinding Key="S" Modifiers="Control+Alt" Command="SaveAs"/>
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="SaveAs"/>
         <KeyBinding Key="F1" Modifiers="Control" Command="Help"/>
     </Window.InputBindings>
     <DockPanel>
