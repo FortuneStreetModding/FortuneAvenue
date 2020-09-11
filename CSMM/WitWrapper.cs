@@ -281,10 +281,16 @@ namespace CustomStreetManager
             return sections;
         }
 
-        public static void createNewTextSection(string inputFile, UInt32 virtualAddress, UInt32 size)
+        public static void createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size)
         {
-            string arguments = "DOLPATCH \"" + inputFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
+            string arguments = "DOLPATCH \"" + mainDolFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
             string output = callWitSync(arguments);
+        }
+
+        public static string applyPatch(string mainDolFile, string xmlPatchFile)
+        {
+            string arguments = "DOLPATCH \"" + mainDolFile + "\" xml=\""+xmlPatchFile+"\"";
+            return callWitSync(arguments);
         }
     }
 }

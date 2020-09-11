@@ -36,6 +36,7 @@ namespace FSEditor.MapDescriptor
         public static readonly UInt32 START_MAP_DEFAULTS_TABLE_VIRTUAL = 0x804363c8;
         public static readonly UInt32 START_MAP_DATA_TABLE_VIRTUAL = 0x80428e50;
         public static readonly UInt32 START_VENTURE_CARD_TABLE_VIRTUAL = 0x80410648;
+        public static readonly UInt32 START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL = 0x80436bc0;
 
         public static readonly uint TABLE_MAP_ICON_VIRTUAL = 0x8047f5c0;
 
@@ -139,6 +140,29 @@ namespace FSEditor.MapDescriptor
                 MapDescriptor mapDescriptor = mapDescriptors[i];
                 mapDescriptor.readMapDefaultsFromStream(binReader);
             }
+            UInt32[] descMsgIdTable = new UInt32[18 * 2];
+            binReader.Seek(toFileAddress(START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL), SeekOrigin.Begin);
+            for (int i = 0; i < descMsgIdTable.Length; i++)
+            {
+                descMsgIdTable[i] = binReader.ReadUInt32();
+            }
+            // has the hack for expanded Description message table already been applied?
+            binReader.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin);
+            var opcode = binReader.ReadUInt32();
+            var hackExpandedDescriptionMessageTableApplied = opcode == 0x3863fffd;
+            var j = 0;
+            foreach (MapDescriptor mapDescriptor in mapDescriptors)
+            {
+                if (mapDescriptor.ID < 18)
+                {
+                    mapDescriptor.Desc_MSG_ID = descMsgIdTable[j];
+                    j++;
+                    if (j == 18 && !hackExpandedDescriptionMessageTableApplied) // vanilla
+                    {
+                        j = 0;
+                    }
+                }
+            }
 
             binReader.Seek(toFileAddress(START_VENTURE_CARD_TABLE_VIRTUAL), SeekOrigin.Begin);
             for (int i = 0; i < 42; i++)
@@ -163,6 +187,13 @@ namespace FSEditor.MapDescriptor
             totalBytesWritten = 0;
             totalBytesLeft = 0;
 
+            // HACK: Expand the description message ID table
+            // subi r3,r3,0x15                                      ->   subi r3,r3,0x03
+            stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin); stream.Write(0x3863fffd);
+            // cmpwi r3,0x12                                        ->   cmpwi r3,0x24
+            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin); stream.Write(0x2c030024);
+            // lwzx r3=>DWORD_80436c08,r3,r0                        ->   li r3,0x1153
+            stream.Seek(toFileAddress(0x80212238), SeekOrigin.Begin); stream.Write(0x38601153);
 
             // HACK: remove the use of Map Difficulty and Map General Play Time to free up some space
             /* stream.Seek(toFileAddress(0x801fd9b8), SeekOrigin.Begin);
@@ -272,6 +303,21 @@ namespace FSEditor.MapDescriptor
             for (int i = 0; i < 42; i++)
             {
                 mapDescriptors[i].writeVentureCardTable(stream);
+            }
+
+            stream.Seek(toFileAddress(START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL), SeekOrigin.Begin);
+            int j = 0;
+            for (int i = 0; i < 48; i++)
+            {
+                if (mapDescriptors[i].ID < 18)
+                {
+                    stream.Write(mapDescriptors[i].Desc_MSG_ID);
+                    j++;
+                }
+            }
+            if (j != 18 * 2)
+            {
+                throw new DataMisalignedException("Expected to write " + 18 * 2 + " Description Message Ids, but wrote " + j + ".");
             }
 
             // custom map icon hack

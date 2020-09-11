@@ -74,6 +74,7 @@ namespace CustomStreetManager
             try
             {
                 progressBar.SetProgress(0, "Writing data to main.dol...");
+                // HACK: expand the description message table
                 using (Stream baseStream = File.Open(tempMainDol, FileMode.Open))
                 {
                     EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
@@ -96,12 +97,13 @@ namespace CustomStreetManager
                     ui_message.writeToFile(fileSet_ui_message_csv);
                 }
 
+                int errorCode = 0;
                 // check if iso has been extracted already
                 if (extractIsoTask != null)
                 {
                     progressBar.SetProgress(10, "Extracting ISO/WBFS file...");
-                    int errorCode = await extractIsoTask;
-                    if (errorCode == 0)
+                    errorCode = await extractIsoTask;
+                    if (errorCode != 0)
                     {
                         throw new ApplicationException("Wit extraction job returned non-zero exit code: " + errorCode);
                     }
@@ -111,7 +113,11 @@ namespace CustomStreetManager
                 WitWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
 
                 progressBar.SetProgress(30, "Packing ISO/WBFS file...");
-                await WitWrapper.packFullIso(inputfilename, outputFilename, progressBar.update, 30, 100);
+                errorCode = await WitWrapper.packFullIso(inputfilename, outputFilename, progressBar.update, 30, 100);
+                if (errorCode != 0)
+                {
+                    throw new ApplicationException("Wit packing job returned non-zero exit code: " + errorCode);
+                }
 
                 progressBar.SetProgress(100, "Done.");
             }

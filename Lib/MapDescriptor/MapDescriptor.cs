@@ -161,11 +161,6 @@ namespace FSEditor.MapDescriptor
             ID = stream.ReadUInt32();
             // ignore BG Sequence
             UInt32 BGSequenceAddr = stream.ReadUInt32();
-
-            if (ID >= 0 && ID < 18)
-            {
-                Desc_MSG_ID = 4416 + ID;
-            }
         }
         public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr)
         {
