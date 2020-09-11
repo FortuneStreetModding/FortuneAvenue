@@ -10,7 +10,9 @@ namespace FSEditor.MapDescriptor
     public class UI_Message
     {
         SortedDictionary<uint, string> map = new SortedDictionary<uint, string>();
-        public UI_Message(string fileName)
+        private string locale;
+
+        public UI_Message(string fileName, string locale)
         {
             string[] lines = File.ReadAllLines(fileName);
             for (int i = 0; i < lines.Length; i += 1)
@@ -21,6 +23,7 @@ namespace FSEditor.MapDescriptor
                 string value = columns[1].Trim().Replace("\"", "");
                 map.Add(key, value);
             }
+            this.locale = locale;
         }
 
         public string get(uint key)
@@ -28,9 +31,43 @@ namespace FSEditor.MapDescriptor
             return map[key];
         }
 
-        public void set(uint key, string value)
+        public uint freeKey()
         {
-            map[key] = value;
+            uint i = 0;
+            while(map.ContainsKey(i))
+            {
+                i++;
+            }
+            return i;
+        }
+        public void add(uint freeKey, string v)
+        {
+            map.Add(freeKey, v);
+        }
+
+        public void set(uint freeKey, string v)
+        {
+            map[freeKey] = v;
+        }
+
+        public void set(List<MapDescriptor> mapDescriptors)
+        {
+            foreach(MapDescriptor mapDescriptor in mapDescriptors)
+            {
+                map[mapDescriptor.Name_MSG_ID] = mapDescriptor.Name[locale];
+                map[mapDescriptor.Desc_MSG_ID] = mapDescriptor.Desc[locale];
+            }
+        }
+
+        public void writeToFile(string filename)
+        {
+            using (StreamWriter file = new StreamWriter(filename))
+            {
+                foreach (var entry in map)
+                {
+                    file.WriteLine("{0},\"{1}\"", entry.Key, entry.Value);
+                }
+            }
         }
     }
 }

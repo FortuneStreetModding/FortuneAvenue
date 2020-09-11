@@ -383,7 +383,7 @@ namespace CustomStreetManager
             // 
             // Venture_Card_Count
             // 
-            this.Venture_Card_Count.DataPropertyName = "Venture_Card_Count";
+            this.Venture_Card_Count.DataPropertyName = "VentureCardActiveCount";
             this.Venture_Card_Count.HeaderText = "Venture Card Count";
             this.Venture_Card_Count.Name = "Venture_Card_Count";
             this.Venture_Card_Count.ReadOnly = true;

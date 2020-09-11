@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace CustomStreetManager
 {
@@ -80,27 +81,74 @@ namespace CustomStreetManager
             }
         }
 
-        public static async Task<string> callWitAsync(string arguments)
+        private static Task<int> callWitAsync(string arguments, Action<int, string, string> update, int progressMin, int progressMax)
         {
             makeSureWitInstalled();
-            return await Task.Run(() => callWitSync(arguments));
+
+            ProcessStartInfo psi = prepareCallWit(arguments);
+
+            return callWitAsync_(psi, update, progressMin, progressMax);
+        }
+
+        private static async Task<int> callWitAsync_(ProcessStartInfo psi, Action<int, string, string> update, int progressMin, int progressMax)
+        {
+            var exitCode = 0;
+            using (Process process = Process.Start(psi))
+            {
+                var stdOut = process.StandardOutput;
+                var stdErr = process.StandardError;
+                while (!process.HasExited)
+                {
+                    string line = stdOut.ReadLine();
+                    while (line != null)
+                    {
+                        Match match = Regex.Match(line, @"(\d+)%");
+                        if (match.Success && match.Groups.Count == 2)
+                        {
+                            var percentage = match.Groups[1].Value;
+                            float number = int.Parse(percentage) / 100.0f;
+                            if(number < 0 ||number > 100)
+                            {
+                                Console.WriteLine("What");
+                            }
+                            update?.Invoke((int)lerp(progressMin, progressMax, number), line, null);
+                        } else
+                        {
+                            update?.Invoke(-1, line, null);
+                        }
+                        
+                        Console.Out.WriteLine(line);
+                        line = stdOut.ReadLine();
+                    }
+                    line = stdErr.ReadLine();
+                    while (line != null)
+                    {
+                        update?.Invoke(-1, null, line);
+                        Console.Error.WriteLine(line);
+                        line = stdErr.ReadLine();
+                    }
+                    await Task.Delay(100);
+                }
+                exitCode = process.ExitCode;
+            }
+            return exitCode;
+        }
+
+        static float lerp(float v0, float v1, float t)
+        {
+            return (1 - t) * v0 + t * v1;
         }
 
         private static string callWitSync(string arguments)
         {
-            string witFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wit.exe");
-            ProcessStartInfo psi = new ProcessStartInfo(witFilePath, arguments);
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
-            psi.WorkingDirectory = Directory.GetCurrentDirectory();
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
+            makeSureWitInstalled();
+            ProcessStartInfo psi = prepareCallWit(arguments);
 
             string result = "";
             using (Process process = Process.Start(psi))
             {
                 process.WaitForExit();
-                if (process.ExitCode != 0 && process.ExitCode != 64)
+                if (process.ExitCode != 0)
                 {
                     string error;
                     using (StreamReader reader = process.StandardError)
@@ -116,6 +164,18 @@ namespace CustomStreetManager
             }
             Console.Write(result);
             return result;
+        }
+
+        private static ProcessStartInfo prepareCallWit(string arguments)
+        {
+            string witFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wit.exe");
+            ProcessStartInfo psi = new ProcessStartInfo(witFilePath, arguments);
+            psi.CreateNoWindow = true;
+            psi.UseShellExecute = false;
+            psi.WorkingDirectory = Directory.GetCurrentDirectory();
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
+            return psi;
         }
 
         internal static void copyRelevantFilesForPacking(FileSet fileSet, string inputFile)
@@ -144,7 +204,7 @@ namespace CustomStreetManager
                 Directory.Delete(tmpDirectory, true);
             }
 
-            string arguments = "COPY --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
+            string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
             callWitSync(arguments);
 
             FileSet fileSet = new FileSet();
@@ -160,18 +220,22 @@ namespace CustomStreetManager
             return fileSet;
         }
 
-        public static Task<string> extractFullIsoAsync(string inputFile)
+        public static Task<int> extractFullIsoAsync(string inputFile, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
-            string arguments = "COPY --fst --preserve --update \"" + inputFile + "\" \"" + tmpExtract + "\"";
-            return callWitAsync(arguments);
+            if (!Directory.Exists(tmpExtract))
+            {
+                string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + tmpExtract + "\"";
+                return callWitAsync(arguments, update, progressMin, progressMax);
+            }
+            return null;
         }
 
-        public static string packFullIso(string inputFile, string outputFile)
+        public static Task<int> packFullIso(string inputFile, string outputFile, Action<int, string, string> update, int progressMin, int progressMax)
         {
             string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
-            string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite";
-            return callWitSync(arguments);
+            string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
+            return callWitAsync(arguments, update, progressMin, progressMax);
         }
 
         public static List<MainDolSection> readSections(string inputFile)

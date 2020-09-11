@@ -849,7 +849,7 @@ namespace Editor
         private void openCSMM(object sender, RoutedEventArgs e)
         {
             CSMM f2 = new CSMM();
-            f2.ShowDialog();
+            f2.Show();
         }
     }
 }

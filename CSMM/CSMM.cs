@@ -15,6 +15,7 @@ using System.Drawing;
 using MiscUtil.IO;
 using MiscUtil.Conversion;
 using System.Threading.Tasks;
+using FSEditor.FSData;
 
 namespace CustomStreetManager
 {
@@ -23,7 +24,8 @@ namespace CustomStreetManager
         private FileSet fileSet;
         private List<MapDescriptor> mapDescriptors;
         private MainDol mainDol;
-        Task<string> extractIsoTask;
+        private Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
+        Task<int> extractIsoTask;
 
         public CSMM()
         {
@@ -55,73 +57,72 @@ namespace CustomStreetManager
                 MessageBox.Show("Please set the output file.");
                 return;
             }
-            if (extractIsoTask == null)
+            ProgressBar progressBar = new ProgressBar();
+            progressBar.Show();
+
+            // expand dol if not already expanded
+            /*if (mainDol.toFileAddress(0x80001800) == -1)
             {
-                MessageBox.Show("Error: Async extractIsoTask is null");
-            }
+                WitWrapper.createNewTextSection(fileSet.main_dol, 0x80001800, 0x1800);
+                mainDol.setSections(WitWrapper.readSections(fileSet.main_dol));
+            }*/
 
-            DialogResult dialogResult = MessageBox.Show("Proceeding here will inject the imported map descriptors into the input ISO/WBFS file. Please make sure to have a backup.", "Start Injection", MessageBoxButtons.OKCancel);
-            if (dialogResult == DialogResult.OK)
+            var tempMainDol = fileSet.main_dol + ".tmp";
+            File.Copy(fileSet.main_dol, tempMainDol, true);
+
+            progressBar.textArea.Text = "";
+            try
             {
-
-
-                ProgressBar progressBar = new ProgressBar();
-                progressBar.Show();
-
-                // expand dol if not already expanded
-                /*if (mainDol.toFileAddress(0x80001800) == -1)
+                progressBar.SetProgress(0, "Writing data to main.dol...");
+                using (Stream baseStream = File.Open(tempMainDol, FileMode.Open))
                 {
-                    WitWrapper.createNewTextSection(fileSet.main_dol, 0x80001800, 0x1800);
-                    mainDol.setSections(WitWrapper.readSections(fileSet.main_dol));
-                }*/
+                    EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
+                    mainDol.writeMainDol(stream, mapDescriptors);
 
-                var tempMainDol = fileSet.main_dol + ".tmp";
-                File.Copy(fileSet.main_dol, tempMainDol, true);
+                    progressBar.textArea.Text += "Amount of free space used in main.dol: " + mainDol.totalBytesWritten + " bytes" + Environment.NewLine;
+                    progressBar.textArea.Text += "Amount of free space left in main.dol: " + mainDol.totalBytesLeft + " bytes" + Environment.NewLine;
+                    progressBar.textArea.Update();
+                }
+                // everything went through successfully, copy the temp file
+                File.Copy(tempMainDol, fileSet.main_dol, true);
+                File.Delete(tempMainDol);
 
-                var info = "";
-                try
+                progressBar.SetProgress(5, "Writing localization files...");
+                foreach (var entry in ui_messages)
                 {
-                    progressBar.SetProgress(20, "Writing data to main.dol...");
-                    using (Stream baseStream = File.Open(tempMainDol, FileMode.Open))
+                    string fileSet_ui_message_csv = entry.Key;
+                    UI_Message ui_message = entry.Value;
+                    ui_message.set(mapDescriptors);
+                    ui_message.writeToFile(fileSet_ui_message_csv);
+                }
+
+                // check if iso has been extracted already
+                if (extractIsoTask != null)
+                {
+                    progressBar.SetProgress(10, "Extracting ISO/WBFS file...");
+                    int errorCode = await extractIsoTask;
+                    if (errorCode == 0)
                     {
-                        EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
-                        mainDol.writeMainDol(stream, mapDescriptors);
-
-                        progressBar.SetProgress(20, "Done.");
-
-                        info += "Amount of free space used: " + mainDol.totalBytesWritten + " bytes" + Environment.NewLine;
-                        info += "Amount of free space left: " + mainDol.totalBytesLeft + " bytes" + Environment.NewLine;
+                        throw new ApplicationException("Wit extraction job returned non-zero exit code: " + errorCode);
                     }
-                    // everything went through successfully, copy the temp file
-                    File.Copy(tempMainDol, fileSet.main_dol, true);
-                    File.Delete(tempMainDol);
-
-                    // check if iso has been extracted already
-                    progressBar.SetProgress(40, "Extracting ISO/WBFS file...");
-                    string result = await extractIsoTask;
-
-                    progressBar.SetProgress(60, "Copying the modified files to be packed into the image...");
-                    WitWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
-
-                    progressBar.SetProgress(80, "Packing ISO/WBFS file...");
-                    WitWrapper.packFullIso(inputfilename, outputFilename);
-
-                    progressBar.SetProgress(100, "Done.");
-                    progressBar.SetProgressBarText(info);
-                }
-                catch (Exception e2)
-                {
-                    progressBar.SetProgressBarText(e2.Message);
-                    progressBar.EnableButton();
-                    Console.Error.WriteLine(e2.ToString());
                 }
 
+                progressBar.SetProgress(25, "Copying the modified files to be packed into the image...");
+                WitWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
+
+                progressBar.SetProgress(30, "Packing ISO/WBFS file...");
+                await WitWrapper.packFullIso(inputfilename, outputFilename, progressBar.update, 30, 100);
+
+                progressBar.SetProgress(100, "Done.");
             }
-        }
-
-        private void writeLocalization()
-        {
-
+            catch (Exception e2)
+            {
+                progressBar.textArea.Text += e2.Message;
+                progressBar.textArea.Text += Environment.NewLine + Environment.NewLine + e2.ToString();
+                progressBar.textArea.Update();
+                progressBar.EnableButton();
+                Console.Error.WriteLine(e2.ToString());
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -136,9 +137,9 @@ namespace CustomStreetManager
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
             saveFileDialog1.Title = "Where shall the patches ISO/WBFS be saved?";
-            saveFileDialog1.FileName = "Patched File";
+            saveFileDialog1.FileName = Path.GetFileName(setInputISOLocation.Text);
 
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 setOutputPathLabel.Text = saveFileDialog1.FileName;
             }
@@ -148,24 +149,78 @@ namespace CustomStreetManager
             }
         }
 
-        private void ReloadWbfsIsoFile()
+        private string reloadUIMessages(List<MapDescriptor> mapDescriptors)
         {
             string warnings = "";
+            ui_messages[fileSet.ui_message_en_csv] = new UI_Message(fileSet.ui_message_en_csv, Locale.EN);
+            ui_messages[fileSet.ui_message_de_csv] = new UI_Message(fileSet.ui_message_de_csv, Locale.DE);
+            ui_messages[fileSet.ui_message_fr_csv] = new UI_Message(fileSet.ui_message_fr_csv, Locale.FR);
+            ui_messages[fileSet.ui_message_it_csv] = new UI_Message(fileSet.ui_message_it_csv, Locale.IT);
+            ui_messages[fileSet.ui_message_su_csv] = new UI_Message(fileSet.ui_message_su_csv, Locale.ES);
+            ui_messages[fileSet.ui_message_jp_csv] = new UI_Message(fileSet.ui_message_jp_csv, Locale.JP);
+            ui_messages[fileSet.ui_message_uk_csv] = ui_messages[fileSet.ui_message_en_csv];
+            foreach (MapDescriptor mapDescriptor in mapDescriptors)
+            {
+                mapDescriptor.Name[Locale.EN] = ui_messages[fileSet.ui_message_en_csv].get(mapDescriptor.Name_MSG_ID);
+                mapDescriptor.Name[Locale.DE] = ui_messages[fileSet.ui_message_de_csv].get(mapDescriptor.Name_MSG_ID);
+                mapDescriptor.Name[Locale.FR] = ui_messages[fileSet.ui_message_fr_csv].get(mapDescriptor.Name_MSG_ID);
+                mapDescriptor.Name[Locale.IT] = ui_messages[fileSet.ui_message_it_csv].get(mapDescriptor.Name_MSG_ID);
+                mapDescriptor.Name[Locale.ES] = ui_messages[fileSet.ui_message_su_csv].get(mapDescriptor.Name_MSG_ID);
+                mapDescriptor.Name[Locale.JP] = ui_messages[fileSet.ui_message_jp_csv].get(mapDescriptor.Name_MSG_ID);
 
+                mapDescriptor.Desc[Locale.EN] = ui_messages[fileSet.ui_message_en_csv].get(mapDescriptor.Desc_MSG_ID);
+                mapDescriptor.Desc[Locale.DE] = ui_messages[fileSet.ui_message_de_csv].get(mapDescriptor.Desc_MSG_ID);
+                mapDescriptor.Desc[Locale.FR] = ui_messages[fileSet.ui_message_fr_csv].get(mapDescriptor.Desc_MSG_ID);
+                mapDescriptor.Desc[Locale.IT] = ui_messages[fileSet.ui_message_it_csv].get(mapDescriptor.Desc_MSG_ID);
+                mapDescriptor.Desc[Locale.ES] = ui_messages[fileSet.ui_message_su_csv].get(mapDescriptor.Desc_MSG_ID);
+                mapDescriptor.Desc[Locale.JP] = ui_messages[fileSet.ui_message_jp_csv].get(mapDescriptor.Desc_MSG_ID);
+
+                warnings += mapDescriptor.readFrbFileInfo(fileSet.param_folder);
+            }
+            for (var i = 0; i <= 17; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.Name_MSG_ID == MainDol.VANILLA_FIRST_MAP_NAME_MESSAGE_ID + i)
+                {
+                    var freeKey = ui_messages.Values.First().freeKey();
+                    foreach (UI_Message ui_message in ui_messages.Values)
+                    {
+                        ui_message.set(freeKey, "");
+                    }
+                    mapDescriptor.Name_MSG_ID = freeKey;
+                }
+            }
+            for (var i = 0; i <= 17; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.Desc_MSG_ID == MainDol.VANILLA_FIRST_MAP_DESC_MESSAGE_ID + i)
+                {
+                    var freeKey = ui_messages.Values.First().freeKey();
+                    foreach (UI_Message ui_message in ui_messages.Values)
+                    {
+                        ui_message.set(freeKey, "");
+                    }
+                    mapDescriptor.Desc_MSG_ID = freeKey;
+                }
+            }
+            return warnings;
+        }
+
+        private void ReloadWbfsIsoFile()
+        {
             ProgressBar progressBar = new ProgressBar();
             progressBar.Show();
             progressBar.SetProgress(0, "Extract relevant files from iso/wbfs...");
 
             if (setInputISOLocation.Text == "None")
             {
-                progressBar.SetProgressBarText("Can't load wbfs or iso file as the input file name is not set.");
+                progressBar.textArea.Text += "Can't load wbfs or iso file as the input file name is not set.";
                 progressBar.EnableButton();
                 return;
             }
 
             try
             {
-
                 fileSet = WitWrapper.extractFiles(setInputISOLocation.Text);
 
                 progressBar.SetProgress(20, "Detect the sections in main.dol file...");
@@ -179,33 +234,8 @@ namespace CustomStreetManager
                     mapDescriptors = mainDol.readMainDol(binReader);
 
                     progressBar.SetProgress(60, "Read localization files...");
-                    UI_Message en = new UI_Message(fileSet.ui_message_en_csv);
-                    UI_Message de = new UI_Message(fileSet.ui_message_de_csv);
-                    UI_Message fr = new UI_Message(fileSet.ui_message_fr_csv);
-                    UI_Message it = new UI_Message(fileSet.ui_message_it_csv);
-                    UI_Message es = new UI_Message(fileSet.ui_message_su_csv);
-                    UI_Message jp = new UI_Message(fileSet.ui_message_jp_csv);
-                    UI_Message uk = new UI_Message(fileSet.ui_message_uk_csv);
-                    foreach (MapDescriptor mapDescriptor in mapDescriptors)
-                    {
-                        mapDescriptor.Name_EN = en.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_DE = de.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_FR = fr.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_IT = it.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_SU = es.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_JP = jp.get(mapDescriptor.Name_MSG_ID);
-                        mapDescriptor.Name_UK = uk.get(mapDescriptor.Name_MSG_ID);
-
-                        mapDescriptor.Desc_EN = en.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_DE = de.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_FR = fr.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_IT = it.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_SU = es.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_JP = jp.get(mapDescriptor.Desc_MSG_ID);
-                        mapDescriptor.Desc_UK = uk.get(mapDescriptor.Desc_MSG_ID);
-
-                        warnings += mapDescriptor.readFrbFileInfo(fileSet.param_folder);
-                    }
+                    progressBar.textArea.Text += reloadUIMessages(mapDescriptors);
+                    progressBar.textArea.Update();
                 }
                 progressBar.SetProgress(80, "Populate UI...");
 
@@ -214,22 +244,15 @@ namespace CustomStreetManager
                 bs.DataSource = mapDescriptors;
                 dataGridView1.DataSource = bs;
 
-                if (!string.IsNullOrWhiteSpace(warnings))
-                {
-                    progressBar.SetProgress(100, "Loaded successfully. Warnings:");
-                    progressBar.SetProgressBarText(warnings);
-                }
-                else
-                {
-                    progressBar.Close();
-                }
-                extractIsoTask = WitWrapper.extractFullIsoAsync(setInputISOLocation.Text);
+                progressBar.SetProgress(100, "Loaded successfully.");
+
+                extractIsoTask = WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, null, 0, 0);
             }
             catch (Exception e2)
             {
                 reset();
 
-                progressBar.SetProgressBarText(e2.Message);
+                progressBar.textArea.Text += e2.Message;
                 progressBar.EnableButton();
 
                 Console.Error.WriteLine(e2.ToString());
@@ -245,7 +268,7 @@ namespace CustomStreetManager
             openFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
             openFileDialog1.Title = "Which ISO image or WBFS file should we patch?";
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
+            if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
                 setInputISOLocation.Text = openFileDialog1.FileName;
                 ReloadWbfsIsoFile();
@@ -317,113 +340,116 @@ namespace CustomStreetManager
 
         private void exportMd(MapDescriptor mapDescriptor)
         {
-            using (var fbd = new FolderBrowserDialog())
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "Map Descriptor file and accompanying .frb files|*.md";
+            saveFileDialog1.Title = "Where shall the map files be exported?";
+            saveFileDialog1.FileName = mapDescriptor.InternalName + ".md";
+            saveFileDialog1.OverwritePrompt = false;
+
+            if (saveFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(saveFileDialog1.FileName))
             {
-                fbd.SelectedPath = Path.GetDirectoryName(setInputISOLocation.Text);
-                DialogResult result = fbd.ShowDialog();
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                var selectedFile = saveFileDialog1.FileName;
+                var directory = Path.GetDirectoryName(selectedFile);
+                string fileNameMd = selectedFile;
+                string fileNameFrb1 = Path.Combine(directory, mapDescriptor.FrbFile1 + ".frb");
+                string fileNameFrb2 = null;
+                string fileNameFrb3 = null;
+                string fileNameFrb4 = null;
+                if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile2))
+                    fileNameFrb2 = Path.Combine(directory, mapDescriptor.FrbFile2 + ".frb");
+                if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile3))
+                    fileNameFrb3 = Path.Combine(directory, mapDescriptor.FrbFile3 + ".frb");
+                if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile4))
+                    fileNameFrb4 = Path.Combine(directory, mapDescriptor.FrbFile4 + ".frb");
+
+                string filesToBeReplaced = "";
+                if (File.Exists(fileNameMd))
                 {
-                    string fileNameMd = Path.Combine(fbd.SelectedPath, mapDescriptor.InternalName + ".md");
-                    string fileNameFrb1 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile1 + ".frb");
-                    string fileNameFrb2 = null;
-                    string fileNameFrb3 = null;
-                    string fileNameFrb4 = null;
-                    if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile2))
-                        fileNameFrb2 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile2 + ".frb");
-                    if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile3))
-                        fileNameFrb3 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile3 + ".frb");
-                    if (!string.IsNullOrWhiteSpace(mapDescriptor.FrbFile4))
-                        fileNameFrb4 = Path.Combine(fbd.SelectedPath, mapDescriptor.FrbFile4 + ".frb");
-
-                    string filesToBeReplaced = "";
-                    if (File.Exists(fileNameMd))
-                    {
-                        filesToBeReplaced += fileNameMd + Environment.NewLine;
-                    }
-                    if (File.Exists(fileNameFrb1))
-                    {
-                        filesToBeReplaced += fileNameFrb1 + Environment.NewLine;
-                    }
-                    if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
-                    {
-                        filesToBeReplaced += fileNameFrb2 + Environment.NewLine;
-                    }
-                    if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
-                    {
-                        filesToBeReplaced += fileNameFrb3 + Environment.NewLine;
-                    }
-                    if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
-                    {
-                        filesToBeReplaced += fileNameFrb4 + Environment.NewLine;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(filesToBeReplaced))
-                    {
-                        DialogResult dialogResult = MessageBox.Show("The following files already exist and will be replaced:" + Environment.NewLine + filesToBeReplaced, "Files already exist", MessageBoxButtons.OKCancel);
-
-                        if (dialogResult == DialogResult.OK)
-                        {
-                            if (File.Exists(fileNameMd))
-                            {
-                                File.Delete(fileNameMd);
-                            }
-                            if (File.Exists(fileNameFrb1))
-                            {
-                                File.Delete(fileNameFrb1);
-                            }
-                            if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
-                            {
-                                File.Delete(fileNameFrb2);
-                            }
-                            if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
-                            {
-                                File.Delete(fileNameFrb3);
-                            }
-                            if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
-                            {
-                                File.Delete(fileNameFrb4);
-                            }
-                        }
-                        else if (dialogResult == DialogResult.Cancel)
-                        {
-                            return;
-                        }
-                    }
-
-                    ProgressBar progressBar = new ProgressBar();
-                    progressBar.Show();
-                    progressBar.SetProgress(0, "Generating Map Descriptor File...");
-
-                    string extractedFiles = "";
-                    using (FileStream fs = File.Create(fileNameMd))
-                    {
-                        byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.generateMapDescriptorFileContent());
-                        fs.Write(content, 0, content.Length);
-                    }
-                    extractedFiles += fileNameMd + Environment.NewLine;
-
-                    progressBar.SetProgress(50, "Copying frb files...");
-
-                    File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile1 + ".frb"), fileNameFrb1);
-                    extractedFiles += fileNameFrb1 + Environment.NewLine;
-                    if (fileNameFrb2 != null)
-                    {
-                        File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile2 + ".frb"), fileNameFrb2);
-                        extractedFiles += fileNameFrb2 + Environment.NewLine;
-                    }
-                    if (fileNameFrb3 != null)
-                    {
-                        File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile3 + ".frb"), fileNameFrb3);
-                        extractedFiles += fileNameFrb3 + Environment.NewLine;
-                    }
-                    if (fileNameFrb4 != null)
-                    {
-                        File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile4 + ".frb"), fileNameFrb4);
-                        extractedFiles += fileNameFrb4 + Environment.NewLine;
-                    }
-                    progressBar.SetProgress(100, "Done. Generated md file and extracted frb file(s):");
-                    progressBar.SetProgressBarText(extractedFiles);
+                    filesToBeReplaced += fileNameMd + Environment.NewLine;
                 }
+                if (File.Exists(fileNameFrb1))
+                {
+                    filesToBeReplaced += fileNameFrb1 + Environment.NewLine;
+                }
+                if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
+                {
+                    filesToBeReplaced += fileNameFrb2 + Environment.NewLine;
+                }
+                if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
+                {
+                    filesToBeReplaced += fileNameFrb3 + Environment.NewLine;
+                }
+                if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
+                {
+                    filesToBeReplaced += fileNameFrb4 + Environment.NewLine;
+                }
+
+                if (!string.IsNullOrWhiteSpace(filesToBeReplaced))
+                {
+                    DialogResult dialogResult = MessageBox.Show("The following files already exist and will be replaced:" + Environment.NewLine + filesToBeReplaced, "Files already exist", MessageBoxButtons.OKCancel);
+
+                    if (dialogResult == DialogResult.OK)
+                    {
+                        if (File.Exists(fileNameMd))
+                        {
+                            File.Delete(fileNameMd);
+                        }
+                        if (File.Exists(fileNameFrb1))
+                        {
+                            File.Delete(fileNameFrb1);
+                        }
+                        if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
+                        {
+                            File.Delete(fileNameFrb2);
+                        }
+                        if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
+                        {
+                            File.Delete(fileNameFrb3);
+                        }
+                        if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
+                        {
+                            File.Delete(fileNameFrb4);
+                        }
+                    }
+                    else if (dialogResult == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+
+                ProgressBar progressBar = new ProgressBar();
+                progressBar.Show();
+                progressBar.SetProgress(0, "Generating Map Descriptor File...");
+
+                string extractedFiles = "";
+                using (FileStream fs = File.Create(fileNameMd))
+                {
+                    byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.generateMapDescriptorFileContent());
+                    fs.Write(content, 0, content.Length);
+                }
+                extractedFiles += fileNameMd + Environment.NewLine;
+
+                progressBar.SetProgress(50, "Copying frb files...");
+
+                File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile1 + ".frb"), fileNameFrb1);
+                extractedFiles += fileNameFrb1 + Environment.NewLine;
+                if (fileNameFrb2 != null)
+                {
+                    File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile2 + ".frb"), fileNameFrb2);
+                    extractedFiles += fileNameFrb2 + Environment.NewLine;
+                }
+                if (fileNameFrb3 != null)
+                {
+                    File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile3 + ".frb"), fileNameFrb3);
+                    extractedFiles += fileNameFrb3 + Environment.NewLine;
+                }
+                if (fileNameFrb4 != null)
+                {
+                    File.Copy(Path.Combine(fileSet.param_folder, mapDescriptor.FrbFile4 + ".frb"), fileNameFrb4);
+                    extractedFiles += fileNameFrb4 + Environment.NewLine;
+                }
+                progressBar.SetProgress(100, "Done. Generated md file and extracted frb file(s):");
+                progressBar.textArea.Text += extractedFiles;
             }
         }
 
@@ -433,12 +459,10 @@ namespace CustomStreetManager
             openFileDialog1.Filter = "Map Descriptor File (.md)|*.md";
             openFileDialog1.Title = "Which Map to import?";
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
+            if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
-
                 ProgressBar progressBar = new ProgressBar();
                 progressBar.Show();
-                string importedFiles = "";
                 try
                 {
                     MapDescriptor mapDescriptorImport = new MapDescriptor();
@@ -448,19 +472,25 @@ namespace CustomStreetManager
                     var mapDescriptorImportFile = openFileDialog1.FileName;
                     var dir = Path.GetDirectoryName(openFileDialog1.FileName);
                     mapDescriptorImport.readMapDescriptorFromFile(mapDescriptorImportFile);
-                    importedFiles += mapDescriptorImportFile + Environment.NewLine;
 
-                    progressBar.SetProgress(30, "Read additional data from frb file(s)...");
+                    if (mapDescriptorImport.VentureCardActiveCount != 64)
+                    {
+                        progressBar.textArea.Text += "Warning: The venture card count needs to be 64 or the game will choose a default venture card table." + Environment.NewLine;
+                    }
+
+                    progressBar.textArea.Text += "Imported " + mapDescriptorImportFile + Environment.NewLine;
+
+                    progressBar.SetProgress(20, "Read additional data from frb file(s)...");
                     mapDescriptorImport.readFrbFileInfo(dir);
 
-                    progressBar.SetProgress(60, "Copy frb file(s) to tmp...");
+                    progressBar.SetProgress(40, "Copy frb file(s) to tmp...");
 
 
                     var frbFileName = mapDescriptorImport.FrbFile1;
                     var importFile = Path.Combine(dir, frbFileName + ".frb");
                     var importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                     File.Copy(importFile, importFileTmp, true);
-                    importedFiles += importFile + Environment.NewLine;
+                    progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
 
                     frbFileName = mapDescriptorImport.FrbFile2;
                     if (frbFileName != null)
@@ -468,7 +498,7 @@ namespace CustomStreetManager
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                         File.Copy(importFile, importFileTmp, true);
-                        importedFiles += importFile + Environment.NewLine;
+                        progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
                     }
                     frbFileName = mapDescriptorImport.FrbFile3;
                     if (frbFileName != null)
@@ -476,7 +506,7 @@ namespace CustomStreetManager
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                         File.Copy(importFile, importFileTmp, true);
-                        importedFiles += importFile + Environment.NewLine;
+                        progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
                     }
                     frbFileName = mapDescriptorImport.FrbFile4;
                     if (frbFileName != null)
@@ -484,21 +514,19 @@ namespace CustomStreetManager
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
                         File.Copy(importFile, importFileTmp, true);
-                        importedFiles += importFile + Environment.NewLine;
+                        progressBar.textArea.Text += "Imported " + importFile + Environment.NewLine;
                     }
-
-                    progressBar.SetProgress(90, "Update UI...");
+                    progressBar.SetProgress(80, "Update UI...");
                     mapDescriptor.set(mapDescriptorImport);
                     mapDescriptor.Dirty = true;
                     Go.Enabled = true;
                     updateDataGridData(null, null);
 
-                    progressBar.SetProgress(100, "Done. Following files have be processed and are ready to be injected:");
-                    progressBar.SetProgressBarText(importedFiles);
+                    progressBar.SetProgress(100, "Done.");
                 }
                 catch (Exception e)
                 {
-                    progressBar.SetProgressBarText(e.Message);
+                    progressBar.textArea.Text += e.Message;
                     progressBar.EnableButton();
                     Console.Error.WriteLine(e.ToString());
                 }

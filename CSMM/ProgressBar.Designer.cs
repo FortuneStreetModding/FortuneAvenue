@@ -31,7 +31,7 @@
             this.mapReplaceProgressBar = new System.Windows.Forms.ProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
             this.progressLabel = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textArea = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // mapReplaceProgressBar
@@ -74,12 +74,12 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(13, 51);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(396, 72);
-            this.textBox1.TabIndex = 3;
+            this.textArea.Location = new System.Drawing.Point(13, 51);
+            this.textArea.Multiline = true;
+            this.textArea.Name = "textBox1";
+            this.textArea.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textArea.Size = new System.Drawing.Size(396, 72);
+            this.textArea.TabIndex = 3;
             // 
             // ProgressBar
             // 
@@ -87,7 +87,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(421, 221);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textArea);
             this.Controls.Add(this.progressLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.mapReplaceProgressBar);
@@ -109,6 +109,6 @@
         private System.Windows.Forms.ProgressBar mapReplaceProgressBar;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Label progressLabel;
-        private System.Windows.Forms.TextBox textBox1;
+        public System.Windows.Forms.TextBox textArea;
     }
 }

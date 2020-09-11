@@ -28,14 +28,9 @@ namespace CustomStreetManager
             progressLabel.Text = text;
         }
 
-        public void SetProgressBarText(string text)
-        {
-            textBox1.Text = text;
-        }
-
         public void SetProgressBarValue(int num)
         {
-            if(num != 100)
+            if (num != 100)
             {
                 mapReplaceProgressBar.Value = num + 1;
                 mapReplaceProgressBar.Value--;
@@ -49,12 +44,29 @@ namespace CustomStreetManager
 
         public void EnableButton()
         {
-             cancelButton.Enabled = true;
+            cancelButton.Enabled = true;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        internal void update(int percentage, string standardOutput, string errorOutput)
+        {
+            if (percentage != -1)
+            {
+                SetProgressBarValue(percentage);
+            }
+            if (standardOutput != null)
+            {
+                textArea.Text += standardOutput;
+            }
+            if (errorOutput != null)
+            {
+                textArea.Text += errorOutput;
+            }
+            textArea.Update();
         }
     }
 }

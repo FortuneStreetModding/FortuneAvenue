@@ -27,5 +27,10 @@ namespace MiscUtil.Conversion
                 return (Encoding.ASCII.GetString(data));
         }
 
+        public static string byteArrayToHex(byte[] bytes)
+        {
+            return BitConverter.ToString(bytes).Replace("-", string.Empty);
+        }
+
     }
 }

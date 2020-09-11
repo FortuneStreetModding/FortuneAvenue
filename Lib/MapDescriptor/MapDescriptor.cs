@@ -19,48 +19,48 @@ namespace FSEditor.MapDescriptor
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
         public RuleSet RuleSet { get; set; }
-        public int InternalNameAddrFilePos { get; set; }
         public UInt32 InternalNameAddr { get; set; }
         public string InternalName { get; set; }
-        public int FrbFile1AddrFilePos { get; set; }
         public UInt32 FrbFile1Addr { get; set; }
         public string FrbFile1 { get; set; }
-        public int FrbFile2AddrFilePos { get; set; }
         public UInt32 FrbFile2Addr { get; set; }
         public string FrbFile2 { get; set; }
-        public int FrbFile3AddrFilePos { get; set; }
         public UInt32 FrbFile3Addr { get; set; }
         public string FrbFile3 { get; set; }
-        public int FrbFile4AddrFilePos { get; set; }
         public UInt32 FrbFile4Addr { get; set; }
         public string FrbFile4 { get; set; }
-        public int BackgroundAddrFilePos { get; set; }
         public UInt32 BackgroundAddr { get; set; }
         public string Background { get; set; }
         public UInt32 BGMID { get; set; }
         public UInt32 Name_MSG_ID { get; set; }
-        public string Name_DE { get; set; }
-        public string Name_EN { get; set; }
-        public string Name_FR { get; set; }
-        public string Name_IT { get; set; }
-        public string Name_JP { get; set; }
-        public string Name_SU { get; set; }
-        public string Name_UK { get; set; }
+        public Dictionary<string, string> Name { get; private set; }
+        public string Name_EN
+        {
+            get { return Name[Locale.EN]; }
+            set { }
+        }
         public UInt32 Desc_MSG_ID { get; set; }
-        public string Desc_DE { get; set; }
-        public string Desc_EN { get; set; }
-        public string Desc_FR { get; set; }
-        public string Desc_IT { get; set; }
-        public string Desc_JP { get; set; }
-        public string Desc_SU { get; set; }
-        public string Desc_UK { get; set; }
+        public Dictionary<string, string> Desc { get; private set; }
         public byte[] VentureCard { get; private set; }
-        public int VentureCardActiveCount { get; private set; }
-        public int MapSwitchParamAddrFilePos { get; set; }
+        public int VentureCardActiveCount
+        {
+            get
+            {
+                var activeCount = 0;
+                for (int i = 0; i < VentureCard.Length; i++)
+                {
+                    if (VentureCard[i] != 0)
+                    {
+                        activeCount++;
+                    }
+                }
+                return activeCount;
+            }
+            set { }
+        }
         public UInt32 MapSwitchParamAddr { get; set; }
         public Dictionary<int, OriginPoint> SwitchRotationOriginPoints { get; private set; }
         public LoopingMode LoopingMode { get; set; }
-        public int LoopingModeParamAddrFilePos { get; set; }
         public UInt32 LoopingModeParamAddr { get; set; }
         public Single LoopingModeRadius { get; set; }
         public Single LoopingModeHorizontalPadding { get; set; }
@@ -76,16 +76,16 @@ namespace FSEditor.MapDescriptor
         public UInt32 TourClearRank { get; set; }
         public UInt32 TourDifficulty { get; set; }
         public UInt32 TourGeneralPlayTime { get; set; }
-        public int MapIconAddrFilePos { get; set; }
         public UInt32 MapIconAddr { get; set; }
         public string MapIcon { get; internal set; }
 
         public MapDescriptor()
         {
+            Name = new Dictionary<string, string>();
+            Desc = new Dictionary<string, string>();
             VentureCard = new byte[130];
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
-
         public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress)
         {
             SwitchRotationOriginPoints.Clear();
@@ -116,7 +116,17 @@ namespace FSEditor.MapDescriptor
                     SwitchRotationOriginPoints[i] = point;
                 }
             }
-
+        }
+        public void writeSwitchRotationOriginPoints(EndianBinaryWriter stream)
+        {
+            stream.Write((UInt32)SwitchRotationOriginPoints.Count);
+            Console.WriteLine("SwitchRotationOriginPoints.Count=" + SwitchRotationOriginPoints.Count);
+            for (int i = 0; i < SwitchRotationOriginPoints.Count; i++)
+            {
+                stream.Write(SwitchRotationOriginPoints[i].X);
+                stream.Write((UInt32)0);
+                stream.Write(SwitchRotationOriginPoints[i].Y);
+            }
         }
         public void readLoopingModeParams(EndianBinaryReader stream, int fileAddress)
         {
@@ -128,35 +138,12 @@ namespace FSEditor.MapDescriptor
                 LoopingModeVerticalSquareCount = stream.ReadSingle();
             }
         }
-
-        public void writeSwitchRotationOriginPoints(EndianBinaryWriter stream)
-        {
-            stream.Write((UInt32)SwitchRotationOriginPoints.Count);
-            for (int i = 0; i < SwitchRotationOriginPoints.Count; i++)
-            {
-                stream.Write(SwitchRotationOriginPoints[i].X);
-                stream.Write(0);
-                stream.Write(SwitchRotationOriginPoints[i].Y);
-            }
-        }
-
-        public int getSwitchRotationOriginPointsSizeInBytes()
-        {
-            return 4 + SwitchRotationOriginPoints.Count * 3 * 4;
-        }
-
         public void writeLoopingModeParams(EndianBinaryWriter stream)
         {
             stream.Write(LoopingModeRadius);
             stream.Write(LoopingModeHorizontalPadding);
             stream.Write(LoopingModeVerticalSquareCount);
         }
-
-        public int getLoopingModeParamsSizeInBytes()
-        {
-            return 3 * 4;
-        }
-
         public void readMapDataFromStream(EndianBinaryReader stream)
         {
             Name_MSG_ID = stream.ReadUInt32();
@@ -180,34 +167,24 @@ namespace FSEditor.MapDescriptor
                 Desc_MSG_ID = 4416 + ID;
             }
         }
-
-        public void writeMapData(EndianBinaryWriter stream)
+        public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr)
         {
-            stream.Seek(4, SeekOrigin.Current); // skip StageNameID
+            stream.Write(Name_MSG_ID);
             stream.Write(BGMID);
-            InternalNameAddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip InternalNameAddr
-            BackgroundAddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip BackgroundAddr
+            stream.Write(internalNameAddr);
+            stream.Write(backgroundAddr);
             stream.Write((UInt32)RuleSet);
             stream.Write((UInt32)Theme);
-            FrbFile1AddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile1Addr
-            FrbFile2AddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile2Addr
-            FrbFile3AddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile3Addr
-            FrbFile4AddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip FrbFile4Addr
-            MapSwitchParamAddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip MapSwitchParam
-            LoopingModeParamAddrFilePos = (int)stream.BaseStream.Position; 
-            stream.Seek(4, SeekOrigin.Current); // remember seek position, skip LoopingModeParam
+            stream.Write(frbFile1Addr);
+            stream.Write(frbFile2Addr);
+            stream.Write(frbFile3Addr);
+            stream.Write(frbFile4Addr);
+            stream.Write(mapSwitchParamAddr);
+            stream.Write(loopingModeParamAddr);
             stream.Seek(4, SeekOrigin.Current); // skip MapOriginID
             // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
             stream.Write(Background == "bg004" ? MainDol.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM : (UInt32)0);
         }
-
         public void readMapDefaultsFromStream(EndianBinaryReader stream)
         {
             TargetAmount = stream.ReadUInt32();
@@ -220,7 +197,6 @@ namespace FSEditor.MapDescriptor
             TourDifficulty = stream.ReadUInt32();
             TourGeneralPlayTime = stream.ReadUInt32();
         }
-
         public void writeMapDefaults(EndianBinaryWriter stream)
         {
             stream.Write(TargetAmount);
@@ -239,14 +215,6 @@ namespace FSEditor.MapDescriptor
             for (int i = 0; i < VentureCard.Length; i++)
             {
                 VentureCard[i] = stream.ReadByte();
-            }
-            VentureCardActiveCount = 0;
-            for (int i = 0; i < VentureCard.Length; i++)
-            {
-                if (VentureCard[i] != 0)
-                {
-                    VentureCardActiveCount++;
-                }
             }
         }
 
@@ -272,21 +240,21 @@ namespace FSEditor.MapDescriptor
                 InitialCash = board.BoardInfo.InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
-                    warning += "[" + ID + "] " + Name_EN + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect." + Environment.NewLine;
+                    warning += "[" + ID + "] " + Name[Locale.EN] + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect." + Environment.NewLine;
                 }
                 LoopingMode = board.BoardInfo.GalaxyStatus;
                 if (LoopingMode != LoopingMode.None)
                 {
                     if (LoopingModeRadius == 0 || LoopingModeVerticalSquareCount == 0)
                     {
-                        warning += "[" + ID + "] " + Name_EN + ": frb has looping enabled, but looping parameters are missing in the md." + Environment.NewLine;
+                        warning += "[" + ID + "] " + Name[Locale.EN] + ": frb has looping enabled, but looping parameters are missing in the md." + Environment.NewLine;
                     }
                 }
                 else if (LoopingMode == LoopingMode.None)
                 {
                     if (LoopingModeRadius != 0 || LoopingModeHorizontalPadding != 0 || LoopingModeVerticalSquareCount != 0)
                     {
-                        warning += "[" + ID + "] " + Name_EN + ": frb has looping disabled. The looping parameters defined in the md will have no effect." + Environment.NewLine;
+                        warning += "[" + ID + "] " + Name[Locale.EN] + ": frb has looping disabled. The looping parameters defined in the md will have no effect." + Environment.NewLine;
                     }
                 }
             }
@@ -337,13 +305,13 @@ namespace FSEditor.MapDescriptor
             mapDescriptor.InternalName = Path.GetFileNameWithoutExtension(fileName);
             if (lines[0].StartsWith("# "))
             {
-                mapDescriptor.Name_EN = lines[0].Replace("#", "").Trim();
+                mapDescriptor.Name[Locale.EN] = lines[0].Replace("#", "").Trim();
             }
             else
             {
                 throw new Exception("Could not parse " + fileName + " because the first line does not start with a '# '.");
             }
-            mapDescriptor.Desc_EN = "";
+            mapDescriptor.Desc[Locale.EN] = "";
             MDParserState state = MDParserState.Description;
             for (int i = 1; i < lines.Length; i += 1)
             {
@@ -368,9 +336,9 @@ namespace FSEditor.MapDescriptor
             switch (state)
             {
                 case MDParserState.Description:
-                    Desc_EN += " ";
-                    Desc_EN += line.Trim();
-                    Desc_EN = Desc_EN.Trim();
+                    Desc[Locale.EN] += " ";
+                    Desc[Locale.EN] += line.Trim();
+                    Desc[Locale.EN] = Desc[Locale.EN].Trim();
                     break;
                 case MDParserState.KeyValueTable:
                     columns = line.Split('|');
@@ -492,34 +460,34 @@ namespace FSEditor.MapDescriptor
                     FrbFile4 = keyValuePair.Value;
                     break;
                 case "namede":
-                    Name_DE = keyValuePair.Value;
+                    Name[Locale.DE] = keyValuePair.Value;
                     break;
                 case "namees":
-                    Name_SU = keyValuePair.Value;
+                    Name[Locale.ES] = keyValuePair.Value;
                     break;
                 case "namefr":
-                    Name_FR = keyValuePair.Value;
+                    Name[Locale.FR] = keyValuePair.Value;
                     break;
                 case "nameit":
-                    Name_IT = keyValuePair.Value;
+                    Name[Locale.IT] = keyValuePair.Value;
                     break;
                 case "namejp":
-                    Name_JP = keyValuePair.Value;
+                    Name[Locale.JP] = keyValuePair.Value;
                     break;
                 case "descde":
-                    Desc_DE = keyValuePair.Value;
+                    Desc[Locale.DE] = keyValuePair.Value;
                     break;
                 case "desces":
-                    Desc_SU = keyValuePair.Value;
+                    Desc[Locale.ES] = keyValuePair.Value;
                     break;
                 case "descfr":
-                    Desc_FR = keyValuePair.Value;
+                    Desc[Locale.FR] = keyValuePair.Value;
                     break;
                 case "descit":
-                    Desc_IT = keyValuePair.Value;
+                    Desc[Locale.IT] = keyValuePair.Value;
                     break;
                 case "descjp":
-                    Desc_JP = keyValuePair.Value;
+                    Desc[Locale.JP] = keyValuePair.Value;
                     break;
             }
             if (key.StartsWith("rotationoriginpoint"))
@@ -527,7 +495,7 @@ namespace FSEditor.MapDescriptor
                 var number = Regex.Match(key, @"\d+").Value;
                 int i = Int32.Parse(number) - 1;
                 Single value = Single.Parse(keyValuePair.Value);
-                if (SwitchRotationOriginPoints[i] == null)
+                if (!SwitchRotationOriginPoints.ContainsKey(i))
                 {
                     SwitchRotationOriginPoints[i] = new OriginPoint();
                 }
@@ -639,21 +607,11 @@ namespace FSEditor.MapDescriptor
             FrbFile4 = mapDescriptor.FrbFile4;
             Background = mapDescriptor.Background;
             BGMID = mapDescriptor.BGMID;
-            Name_DE = mapDescriptor.Name_DE;
-            Name_EN = mapDescriptor.Name_EN;
-            Name_FR = mapDescriptor.Name_FR;
-            Name_IT = mapDescriptor.Name_IT;
-            Name_JP = mapDescriptor.Name_JP;
-            Name_SU = mapDescriptor.Name_SU;
-            Name_UK = mapDescriptor.Name_UK;
-
-            Desc_DE = mapDescriptor.Desc_DE;
-            Desc_EN = mapDescriptor.Desc_EN;
-            Desc_FR = mapDescriptor.Desc_FR;
-            Desc_IT = mapDescriptor.Desc_IT;
-            Desc_JP = mapDescriptor.Desc_JP;
-            Desc_SU = mapDescriptor.Desc_SU;
-            Desc_UK = mapDescriptor.Desc_UK;
+            foreach (string locale in Locale.ALL_WITHOUT_UK)
+            {
+                Name[locale] = mapDescriptor.Name[locale];
+                Desc[locale] = mapDescriptor.Desc[locale];
+            }
 
             for (int i = 0; i < VentureCard.Length; i++)
             {

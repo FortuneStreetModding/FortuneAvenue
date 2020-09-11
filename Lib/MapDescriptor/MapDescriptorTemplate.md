@@ -2,9 +2,9 @@
 <#@ output encoding="utf-8"#>
 <#@ import namespace="FSEditor.FSData" #>
 
-# <#= md.Name_EN #>
+# <#= md.Name[Locale.EN] #>
 
-<#= md.Desc_EN #>
+<#= md.Desc[Locale.EN] #>
 
 ## Screenshots
 
@@ -169,16 +169,16 @@
     
 | Message   | String |
 | --------- | ------ |
-| Name (DE) | <#= md.Name_DE #> |
-| Name (ES) | <#= md.Name_SU #> |
-| Name (FR) | <#= md.Name_FR #> |
-| Name (IT) | <#= md.Name_IT #> |
-| Name (JP) | <#= md.Name_JP #> |
-| Desc (DE) | <#= md.Desc_DE #> |
-| Desc (ES) | <#= md.Desc_SU #> |
-| Desc (FR) | <#= md.Desc_DE #> |
-| Desc (IT) | <#= md.Desc_SU #> |
-| Desc (JP) | <#= md.Desc_FR #> |
+| Name (DE) | <#= md.Name[Locale.DE] #> |
+| Name (ES) | <#= md.Name[Locale.ES] #> |
+| Name (FR) | <#= md.Name[Locale.FR] #> |
+| Name (IT) | <#= md.Name[Locale.IT] #> |
+| Name (JP) | <#= md.Name[Locale.JP] #> |
+| Desc (DE) | <#= md.Desc[Locale.DE] #> |
+| Desc (ES) | <#= md.Desc[Locale.ES] #> |
+| Desc (FR) | <#= md.Desc[Locale.FR] #> |
+| Desc (IT) | <#= md.Desc[Locale.IT] #> |
+| Desc (JP) | <#= md.Desc[Locale.JP] #> |
 
 </details>
 
