@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -132,6 +132,7 @@ namespace CustomStreetManager
             this.deflaktorsASMHacksToolStripMenuItem,
             this.removeIntroMenuAndMapBgmToolStripMenuItem,
             this.patchToWiimmfiToolStripMenuItem});
+            this.optionsToolStripMenuItem.Enabled = false;
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.optionsToolStripMenuItem.Text = "Optional Patches";
