@@ -68,6 +68,34 @@
 
 </details>
 
+### Map Icon
+
+<details>
+  <summary>Click to expand!</summary>
+
+| On  | Icon       | Description          |
+| --- | ---------- | -------------------- |
+| <#= md.MapIcon == "p_bg_101"?":o:":"   " #> | p_bg_101   | Trodain Castle       |
+| <#= md.MapIcon == "p_bg_109"?":o:":"   " #> | p_bg_109   | The Observatory      |
+| <#= md.MapIcon == "p_bg_102"?":o:":"   " #> | p_bg_102   | Ghost Ship           |
+| <#= md.MapIcon == "p_bg_105"?":o:":"   " #> | p_bg_105   | Slimenia             |
+| <#= md.MapIcon == "p_bg_104"?":o:":"   " #> | p_bg_104   | Mt. Magmageddon      |
+| <#= md.MapIcon == "p_bg_106"?":o:":"   " #> | p_bg_106   | Robbin' Hood Ruins   |
+| <#= md.MapIcon == "p_bg_004"?":o:":"   " #> | p_bg_004   | Mario Stadium        |
+| <#= md.MapIcon == "p_bg_008"?":o:":"   " #> | p_bg_008   | Starship Mario       |
+| <#= md.MapIcon == "p_bg_002"?":o:":"   " #> | p_bg_002   | Mario Circuit        |
+| <#= md.MapIcon == "p_bg_001"?":o:":"   " #> | p_bg_001   | Yoshi's Island       |
+| <#= md.MapIcon == "p_bg_005"?":o:":"   " #> | p_bg_005   | Delfino Plaza        |
+| <#= md.MapIcon == "p_bg_003"?":o:":"   " #> | p_bg_003   | Peach's Castle       |
+| <#= md.MapIcon == "p_bg_107"?":o:":"   " #> | p_bg_107   | Alefgard             |
+| <#= md.MapIcon == "p_bg_006"?":o:":"   " #> | p_bg_006   | Super Mario Bros     |
+| <#= md.MapIcon == "p_bg_007"?":o:":"   " #> | p_bg_007   | Bowser's Castle      |
+| <#= md.MapIcon == "p_bg_009"?":o:":"   " #> | p_bg_009   | Good Egg Galaxy      |
+| <#= md.MapIcon == "p_bg_103"?":o:":"   " #> | p_bg_103   | The Colossus         |
+| <#= md.MapIcon == "p_bg_108"?":o:":"   " #> | p_bg_108   | Alltrades Abbey      |
+
+</details>
+
 ### Map Background Music
 
 <details>
@@ -157,8 +185,6 @@
 | Tour Opponent 2        | <#= String.Format("{0,15}", md.TourOpponent2) #> |
 | Tour Opponent 3        | <#= String.Format("{0,15}", md.TourOpponent3) #> |
 | Tour Clear Rank        | <#= String.Format("{0,15}", md.TourClearRank) #> |
-| Tour Difficulty        | <#= String.Format("{0,15}", md.TourDifficulty) #> |
-| Tour General Play Time | <#= String.Format("{0,15}", md.TourGeneralPlayTime) #> |
 
 </details>
 

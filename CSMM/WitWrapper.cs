@@ -126,6 +126,7 @@ namespace CustomStreetManager
                         update?.Invoke(-1, null, line);
                         Console.Error.WriteLine(line);
                         error += line + Environment.NewLine;
+                        line = stdErr.ReadLine();
                     }
                     await Task.Delay(100);
                 }

@@ -68,6 +68,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MapDescriptorTemplate.md</DependentUpon>
     </Compile>
+    <Compile Include="MapDescriptor\PowerPcAsm.cs" />
     <Compile Include="MapDescriptor\UI_Message.cs" />
     <Compile Include="MapDescriptor\MainDolSection.cs" />
     <Compile Include="MapDescriptor\MainDol.cs" />

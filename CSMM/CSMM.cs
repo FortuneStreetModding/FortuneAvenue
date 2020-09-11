@@ -240,7 +240,7 @@ namespace CustomStreetManager
                 bs.DataSource = mapDescriptors;
                 dataGridView1.DataSource = bs;
 
-                progressBar.SetProgress(40, "Extract WBFS/ISO async...");
+                progressBar.SetProgress(40, "Extract WBFS/ISO...");
 
                 await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 40, 100);
 
