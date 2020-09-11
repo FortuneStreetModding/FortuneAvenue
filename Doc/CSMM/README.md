@@ -1,13 +1,13 @@
 # How to use CSMM
 
 First of all, you need to open the Custom Street Map Manager under Tools -> Open CSMM.
-![CSMM_Open.png](Screenshot)
+![CSMM_Open.png](CSMM_Open.png)
 
 ## CSMM Main UI
 
 When CSMM starts up, it is best to first open your Boom Street wbfs or iso file by clicking on "Set Input WBFS/ISO".
 
-![CSMM_Main.png](Screenshot)
+![CSMM_Main.png](CSMM_Main.png)
 
 In the center you see the table of all standard maps of Boom Street. The first 18 maps are for the standard rules the latter 18 for the basic rules. The unused maps are not shown here unless you click on the checkbox "Show Unused" at the bottom of the ui.
 
