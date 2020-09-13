@@ -99,13 +99,9 @@ namespace FSEditor.MapDescriptor
         {
             List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
             // has the hack for unique map icons been applied?
-            binReader.Seek(toFileAddress(0x8021e790), SeekOrigin.Begin);
-            var opcode = binReader.ReadUInt32();
-            var hackExpandedMapIconsApplied = opcode == PowerPcAsm.cmpw_r29_r30;
+            var hackExpandedMapIconsApplied = data.isHackCustomMapIcons(binReader, toFileAddress);
             // has the hack for expanded Description message table already been applied?
-            binReader.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin);
-            opcode = binReader.ReadUInt32();
-            var hackExpandedDescriptionMessageTableApplied = opcode == 0x3863fffd;
+            var hackExpandedDescriptionMessageTableApplied = data.isHackExtendedMapDescriptions(binReader, toFileAddress);
 
             binReader.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
@@ -190,13 +186,7 @@ namespace FSEditor.MapDescriptor
             totalBytesWritten = 0;
             totalBytesLeft = 0;
 
-            // HACK: Expand the description message ID table
-            // subi r3,r3,0x15                                      ->   subi r3,r3,0x03
-            stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin); stream.Write(0x3863fffd);
-            // cmpwi r3,0x12                                        ->   cmpwi r3,0x24
-            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin); stream.Write(0x2c030024);
-            // lwzx r3=>DWORD_80436c08,r3,r0                        ->   li r3,0x1153
-            stream.Seek(toFileAddress(0x80212238), SeekOrigin.Begin); stream.Write(0x38601153);
+            data.writeHackExtendedMapDescriptions(stream, toFileAddress);
 
             // HACK: remove the use of Map Difficulty and Map General Play Time to free up some space
             /* stream.Seek(toFileAddress(0x801fd9b8), SeekOrigin.Begin);
@@ -378,30 +368,7 @@ namespace FSEditor.MapDescriptor
                 mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
             }
 
-            // custom map icon hack
-            // bl GetMapOrigin                                     -> bl GetMapDifficulty
-            stream.Seek(toFileAddress(0x8021e77c), SeekOrigin.Begin); stream.Write(0x4bff3629);
-            // cmpw r28,r30                                        -> cmpw r29,r30
-            stream.Seek(toFileAddress(0x8021e790), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpw_r29_r30);
-            // cmplwi r28,0x12                                     -> cmplwi r28,mapIconAddrTableItemCount
-            stream.Seek(toFileAddress(0x8021e7c0), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r28(mapIconAddrTableItemCount));
-            // bl GetMapOrigin                                     -> bl GetMapDifficulty
-            stream.Seek(toFileAddress(0x8021e8a4), SeekOrigin.Begin); stream.Write(0x4bff3501);
-            // cmpw r29,r28                                        -> cmpw r30,r28
-            stream.Seek(toFileAddress(0x8021e8b8), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpw_r30_r28);
-            // cmplwi r29,0x12                                     -> cmplwi r29,mapIconAddrTableItemCount
-            stream.Seek(toFileAddress(0x8021e8e8), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r29(mapIconAddrTableItemCount));
-            // cmpw r29,r28                                        -> cmpw r30,r28
-            stream.Seek(toFileAddress(0x8021e8b8), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpw_r30_r28);
-            // cmplwi r28,0x12                                     -> cmplwi r28,mapIconAddrTableItemCount
-            stream.Seek(toFileAddress(0x8021e84c), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r28(mapIconAddrTableItemCount));
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make32bitValue(mapIconAddrTable);
-            // r29 <- 0x8047f5c0                                   -> r29 <- mapIconAddrTable
-            stream.Seek(toFileAddress(0x8021e780), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r29(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r29(v.lower16Bit));
-            // r30 <- 0x8047f5c0                                   -> r30 <- mapIconAddrTable
-            stream.Seek(toFileAddress(0x8021e8a8), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r30(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r30(v.lower16Bit));
-            // r30 <- 0x8047f5c0                                   -> r30 <- mapIconAddrTable
-            stream.Seek(toFileAddress(0x8021e830), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r30(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r30(v.lower16Bit));
+            data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
 
             stream.Seek(toFileAddress(data.START_VENTURE_CARD_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 42; i++)

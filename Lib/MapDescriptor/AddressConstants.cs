@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiscUtil.IO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,5 +31,10 @@ namespace FSEditor.MapDescriptor
         UInt32 START_MAP_DATA_TABLE_VIRTUAL();
         UInt32 START_VENTURE_CARD_TABLE_VIRTUAL();
         UInt32 START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL();
+
+        void writeHackExtendedMapDescriptions(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress);
+        bool isHackExtendedMapDescriptions(EndianBinaryReader stream, Func<UInt32, int> toFileAddress);
+        void writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable);
+        bool isHackCustomMapIcons(EndianBinaryReader stream, Func<uint, int> toFileAddress);
     }
 }
