@@ -50,7 +50,7 @@ namespace CustomStreetManager
                         {
                             string destinationPath = Path.GetFullPath(Path.Combine(extractPath, entry.Name));
                             if (destinationPath.StartsWith(extractPath, StringComparison.Ordinal))
-                                entry.ExtractToFile(destinationPath);
+                                entry.ExtractToFile(destinationPath, true);
                         }
                     }
                 }

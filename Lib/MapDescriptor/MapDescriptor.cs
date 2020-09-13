@@ -292,11 +292,11 @@ namespace FSEditor.MapDescriptor
             BGMTable,
             VentureCardTable
         }
-        public void readMapDescriptorFromFile(string fileName)
+        public void readMapDescriptorFromFile(string fileName, string name)
         {
             string[] lines = File.ReadAllLines(fileName);
             MapDescriptor mapDescriptor = new MapDescriptor();
-            mapDescriptor.InternalName = Path.GetFileNameWithoutExtension(fileName);
+            mapDescriptor.InternalName = name;
             if (lines[0].StartsWith("# "))
             {
                 mapDescriptor.Name[Locale.EN] = lines[0].Replace("#", "").Trim();

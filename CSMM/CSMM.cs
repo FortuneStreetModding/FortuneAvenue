@@ -475,7 +475,14 @@ namespace CustomStreetManager
 
                     var mapDescriptorImportFile = openFileDialog1.FileName;
                     var dir = Path.GetDirectoryName(openFileDialog1.FileName);
-                    mapDescriptorImport.readMapDescriptorFromFile(mapDescriptorImportFile);
+
+                    var name = Path.GetFileNameWithoutExtension(mapDescriptorImportFile);
+                    if(name.ToLower() == "readme")
+                    {
+                        name = Path.GetFileName(dir);
+                    }
+
+                    mapDescriptorImport.readMapDescriptorFromFile(mapDescriptorImportFile, name);
 
                     if (mapDescriptorImport.VentureCardActiveCount != 64)
                     {
