@@ -13,37 +13,11 @@ namespace FSEditor.MapDescriptor
     public class MainDol
     {
         private List<MainDolSection> sections;
-
-        public static readonly uint VANILLA_FIRST_MAP_NAME_MESSAGE_ID = 5433;
-        public static readonly uint VANILLA_FIRST_MAP_DESC_MESSAGE_ID = 4416;
-
-        // map data string table
-        public static readonly UInt32 UNUSED_SPACE_1_START_VIRTUAL = 0x80428978;
-        public static readonly UInt32 UNUSED_SPACE_1_END_VIRTUAL = 0x80428e4F;
-        // unused costume string table 1
-        public static readonly UInt32 UNUSED_SPACE_2_START_VIRTUAL = 0x8042bc78;
-        public static readonly UInt32 UNUSED_SPACE_2_END_VIRTUAL = 0x8042c23f;
-        // unused costume string table 2
-        public static readonly UInt32 UNUSED_SPACE_3_START_VIRTUAL = 0x8042dfc0;
-        public static readonly UInt32 UNUSED_SPACE_3_END_VIRTUAL = 0x8042e22f;
-        // unused costume string table 3
-        public static readonly UInt32 UNUSED_SPACE_4_START_VIRTUAL = 0x8042ef30;
-        public static readonly UInt32 UNUSED_SPACE_4_END_VIRTUAL = 0x8042f7ef;
-
-        public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON = 0x806b8df0;
-        public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_COLLOSUS = 0x8047d598;
-        public static readonly UInt32 MAP_SWITCH_PARAM_ADDR_OBSERVATORY = 0x8047d5b4;
-        public static readonly UInt32 MAP_BGSEQUENCE_ADDR_MARIOSTADIUM = 0x80428968;
-
-        public static readonly UInt32 START_MAP_DEFAULTS_TABLE_VIRTUAL = 0x804363c8;
-        public static readonly UInt32 START_MAP_DATA_TABLE_VIRTUAL = 0x80428e50;
-        public static readonly UInt32 START_VENTURE_CARD_TABLE_VIRTUAL = 0x80410648;
-        public static readonly UInt32 START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL = 0x80436bc0;
-
         private Dictionary<byte[], UInt32> reuseValues;
         private UInt32 unusedSpacePositionVirtual;
         public int totalBytesWritten;
         public int totalBytesLeft;
+        public AddressConstants data = new ST7P01();
 
         public MainDol(List<MainDolSection> sections)
         {
@@ -133,14 +107,14 @@ namespace FSEditor.MapDescriptor
             opcode = binReader.ReadUInt32();
             var hackExpandedDescriptionMessageTableApplied = opcode == 0x3863fffd;
 
-            binReader.Seek(toFileAddress(START_MAP_DATA_TABLE_VIRTUAL), SeekOrigin.Begin);
+            binReader.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 MapDescriptor mapDescriptor = new MapDescriptor();
                 mapDescriptor.readMapDataFromStream(binReader);
                 mapDescriptors.Add(mapDescriptor);
             }
-            binReader.Seek(toFileAddress(START_MAP_DEFAULTS_TABLE_VIRTUAL), SeekOrigin.Begin);
+            binReader.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
@@ -156,7 +130,7 @@ namespace FSEditor.MapDescriptor
                 mapDescriptor.FrbFile2 = resolveAddressToString(mapDescriptor.FrbFile2Addr, binReader);
                 mapDescriptor.FrbFile3 = resolveAddressToString(mapDescriptor.FrbFile3Addr, binReader);
                 mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, binReader);
-                mapDescriptor.readRotationOriginPoints(binReader, toFileAddress(mapDescriptor.MapSwitchParamAddr));
+                mapDescriptor.readRotationOriginPoints(binReader, toFileAddress(mapDescriptor.MapSwitchParamAddr), data);
                 mapDescriptor.readLoopingModeParams(binReader, toFileAddress(mapDescriptor.LoopingModeParamAddr));
 
                 if (hackExpandedMapIconsApplied)
@@ -174,7 +148,7 @@ namespace FSEditor.MapDescriptor
                 }
             }
             UInt32[] descMsgIdTable = new UInt32[18 * 2];
-            binReader.Seek(toFileAddress(START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL), SeekOrigin.Begin);
+            binReader.Seek(toFileAddress(data.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < descMsgIdTable.Length; i++)
             {
                 descMsgIdTable[i] = binReader.ReadUInt32();
@@ -193,7 +167,7 @@ namespace FSEditor.MapDescriptor
                 }
             }
 
-            binReader.Seek(toFileAddress(START_VENTURE_CARD_TABLE_VIRTUAL), SeekOrigin.Begin);
+            binReader.Seek(toFileAddress(data.START_VENTURE_CARD_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 42; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
@@ -212,7 +186,7 @@ namespace FSEditor.MapDescriptor
 
             // reset writing state
             reuseValues = new Dictionary<byte[], UInt32>(new ByteArrayComparer());
-            unusedSpacePositionVirtual = UNUSED_SPACE_1_START_VIRTUAL;
+            unusedSpacePositionVirtual = data.UNUSED_SPACE_1_START_VIRTUAL();
             totalBytesWritten = 0;
             totalBytesLeft = 0;
 
@@ -235,7 +209,7 @@ namespace FSEditor.MapDescriptor
             stream.Write(NOP);
             */
 
-            stream.Seek(toFileAddress(START_MAP_DATA_TABLE_VIRTUAL), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 int seek = (int)stream.BaseStream.Position;
@@ -319,10 +293,10 @@ namespace FSEditor.MapDescriptor
                     }
                 }
                 stream.Seek(seek, SeekOrigin.Begin);
-                mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr);
+                mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, data.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM());
             }
 
-            stream.Seek(toFileAddress(START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(data.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL()), SeekOrigin.Begin);
             int j = 0;
             for (int i = 0; i < 48; i++)
             {
@@ -398,7 +372,7 @@ namespace FSEditor.MapDescriptor
                 }
             }
             // pass the map icon addr as property for the map defaults table
-            stream.Seek(toFileAddress(START_MAP_DEFAULTS_TABLE_VIRTUAL), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
@@ -429,7 +403,7 @@ namespace FSEditor.MapDescriptor
             // r30 <- 0x8047f5c0                                   -> r30 <- mapIconAddrTable
             stream.Seek(toFileAddress(0x8021e830), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r30(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r30(v.lower16Bit));
 
-            stream.Seek(toFileAddress(START_VENTURE_CARD_TABLE_VIRTUAL), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(data.START_VENTURE_CARD_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 42; i++)
             {
                 mapDescriptors[i].writeVentureCardTable(stream);
@@ -456,31 +430,31 @@ namespace FSEditor.MapDescriptor
                 while (unusedSpacePositionVirtual % 4 != 0)
                     unusedSpacePositionVirtual++;
 
-                if (unusedSpacePositionVirtual > UNUSED_SPACE_4_END_VIRTUAL)
+                if (unusedSpacePositionVirtual > data.UNUSED_SPACE_4_END_VIRTUAL())
                 {
                     throw new InsufficientMemoryException("There is not enough free space in the main.dol available.");
                 }
-                else if (unusedSpacePositionVirtual > UNUSED_SPACE_3_END_VIRTUAL && unusedSpacePositionVirtual < UNUSED_SPACE_4_START_VIRTUAL)
+                else if (unusedSpacePositionVirtual > data.UNUSED_SPACE_3_END_VIRTUAL() && unusedSpacePositionVirtual < data.UNUSED_SPACE_4_START_VIRTUAL())
                 {
-                    unusedSpacePositionVirtual = UNUSED_SPACE_4_START_VIRTUAL;
+                    unusedSpacePositionVirtual = data.UNUSED_SPACE_4_START_VIRTUAL();
                     virtualAddr = unusedSpacePositionVirtual;
                     // align to 4
                     unusedSpacePositionVirtual += (UInt32)bytes.Length;
                     while (unusedSpacePositionVirtual % 4 != 0)
                         unusedSpacePositionVirtual++;
                 }
-                else if (unusedSpacePositionVirtual > UNUSED_SPACE_2_END_VIRTUAL && unusedSpacePositionVirtual < UNUSED_SPACE_3_START_VIRTUAL)
+                else if (unusedSpacePositionVirtual > data.UNUSED_SPACE_2_END_VIRTUAL() && unusedSpacePositionVirtual < data.UNUSED_SPACE_3_START_VIRTUAL())
                 {
-                    unusedSpacePositionVirtual = UNUSED_SPACE_3_START_VIRTUAL;
+                    unusedSpacePositionVirtual = data.UNUSED_SPACE_3_START_VIRTUAL();
                     virtualAddr = unusedSpacePositionVirtual;
                     // align to 4
                     unusedSpacePositionVirtual += (UInt32)bytes.Length;
                     while (unusedSpacePositionVirtual % 4 != 0)
                         unusedSpacePositionVirtual++;
                 }
-                else if (unusedSpacePositionVirtual > UNUSED_SPACE_1_END_VIRTUAL && unusedSpacePositionVirtual < UNUSED_SPACE_2_START_VIRTUAL)
+                else if (unusedSpacePositionVirtual > data.UNUSED_SPACE_1_END_VIRTUAL() && unusedSpacePositionVirtual < data.UNUSED_SPACE_2_START_VIRTUAL())
                 {
-                    unusedSpacePositionVirtual = UNUSED_SPACE_2_START_VIRTUAL;
+                    unusedSpacePositionVirtual = data.UNUSED_SPACE_2_START_VIRTUAL();
                     virtualAddr = unusedSpacePositionVirtual;
                     // align to 4
                     unusedSpacePositionVirtual += (UInt32)bytes.Length;
@@ -505,30 +479,30 @@ namespace FSEditor.MapDescriptor
             UInt32 virtualAddr = unusedSpacePositionVirtual;
             stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
             byte[] nullBytes;
-            if (virtualAddr < UNUSED_SPACE_1_END_VIRTUAL)
+            if (virtualAddr < data.UNUSED_SPACE_1_END_VIRTUAL())
             {
-                nullBytes = new byte[UNUSED_SPACE_1_END_VIRTUAL - virtualAddr];
+                nullBytes = new byte[data.UNUSED_SPACE_1_END_VIRTUAL() - virtualAddr];
                 stream.Write(nullBytes);
-                stream.Seek(toFileAddress(UNUSED_SPACE_2_START_VIRTUAL), SeekOrigin.Begin);
+                stream.Seek(toFileAddress(data.UNUSED_SPACE_2_START_VIRTUAL()), SeekOrigin.Begin);
                 totalBytesLeft += nullBytes.Length;
             }
-            if (virtualAddr < UNUSED_SPACE_2_END_VIRTUAL)
+            if (virtualAddr < data.UNUSED_SPACE_2_END_VIRTUAL())
             {
-                nullBytes = new byte[UNUSED_SPACE_2_END_VIRTUAL - virtualAddr];
+                nullBytes = new byte[data.UNUSED_SPACE_2_END_VIRTUAL() - virtualAddr];
                 stream.Write(nullBytes);
-                stream.Seek(toFileAddress(UNUSED_SPACE_3_START_VIRTUAL), SeekOrigin.Begin);
+                stream.Seek(toFileAddress(data.UNUSED_SPACE_3_START_VIRTUAL()), SeekOrigin.Begin);
                 totalBytesLeft += nullBytes.Length;
             }
-            if (virtualAddr < UNUSED_SPACE_3_END_VIRTUAL)
+            if (virtualAddr < data.UNUSED_SPACE_3_END_VIRTUAL())
             {
-                nullBytes = new byte[UNUSED_SPACE_3_END_VIRTUAL - virtualAddr];
+                nullBytes = new byte[data.UNUSED_SPACE_3_END_VIRTUAL() - virtualAddr];
                 stream.Write(nullBytes);
-                stream.Seek(toFileAddress(UNUSED_SPACE_4_START_VIRTUAL), SeekOrigin.Begin);
+                stream.Seek(toFileAddress(data.UNUSED_SPACE_4_START_VIRTUAL()), SeekOrigin.Begin);
                 totalBytesLeft += nullBytes.Length;
             }
-            if (virtualAddr < UNUSED_SPACE_4_END_VIRTUAL)
+            if (virtualAddr < data.UNUSED_SPACE_4_END_VIRTUAL())
             {
-                nullBytes = new byte[UNUSED_SPACE_4_END_VIRTUAL - virtualAddr];
+                nullBytes = new byte[data.UNUSED_SPACE_4_END_VIRTUAL() - virtualAddr];
                 stream.Write(nullBytes);
                 totalBytesLeft += nullBytes.Length;
             }

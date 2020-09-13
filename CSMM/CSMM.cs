@@ -103,6 +103,9 @@ namespace CustomStreetManager
                 progressBar.SetProgress(15, "Packing ISO/WBFS file...");
 
                 await WitWrapper.packFullIso(inputfilename, outputFilename, ct, progressBar.update, 15, 100);
+
+                progressBar.ShowCheckbox("Cleanup temporary files.", false);
+                progressBar.callback = (c) => { if (c) WitWrapper.cleanup(inputfilename); };
                 progressBar.SetProgress(100, "Done.");
             }
             catch (Exception e2)
@@ -142,7 +145,7 @@ namespace CustomStreetManager
             }
         }
 
-        private string reloadUIMessages(List<MapDescriptor> mapDescriptors)
+        private string reloadUIMessages(List<MapDescriptor> mapDescriptors, AddressConstants data)
         {
             string warnings = "";
             ui_messages[fileSet.ui_message_en_csv] = new UI_Message(fileSet.ui_message_en_csv, Locale.EN);
@@ -173,7 +176,7 @@ namespace CustomStreetManager
             for (var i = 0; i <= 17; i++)
             {
                 var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Name_MSG_ID == MainDol.VANILLA_FIRST_MAP_NAME_MESSAGE_ID + i)
+                if (mapDescriptor.Name_MSG_ID == data.VANILLA_FIRST_MAP_NAME_MESSAGE_ID() + i)
                 {
                     var freeKey = ui_messages.Values.First().freeKey();
                     foreach (UI_Message ui_message in ui_messages.Values)
@@ -186,7 +189,7 @@ namespace CustomStreetManager
             for (var i = 0; i <= 17; i++)
             {
                 var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Desc_MSG_ID == MainDol.VANILLA_FIRST_MAP_DESC_MESSAGE_ID + i)
+                if (mapDescriptor.Desc_MSG_ID == data.VANILLA_FIRST_MAP_DESC_MESSAGE_ID() + i)
                 {
                     var freeKey = ui_messages.Values.First().freeKey();
                     foreach (UI_Message ui_message in ui_messages.Values)
@@ -201,8 +204,6 @@ namespace CustomStreetManager
 
         private async void ReloadWbfsIsoFile()
         {
-            WitWrapper.makeSureWitInstalled();
-
             ProgressBar progressBar = new ProgressBar();
             progressBar.Show(this);
             progressBar.SetProgress(0, "Extract relevant files from iso/wbfs...");
@@ -218,6 +219,7 @@ namespace CustomStreetManager
 
             try
             {
+                WitWrapper.makeSureWitInstalled();
                 fileSet = await WitWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 10);
 
                 progressBar.SetProgress(10, "Detect the sections in main.dol file...");
@@ -231,7 +233,7 @@ namespace CustomStreetManager
                     mapDescriptors = mainDol.readMainDol(binReader);
 
                     progressBar.SetProgress(30, "Read localization files...");
-                    progressBar.appendText(reloadUIMessages(mapDescriptors));
+                    progressBar.appendText(reloadUIMessages(mapDescriptors, mainDol.data));
                 }
                 progressBar.SetProgress(35, "Populate UI...");
 

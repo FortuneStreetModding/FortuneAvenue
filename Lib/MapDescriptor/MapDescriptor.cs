@@ -84,20 +84,20 @@ namespace FSEditor.MapDescriptor
             VentureCard = new byte[130];
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
-        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress)
+        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress, AddressConstants data)
         {
             SwitchRotationOriginPoints.Clear();
             // Special case handling: in the original game these values are initialized at run time only. So we need to hardcode them:
-            if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON) // magmageddon
+            if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON()) // magmageddon
             {
                 // no points
             }
-            else if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_COLLOSUS) // collosus
+            else if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_COLLOSUS()) // collosus
             {
                 SwitchRotationOriginPoints[0] = new OriginPoint(-288, -32);
                 SwitchRotationOriginPoints[1] = new OriginPoint(288, -32);
             }
-            else if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_OBSERVATORY) // observatory
+            else if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_OBSERVATORY()) // observatory
             {
                 SwitchRotationOriginPoints[0] = new OriginPoint(0, 0);
             }
@@ -160,7 +160,7 @@ namespace FSEditor.MapDescriptor
             // ignore BG Sequence
             UInt32 BGSequenceAddr = stream.ReadUInt32();
         }
-        public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr)
+        public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr, UInt32 bgSequenceMarioStadium)
         {
             stream.Write(Name_MSG_ID);
             stream.Write(BGMID);
@@ -176,7 +176,7 @@ namespace FSEditor.MapDescriptor
             stream.Write(loopingModeParamAddr);
             stream.Seek(4, SeekOrigin.Current); // skip MapOriginID
             // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
-            stream.Write(Background == "bg004" ? MainDol.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM : (UInt32)0);
+            stream.Write(Background == "bg004" ? bgSequenceMarioStadium : (UInt32)0);
         }
         public void readMapDefaultsFromStream(EndianBinaryReader stream)
         {
@@ -612,8 +612,22 @@ namespace FSEditor.MapDescriptor
             BGMID = mapDescriptor.BGMID;
             foreach (string locale in Locale.ALL_WITHOUT_UK)
             {
-                Name[locale] = mapDescriptor.Name[locale];
-                Desc[locale] = mapDescriptor.Desc[locale];
+                if (mapDescriptor.Name.ContainsKey(locale))
+                {
+                    Name[locale] = mapDescriptor.Name[locale];
+                }
+                else
+                {
+                    Name[locale] = mapDescriptor.Name[Locale.EN];
+                }
+                if (mapDescriptor.Desc.ContainsKey(locale))
+                {
+                    Desc[locale] = mapDescriptor.Desc[locale];
+                }
+                else
+                {
+                    Desc[locale] = mapDescriptor.Desc[Locale.EN];
+                }
             }
 
             for (int i = 0; i < VentureCard.Length; i++)

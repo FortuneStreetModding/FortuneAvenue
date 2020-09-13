@@ -17,7 +17,7 @@ namespace CustomStreetManager
 {
     class WitWrapper
     {
-        private static readonly string[] requiredFiles = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll" };
+        private static readonly string[] requiredFiles = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
 
         private static Boolean witExists()
         {
@@ -216,6 +216,20 @@ namespace CustomStreetManager
             string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
             string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
             return await callWit(arguments, cancelToken, update, progressMin, progressMax);
+        }
+
+        public static void cleanup(string inputFile)
+        {
+            string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
+            if (Directory.Exists(tmpDirectory))
+            {
+                Directory.Delete(tmpDirectory, true);
+            }
+            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
+            if (Directory.Exists(tmpExtract))
+            {
+                Directory.Delete(tmpExtract, true);
+            }
         }
 
         public static async Task<List<MainDolSection>> readSections(string inputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)

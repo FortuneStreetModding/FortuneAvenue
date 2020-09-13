@@ -41,27 +41,27 @@ namespace FSEditor.MapDescriptor
         }
         public static UInt32 lis_r29(UInt16 addr)
         {
-            return lis_r29_zero + ((UInt32)addr & 0x0000FFFF);
+            return lis_r29_zero + (UInt32)addr;
         }
         public static UInt32 addi_r29(Int16 addr)
         {
-            return addi_r29_zero + ((UInt32)addr & 0x0000FFFF);
+            return addi_r29_zero + (UInt32)addr;
         }
         public static UInt32 lis_r30(UInt16 addr)
         {
-            return lis_r30_zero + ((UInt32)addr & 0x0000FFFF);
+            return lis_r30_zero + (UInt32)addr;
         }
         public static UInt32 addi_r30(Int16 addr)
         {
-            return addi_r30_zero + ((UInt32)addr & 0x0000FFFF);
+            return addi_r30_zero + (UInt32)addr;
         }
         public static UInt32 cmplwi_r28(Int16 addr)
         {
-            return cmplwi_r28_zero + ((UInt32)addr & 0x0000FFFF);
+            return cmplwi_r28_zero + (UInt32)addr;
         }
         public static UInt32 cmplwi_r29(Int16 addr)
         {
-            return cmplwi_r29_zero + ((UInt32)addr & 0x0000FFFF);
+            return cmplwi_r29_zero + (UInt32)addr;
         }
     }
 }

@@ -12,6 +12,8 @@ namespace CustomStreetManager
 {
     public partial class ProgressBar : Form
     {
+        public Action<bool> callback;
+
         public ProgressBar()
         {
             InitializeComponent();
@@ -48,6 +50,13 @@ namespace CustomStreetManager
             cancelButton.Enabled = true;
         }
 
+        public void ShowCheckbox(string text, bool isChecked)
+        {
+            checkBox1.Text = text;
+            checkBox1.Checked = isChecked;
+            checkBox1.Visible = true;
+        }
+
         private void cancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -77,6 +86,7 @@ namespace CustomStreetManager
 
         private void ProgressBar_FormClosed(object sender, FormClosedEventArgs e)
         {
+            callback?.Invoke(checkBox1.Checked);
         }
     }
 }
