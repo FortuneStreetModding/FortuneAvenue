@@ -63,6 +63,7 @@
     <Compile Include="FSData\Character.cs" />
     <Compile Include="MapDescriptor\ByteArrayComparer.cs" />
     <Compile Include="MapDescriptor\AddressConstants.cs" />
+    <Compile Include="MapDescriptor\Database.cs" />
     <Compile Include="MapDescriptor\ST7P01.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplate.cs">

@@ -46,25 +46,26 @@
 
 | On  | Background | Description          |
 | --- | ---------- | -------------------- |
-| <#= md.Background == "bg101"?":o:":"   " #> | bg101      | Trodain Castle       |
-| <#= md.Background == "bg109"?":o:":"   " #> | bg109      | The Observatory      |
-| <#= md.Background == "bg102"?":o:":"   " #> | bg102      | Ghost Ship           |
-| <#= md.Background == "bg105"?":o:":"   " #> | bg105      | Slimenia             |
-| <#= md.Background == "bg104"?":o:":"   " #> | bg104      | Mt. Magmageddon      |
-| <#= md.Background == "bg106"?":o:":"   " #> | bg106      | Robbin' Hood Ruins   |
-| <#= md.Background == "bg004"?":o:":"   " #> | bg004      | Mario Stadium        |
-| <#= md.Background == "bg008"?":o:":"   " #> | bg008      | Starship Mario       |
-| <#= md.Background == "bg002"?":o:":"   " #> | bg002      | Mario Circuit        |
-| <#= md.Background == "bg001"?":o:":"   " #> | bg001      | Yoshi's Island       |
-| <#= md.Background == "bg005"?":o:":"   " #> | bg005      | Delfino Plaza        |
-| <#= md.Background == "bg003"?":o:":"   " #> | bg003      | Peach's Castle       |
-| <#= md.Background == "bg107"?":o:":"   " #> | bg107      | Alefgard             |
-| <#= md.Background == "bg006"?":o:":"   " #> | bg006      | Super Mario Bros     |
-| <#= md.Background == "bg007"?":o:":"   " #> | bg007      | Bowser's Castle      |
-| <#= md.Background == "bg009"?":o:":"   " #> | bg009      | Good Egg Galaxy      |
-| <#= md.Background == "bg103"?":o:":"   " #> | bg103      | The Colossus         |
-| <#= md.Background == "bg108"?":o:":"   " #> | bg108      | Alltrades Abbey      |
-| <#= md.Background == "bg901"?":o:":"   " #> | bg901      | Practice Board       |
+| <#= md.Background == "bg101"?  ":o:":"   " #> | bg101      | Trodain Castle       |
+| <#= md.Background == "bg109"?  ":o:":"   " #> | bg109      | The Observatory      |
+| <#= md.Background == "bg102"?  ":o:":"   " #> | bg102      | Ghost Ship           |
+| <#= md.Background == "bg105"?  ":o:":"   " #> | bg105      | Slimenia             |
+| <#= md.Background == "bg104"?  ":o:":"   " #> | bg104      | Mt. Magmageddon      |
+| <#= md.Background == "bg106"?  ":o:":"   " #> | bg106      | Robbin' Hood Ruins   |
+| <#= md.Background == "bg004"?  ":o:":"   " #> | bg004      | Mario Stadium        |
+| <#= md.Background == "bg008"?  ":o:":"   " #> | bg008      | Starship Mario       |
+| <#= md.Background == "bg002"?  ":o:":"   " #> | bg002      | Mario Circuit        |
+| <#= md.Background == "bg001"?  ":o:":"   " #> | bg001      | Yoshi's Island       |
+| <#= md.Background == "bg005"?  ":o:":"   " #> | bg005      | Delfino Plaza        |
+| <#= md.Background == "bg003"?  ":o:":"   " #> | bg003      | Peach's Castle       |
+| <#= md.Background == "bg107"?  ":o:":"   " #> | bg107      | Alefgard             |
+| <#= md.Background == "bg006"?  ":o:":"   " #> | bg006      | Super Mario Bros     |
+| <#= md.Background == "bg007"?  ":o:":"   " #> | bg007      | Bowser's Castle      |
+| <#= md.Background == "bg009"?  ":o:":"   " #> | bg009      | Good Egg Galaxy      |
+| <#= md.Background == "bg103"?  ":o:":"   " #> | bg103      | The Colossus         |
+| <#= md.Background == "bg103_e"?":o:":"   " #> | bg103_e    | The Colossus Easy    |
+| <#= md.Background == "bg108"?  ":o:":"   " #> | bg108      | Alltrades Abbey      |
+| <#= md.Background == "bg901"?  ":o:":"   " #> | bg901      | Practice Board       |
 
 </details>
 
