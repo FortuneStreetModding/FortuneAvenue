@@ -190,7 +190,7 @@ namespace FSEditor.MapDescriptor
             MapIconAddrAddr = stream.ReadUInt32(); // this is normally TourMapDifficulty, but since it is unused it has been repurposed so that each map can have a unique icon
             var TourGeneralPlayTime = stream.ReadUInt32(); // ignore unused tour general play time
         }
-        public void writeMapDefaults(EndianBinaryWriter stream, UInt32 mapIconAddr)
+        public void writeMapDefaults(EndianBinaryWriter stream, UInt32 mapIconAddrAddr)
         {
             stream.Write(TargetAmount);
             stream.Write(TourBankruptcyLimit);
@@ -199,7 +199,7 @@ namespace FSEditor.MapDescriptor
             stream.Write((UInt32)TourOpponent2);
             stream.Write((UInt32)TourOpponent3);
             stream.Write(TourClearRank);
-            stream.Write(mapIconAddr); // stream.Write(TourDifficulty);
+            stream.Write(mapIconAddrAddr); // stream.Write(TourDifficulty);
             stream.Write(0); // stream.Write(TourGeneralPlayTime);
         }
 

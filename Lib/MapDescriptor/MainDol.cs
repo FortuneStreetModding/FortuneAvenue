@@ -305,7 +305,8 @@ namespace FSEditor.MapDescriptor
             HashSet<string> allUniqueMapIcons = new HashSet<string>();
             for (int i = 0; i < 48; i++)
             {
-                allUniqueMapIcons.Add(mapDescriptors[i].MapIcon);
+                if (mapDescriptors[i].MapIcon != null)
+                    allUniqueMapIcons.Add(mapDescriptors[i].MapIcon);
             }
             allUniqueMapIcons.Add("p_bg_101");
             allUniqueMapIcons.Add("p_bg_109");
@@ -365,7 +366,14 @@ namespace FSEditor.MapDescriptor
             stream.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
-                mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
+                if(string.IsNullOrEmpty(mapDescriptors[i].MapIcon))
+                {
+                    mapDescriptors[i].writeMapDefaults(stream, 0);
+                } else
+                {
+                    mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
+                }
+                
             }
 
             data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
