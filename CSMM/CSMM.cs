@@ -148,29 +148,18 @@ namespace CustomStreetManager
         private string reloadUIMessages(List<MapDescriptor> mapDescriptors, AddressConstants data)
         {
             string warnings = "";
-            ui_messages[fileSet.ui_message_en_csv] = new UI_Message(fileSet.ui_message_en_csv, Locale.EN);
-            ui_messages[fileSet.ui_message_de_csv] = new UI_Message(fileSet.ui_message_de_csv, Locale.DE);
-            ui_messages[fileSet.ui_message_fr_csv] = new UI_Message(fileSet.ui_message_fr_csv, Locale.FR);
-            ui_messages[fileSet.ui_message_it_csv] = new UI_Message(fileSet.ui_message_it_csv, Locale.IT);
-            ui_messages[fileSet.ui_message_su_csv] = new UI_Message(fileSet.ui_message_su_csv, Locale.ES);
-            ui_messages[fileSet.ui_message_jp_csv] = new UI_Message(fileSet.ui_message_jp_csv, Locale.JP);
-            ui_messages[fileSet.ui_message_uk_csv] = ui_messages[fileSet.ui_message_en_csv];
+            foreach(string locale in Locale.ALL_WITHOUT_UK)
+            {
+                ui_messages[fileSet.ui_message_csv[locale]] = new UI_Message(fileSet.ui_message_csv[locale], locale);
+            }
+            ui_messages[fileSet.ui_message_csv[Locale.UK]] = ui_messages[fileSet.ui_message_csv[Locale.EN]];
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
-                mapDescriptor.Name[Locale.EN] = ui_messages[fileSet.ui_message_en_csv].get(mapDescriptor.Name_MSG_ID);
-                mapDescriptor.Name[Locale.DE] = ui_messages[fileSet.ui_message_de_csv].get(mapDescriptor.Name_MSG_ID);
-                mapDescriptor.Name[Locale.FR] = ui_messages[fileSet.ui_message_fr_csv].get(mapDescriptor.Name_MSG_ID);
-                mapDescriptor.Name[Locale.IT] = ui_messages[fileSet.ui_message_it_csv].get(mapDescriptor.Name_MSG_ID);
-                mapDescriptor.Name[Locale.ES] = ui_messages[fileSet.ui_message_su_csv].get(mapDescriptor.Name_MSG_ID);
-                mapDescriptor.Name[Locale.JP] = ui_messages[fileSet.ui_message_jp_csv].get(mapDescriptor.Name_MSG_ID);
-
-                mapDescriptor.Desc[Locale.EN] = ui_messages[fileSet.ui_message_en_csv].get(mapDescriptor.Desc_MSG_ID);
-                mapDescriptor.Desc[Locale.DE] = ui_messages[fileSet.ui_message_de_csv].get(mapDescriptor.Desc_MSG_ID);
-                mapDescriptor.Desc[Locale.FR] = ui_messages[fileSet.ui_message_fr_csv].get(mapDescriptor.Desc_MSG_ID);
-                mapDescriptor.Desc[Locale.IT] = ui_messages[fileSet.ui_message_it_csv].get(mapDescriptor.Desc_MSG_ID);
-                mapDescriptor.Desc[Locale.ES] = ui_messages[fileSet.ui_message_su_csv].get(mapDescriptor.Desc_MSG_ID);
-                mapDescriptor.Desc[Locale.JP] = ui_messages[fileSet.ui_message_jp_csv].get(mapDescriptor.Desc_MSG_ID);
-
+                foreach (string locale in Locale.ALL_WITHOUT_UK)
+                {
+                    mapDescriptor.Name[locale] = ui_messages[fileSet.ui_message_csv[locale]].get(mapDescriptor.Name_MSG_ID);
+                    mapDescriptor.Desc[locale] = ui_messages[fileSet.ui_message_csv[locale]].get(mapDescriptor.Desc_MSG_ID);
+                }
                 warnings += mapDescriptor.readFrbFileInfo(fileSet.param_folder);
             }
             for (var i = 0; i <= 17; i++)

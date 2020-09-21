@@ -12,6 +12,7 @@ using MiscUtil.Conversion;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Threading;
+using FSEditor.FSData;
 
 namespace CustomStreetManager
 {
@@ -189,13 +190,13 @@ namespace CustomStreetManager
 
             FileSet fileSet = new FileSet();
             fileSet.main_dol = Path.Combine(tmpDirectory, "sys", "main.dol");
-            fileSet.ui_message_de_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.de.csv");
-            fileSet.ui_message_en_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.en.csv");
-            fileSet.ui_message_fr_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.fr.csv");
-            fileSet.ui_message_it_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.it.csv");
-            fileSet.ui_message_jp_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.jp.csv");
-            fileSet.ui_message_su_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.su.csv");
-            fileSet.ui_message_uk_csv = Path.Combine(tmpDirectory, "files", "localize", "ui_message.uk.csv");
+            fileSet.ui_message_csv[Locale.DE] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.de.csv");
+            fileSet.ui_message_csv[Locale.EN] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.en.csv");
+            fileSet.ui_message_csv[Locale.FR] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.fr.csv");
+            fileSet.ui_message_csv[Locale.IT] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.it.csv");
+            fileSet.ui_message_csv[Locale.JP] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.jp.csv");
+            fileSet.ui_message_csv[Locale.ES] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.su.csv");
+            fileSet.ui_message_csv[Locale.UK] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.uk.csv");
             fileSet.param_folder = Path.Combine(tmpDirectory, "files", "param");
             return fileSet;
         }

@@ -9,21 +9,9 @@ namespace FSEditor.MapDescriptor
     {
         public string main_dol
         { get; set; }
-        public string ui_message_de_csv
-        { get; set; }
-        public string ui_message_en_csv
-        { get; set; }
-        public string ui_message_fr_csv
-        { get; set; }
-        public string ui_message_it_csv
-        { get; set; }
-        public string ui_message_jp_csv
-        { get; set; }
-        public string ui_message_su_csv
-        { get; set; }
-        public string ui_message_uk_csv
-        { get; set; }
+        public readonly Dictionary<string, string> ui_message_csv = new Dictionary<string, string>();
         public string param_folder 
         { get; set; }
+        public readonly Dictionary<string, string> game_sequence_arc = new Dictionary<string, string>();
     }
 }
