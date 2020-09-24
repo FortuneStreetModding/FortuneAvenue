@@ -98,14 +98,14 @@ namespace CustomStreetManager
                 }
 
                 progressBar.SetProgress(10, "Copying the modified files to be packed into the image...");
-                WitWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
+                ExeWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
 
                 progressBar.SetProgress(15, "Packing ISO/WBFS file...");
 
-                await WitWrapper.packFullIso(inputfilename, outputFilename, ct, progressBar.update, 15, 100);
+                await ExeWrapper.packFullIso(inputfilename, outputFilename, ct, progressBar.update, 15, 100);
 
                 progressBar.ShowCheckbox("Cleanup temporary files.", false);
-                progressBar.callback = (c) => { if (c) WitWrapper.cleanup(inputfilename); };
+                progressBar.callback = (c) => { if (c) ExeWrapper.cleanup(inputfilename); };
                 progressBar.SetProgress(100, "Done.");
             }
             catch (Exception e2)
@@ -209,10 +209,10 @@ namespace CustomStreetManager
 
             try
             {
-                fileSet = await WitWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 40);
+                fileSet = await ExeWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 40);
 
                 progressBar.SetProgressBarLabel("Detect the sections in main.dol file...");
-                List<MainDolSection> sections = await WitWrapper.readSections(fileSet.main_dol, ct, progressBar.update, 40, 45);
+                List<MainDolSection> sections = await ExeWrapper.readSections(fileSet.main_dol, ct, progressBar.update, 40, 45);
                 mainDol = new MainDol(sections);
 
                 progressBar.SetProgressBarLabel("Read data from main.dol file...");
@@ -233,7 +233,7 @@ namespace CustomStreetManager
 
                 progressBar.SetProgress(50, "Extract WBFS/ISO...");
 
-                string cacheDirectory = await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 50, 100);
+                string cacheDirectory = await ExeWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 50, 100);
 
                 fileSet.game_sequence_arc[Locale.EN] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langEN", "game_sequence_EN.arc");
                 fileSet.game_sequence_arc[Locale.DE] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langDE", "game_sequence_DE.arc");

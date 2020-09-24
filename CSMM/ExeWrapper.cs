@@ -16,7 +16,7 @@ using FSEditor.FSData;
 
 namespace CustomStreetManager
 {
-    class WitWrapper
+    class ExeWrapper
     {
         private static bool requiredFilesExist(string[] requiredFiles)
         {
