@@ -18,11 +18,7 @@ namespace CustomStreetManager
 {
     class WitWrapper
     {
-        private static readonly string[] requiredFilesWit = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll"};
-        private static readonly string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll"};
-        private static readonly string[] requiredFilesBenzin = new string[] { "benzin.exe", "cyggcc_s-1.dll", "cygwin1.dll" };
-
-        private static Boolean requiredFilesExist(string[] requiredFiles)
+        private static bool requiredFilesExist(string[] requiredFiles)
         {
             foreach (string requiredFile in requiredFiles)
             {
@@ -34,68 +30,90 @@ namespace CustomStreetManager
             return true;
         }
 
-        private static void downloadAndExtractZip(string downloadUrl, string[] requiredFiles)
+        private static async Task<bool> downloadAndExtractZip(string name, string downloadUrl, string[] requiredFiles, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            string zipFileName = "tmp.zip";
+            string zipFileName = name + ".zip";
             string zipFilePath = Path.Combine(Directory.GetCurrentDirectory(), zipFileName);
             string extractPath = Directory.GetCurrentDirectory();
             using (var client = new WebClient())
             {
-                client.DownloadFile("https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", zipFilePath);
+                int progressMaxDownload = lerp(progressMin, progressMax, 0.5f);
+                client.DownloadProgressChanged += (s, e) => { 
+                    update?.Invoke(lerp(progressMin, progressMaxDownload, e.ProgressPercentage / 100f), "Downloading " + name + "...", null); 
+                };
+                await client.DownloadFileTaskAsync(downloadUrl, zipFilePath);
+                progressMin = progressMaxDownload;
             }
             using (ZipArchive archive = ZipFile.OpenRead(zipFilePath))
             {
-                foreach (ZipArchiveEntry entry in archive.Entries)
+                int i = 0;
+                foreach(ZipArchiveEntry entry in archive.Entries)
                 {
                     foreach (string requiredFile in requiredFiles)
                     {
                         if (entry.FullName.EndsWith(requiredFile, StringComparison.OrdinalIgnoreCase))
                         {
                             string destinationPath = Path.GetFullPath(Path.Combine(extractPath, entry.Name));
-                            if (destinationPath.StartsWith(extractPath, StringComparison.Ordinal))
+                            if (destinationPath.StartsWith(extractPath, StringComparison.Ordinal)) { 
                                 entry.ExtractToFile(destinationPath, true);
+                                update?.Invoke(lerp(progressMin, progressMax, i / (float)requiredFiles.Length), "Extracting " + entry.Name + "...", null);
+                                i++;
+                            }
+
                         }
                     }
                 }
             }
             File.Delete(zipFilePath);
+            return true;
         }
 
-        private static void downloadWit()
+        private static async Task<bool> makeSureInstalled(string name, string[] requiredFiles, string host, string downloadUrl, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            downloadAndExtractZip("https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", requiredFilesWit);
-        }
-
-        public static void makeSureWitInstalled()
-        {
-            if (!requiredFilesExist(requiredFilesWit))
+            if (!requiredFilesExist(requiredFiles))
             {
-                DialogResult dialogResult = MessageBox.Show("This application relies on WIT for patching. It is currently not residing next to this application. Do you want to automatically download WIT and extract the needed files next to this application from https://wit.wiimm.de/?", "Install WIT", MessageBoxButtons.YesNo);
+                DialogResult dialogResult = MessageBox.Show("This application relies on " + name + " for patching. It is currently not residing next to this application. Do you want to automatically download " + name + " and extract the needed files next to this application from " + host + "?", "Install " + name, MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    downloadWit();
-                    if (requiredFilesExist(requiredFilesWit))
+                    await downloadAndExtractZip(name, downloadUrl, requiredFiles, cancelToken, update, progressMin, progressMax);
+                    if (requiredFilesExist(requiredFiles))
                     {
-                        MessageBox.Show("WIT has been extracted next to this application.");
+                        update?.Invoke(progressMax, name + " has been extracted next to this application.", null);
                     }
                     else
                     {
-                        throw new Exception("Unable to install WIT.");
+                        update?.Invoke(progressMax, null, "Unable to install " + name + ".");
+                        throw new Exception();
                     }
                 }
                 else if (dialogResult == DialogResult.No)
                 {
-                    throw new Exception("This application cannot work without WIT.");
+                    throw new Exception("This application cannot work without " + name);
                 }
             }
+            return true;
         }
 
-        private static async Task<string> callWit(string arguments, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
+        private static async Task<bool> makeSureWitInstalled(CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            makeSureWitInstalled();
+            string[] requiredFilesWit = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
+            return await makeSureInstalled("Wiimms ISO Tools", requiredFilesWit, "https://wit.wiimm.de/", "https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", cancelToken, update, progressMin, progressMax);
+        }
 
-            ProcessStartInfo psi = prepareCallWit(arguments);
+        private static async Task<bool> makeSureWszstInstalled(CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
+        {
+            string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
+            return await makeSureInstalled("Wiimms SZS Toolset", requiredFilesWszst, "https://szs.wiimm.de", "https://szs.wiimm.de/download/szs-v2.19b-r8243-cygwin.zip", cancelToken, update, progressMin, progressMax);
+        }
 
+        private static async Task<bool> makeSureBenzinInstalled(CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
+        {
+            string[] requiredFilesBenzin = new string[] { "benzin.exe", "cygwin1.dll" };
+            return await makeSureInstalled("Benzin", requiredFilesBenzin, "https://github.com/Deflaktor/benzin", "https://github.com/Deflaktor/benzin/releases/download/2.1.11Beta/benzin-2.1.11BETA-cygwin.zip", cancelToken, update, progressMin, progressMax);
+        }
+
+        private static async Task<string> execute(ProcessStartInfo psi, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
+        {
             var exitCode = 0;
             string output = "";
             string error = "";
@@ -118,12 +136,13 @@ namespace CustomStreetManager
                         {
                             var percentage = match.Groups[1].Value;
                             float number = int.Parse(percentage) / 100.0f;
-                            update?.Invoke((int)lerp(progressMin, progressMax, number), line, null);
-                        } else
+                            update?.Invoke(lerp(progressMin, progressMax, number), line, null);
+                        }
+                        else
                         {
                             update?.Invoke(-1, line, null);
                         }
-                        
+
                         Console.Out.WriteLine(line);
                         output += line + Environment.NewLine;
                         line = stdOut.ReadLine();
@@ -141,23 +160,53 @@ namespace CustomStreetManager
                 exitCode = process.ExitCode;
             }
 
-            if(exitCode != 0)
+            if (exitCode != 0)
             {
-                throw new ApplicationException("WIT returned non-zero exit code: " + exitCode + ". Output: " + error);
+                throw new ApplicationException(psi.FileName + " returned non-zero exit code: " + exitCode + ". Output: " + error);
             }
 
             return output;
         }
 
-        static float lerp(float v0, float v1, float t)
+        private static async Task<string> callWit(string arguments, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            return (1 - t) * v0 + t * v1;
+            await makeSureWitInstalled(cancelToken, update, progressMin, lerp(progressMin, progressMax, 0.5f));
+            await makeSureWszstInstalled(cancelToken, update, progressMin, lerp(progressMin, progressMax, 0.5f));
+            await makeSureBenzinInstalled(cancelToken, update, progressMin, lerp(progressMin, progressMax, 0.5f));
+            ProcessStartInfo psi = preparePsi("wit.exe", arguments);
+            return await execute(psi, cancelToken, update, lerp(progressMin, progressMax, 0.5f), progressMax);
         }
 
-        private static ProcessStartInfo prepareCallWit(string arguments)
+        private static async Task<string> callWszst(string arguments, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            string witFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wit.exe");
-            ProcessStartInfo psi = new ProcessStartInfo(witFilePath, arguments);
+            await makeSureWszstInstalled(cancelToken, update, progressMin, lerp(progressMin, progressMax, 0.5f));
+            ProcessStartInfo psi = preparePsi("wszst.exe", arguments);
+            return await execute(psi, cancelToken, update, lerp(progressMin, progressMax, 0.5f), progressMax);
+        }
+
+        private static async Task<string> callWimgt(string arguments, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
+        {
+            await makeSureWszstInstalled(cancelToken, update, progressMin, lerp(progressMin, progressMax, 0.5f));
+            ProcessStartInfo psi = preparePsi("wimgt.exe", arguments);
+            return await execute(psi, cancelToken, update, lerp(progressMin, progressMax, 0.5f), progressMax);
+        }
+
+        private static async Task<string> callBenzin(string arguments, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
+        {
+            await makeSureBenzinInstalled(cancelToken, update, progressMin, lerp(progressMin, progressMax, 0.5f));
+            ProcessStartInfo psi = preparePsi("benzin.exe", arguments);
+            return await execute(psi, cancelToken, update, lerp(progressMin, progressMax, 0.5f), progressMax);
+        }
+
+        static int lerp(float v0, float v1, float t)
+        {
+            return (int)((1 - t) * v0 + t * v1);
+        }
+
+        private static ProcessStartInfo preparePsi(string executable, string arguments)
+        {
+            string executablePath = Path.Combine(Directory.GetCurrentDirectory(), executable);
+            ProcessStartInfo psi = new ProcessStartInfo(executablePath, arguments);
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
             psi.WorkingDirectory = Directory.GetCurrentDirectory();
@@ -291,7 +340,7 @@ namespace CustomStreetManager
 
         public static async Task<string> applyPatch(string mainDolFile, string xmlPatchFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            string arguments = "DOLPATCH \"" + mainDolFile + "\" xml=\""+xmlPatchFile+"\"";
+            string arguments = "DOLPATCH \"" + mainDolFile + "\" xml=\"" + xmlPatchFile + "\"";
             return await callWit(arguments, cancelToken, update, progressMin, progressMax);
         }
     }

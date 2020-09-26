@@ -68,13 +68,20 @@ namespace CustomStreetManager
             {
                 SetProgressBarValue(percentage);
             }
+            string lastLine = "";
+            if (textBox.Lines.Length >= 2)
+            {
+                lastLine = textBox.Lines[textBox.Lines.Length - 2];
+            }
             if (standardOutput != null)
             {
-                textBox.AppendText(standardOutput + Environment.NewLine);
+                if(lastLine.ToLower() != standardOutput.ToLower())
+                    textBox.AppendText(standardOutput + Environment.NewLine);
             }
             if (errorOutput != null)
             {
-                textBox.AppendText(errorOutput + Environment.NewLine);
+                if (lastLine.ToLower() != errorOutput.ToLower())
+                    textBox.AppendText(errorOutput + Environment.NewLine);
             }
             Update();
         }

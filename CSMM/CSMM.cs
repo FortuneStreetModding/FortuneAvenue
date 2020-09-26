@@ -209,32 +209,31 @@ namespace CustomStreetManager
 
             try
             {
-                WitWrapper.makeSureWitInstalled();
-                fileSet = await WitWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 10);
+                fileSet = await WitWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 40);
 
-                progressBar.SetProgress(10, "Detect the sections in main.dol file...");
-                List<MainDolSection> sections = await WitWrapper.readSections(fileSet.main_dol, ct, progressBar.update, 10, 20);
+                progressBar.SetProgressBarLabel("Detect the sections in main.dol file...");
+                List<MainDolSection> sections = await WitWrapper.readSections(fileSet.main_dol, ct, progressBar.update, 40, 45);
                 mainDol = new MainDol(sections);
 
-                progressBar.SetProgress(25, "Read data from main.dol file...");
+                progressBar.SetProgressBarLabel("Read data from main.dol file...");
                 using (var stream = File.OpenRead(fileSet.main_dol))
                 {
                     EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
                     mapDescriptors = mainDol.readMainDol(binReader);
 
-                    progressBar.SetProgress(30, "Read localization files...");
+                    progressBar.SetProgress(47, "Read localization files...");
                     progressBar.appendText(reloadUIMessages(mapDescriptors, mainDol.data));
                 }
-                progressBar.SetProgress(35, "Populate UI...");
+                progressBar.SetProgress(49, "Populate UI...");
 
                 Go.Enabled = false;
                 BindingSource bs = new BindingSource();
                 bs.DataSource = mapDescriptors;
                 dataGridView1.DataSource = bs;
 
-                progressBar.SetProgress(40, "Extract WBFS/ISO...");
+                progressBar.SetProgress(50, "Extract WBFS/ISO...");
 
-                string cacheDirectory = await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 40, 100);
+                string cacheDirectory = await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 50, 100);
 
                 fileSet.game_sequence_arc[Locale.EN] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langEN", "game_sequence_EN.arc");
                 fileSet.game_sequence_arc[Locale.DE] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langDE", "game_sequence_DE.arc");
