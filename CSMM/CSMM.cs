@@ -16,6 +16,7 @@ using MiscUtil.IO;
 using MiscUtil.Conversion;
 using System.Threading.Tasks;
 using FSEditor.FSData;
+using System.Xml;
 
 namespace CustomStreetManager
 {
@@ -60,7 +61,13 @@ namespace CustomStreetManager
             CancellationToken ct = tokenSource2.Token;
 
             ProgressBar progressBar = new ProgressBar();
+            progressBar.callback = (b) => tokenSource2?.Cancel();
+
             progressBar.Show(this);
+            var progress = new Progress<ProgressInfo>(progressInfo =>
+            {
+                progressBar.update(progressInfo);
+            });
 
             // expand dol if not already expanded
             /*if (mainDol.toFileAddress(0x80001800) == -1)
@@ -73,7 +80,7 @@ namespace CustomStreetManager
             File.Copy(fileSet.main_dol, tempMainDol, true);
 
             try
-            {             
+            {
 
                 progressBar.SetProgress(0, "Writing data to main.dol...");
                 // HACK: expand the description message table
@@ -88,7 +95,10 @@ namespace CustomStreetManager
                 // everything went through successfully, copy the temp file
                 File.Copy(tempMainDol, fileSet.main_dol, true);
 
-                progressBar.SetProgress(5, "Writing localization files...");
+                // lets get to the map icons
+                _ = await injectMapIcons(progressBar, ct, progress, 5, 50);
+
+                progressBar.SetProgress(46, "Writing localization files...");
                 foreach (var entry in ui_messages)
                 {
                     string fileSet_ui_message_csv = entry.Key;
@@ -97,12 +107,12 @@ namespace CustomStreetManager
                     ui_message.writeToFile(fileSet_ui_message_csv);
                 }
 
-                progressBar.SetProgress(10, "Copying the modified files to be packed into the image...");
+                progressBar.SetProgress(47, "Copying the modified files to be packed into the image...");
                 ExeWrapper.copyRelevantFilesForPacking(fileSet, inputfilename);
 
-                progressBar.SetProgress(15, "Packing ISO/WBFS file...");
+                progressBar.SetProgress(50, "Packing ISO/WBFS file...");
 
-                await ExeWrapper.packFullIso(inputfilename, outputFilename, ct, progressBar.update, 15, 100);
+                await ExeWrapper.packFullIso(inputfilename, outputFilename, ct, progress, 50, 100);
 
                 progressBar.ShowCheckbox("Cleanup temporary files.", false);
                 progressBar.callback = (c) => { if (c) ExeWrapper.cleanup(inputfilename); };
@@ -118,8 +128,119 @@ namespace CustomStreetManager
             finally
             {
                 File.Delete(tempMainDol);
-                tokenSource2.Dispose();
+                // tokenSource2.Dispose();
             }
+        }
+
+        private string toTmpDirectory(string file, string origin, string extensionWithDot)
+        {
+            if (origin == null)
+            {
+                origin = "";
+            }
+            else
+            {
+                origin = "." + Path.GetFileNameWithoutExtension(origin) + ".";
+            }
+            return Path.Combine(Directory.GetCurrentDirectory(), "tmp", Path.GetFileNameWithoutExtension(file) + origin + extensionWithDot);
+        }
+
+        private async Task<bool> injectMapIcons(ProgressBar progressBar, CancellationToken ct, Progress<ProgressInfo> progress, int minProgress, int maxProgress)
+        {
+            var minProgress1 = ProgressInfo.lerp(minProgress, maxProgress, 0.0f);
+            var maxProgress1 = ProgressInfo.lerp(minProgress, maxProgress, 0.25f);
+            var minProgress2 = ProgressInfo.lerp(minProgress, maxProgress, 0.25f);
+            var maxProgress2 = ProgressInfo.lerp(minProgress, maxProgress, 0.50f);
+            var minProgress3 = ProgressInfo.lerp(minProgress, maxProgress, 0.50f);
+            var maxProgress3 = ProgressInfo.lerp(minProgress, maxProgress, 0.75f);
+            var minProgress4 = ProgressInfo.lerp(minProgress, maxProgress, 0.75f);
+            var maxProgress4 = ProgressInfo.lerp(minProgress, maxProgress, 1.0f);
+
+            progressBar.SetProgress(5, "Extract game_sequence files...");
+            // throw together the game_sequence and game_sequence_wifi files
+            List<string> gameSequenceFiles = new List<string>();
+            gameSequenceFiles.AddRange(fileSet.game_sequence_arc.Values);
+            gameSequenceFiles.AddRange(fileSet.game_sequence_wifi_arc.Values);
+
+            // extract the arc files
+            List<Task<string>> extractArcFileTasks = new List<Task<string>>();
+            foreach (var gameSequenceFile in gameSequenceFiles)
+            {
+                extractArcFileTasks.Add(ExeWrapper.extractArcFile(gameSequenceFile, toTmpDirectory(gameSequenceFile, null, "_d"), ct, progress, minProgress1, maxProgress1));
+            }
+            await Task.WhenAll(extractArcFileTasks);
+
+            // convert the png files to tpl and copy them to the correct location
+            Dictionary<string, string> mapIconToTplName = new Dictionary<string, string>();
+            List<Task<string>> convertPngFileTasks = new List<Task<string>>();
+            foreach (var mapDescriptor in mapDescriptors)
+            {
+                var mapIcon = mapDescriptor.MapIcon;
+                if (string.IsNullOrEmpty(mapIcon))
+                    continue;
+                var mapIconPng = toTmpDirectory(mapIcon, null, ".png");
+                var mapIconTpl = toTmpDirectory(mapIcon, null, ".tpl");
+                var tplName = Ui_menu_19_00a_XMLYT.constructMapIconTplName(mapIcon);
+                if (!mapIconToTplName.ContainsKey(mapIcon))
+                {
+                    mapIconToTplName.Add(mapIcon, tplName);
+                }
+                if (File.Exists(mapIconPng))
+                {
+                    Task task1 = ExeWrapper.convertPngToTpl(mapIconPng, mapIconTpl, ct, progress, minProgress2, maxProgress2);
+                    Task task2 = task1.ContinueWith((t1) =>
+                    {
+                        foreach (var gameSequenceFile in gameSequenceFiles)
+                        {
+                            var gameSequenceExtractedDir = toTmpDirectory(gameSequenceFile, null, "_d");
+                            var mapIconTplCopy = Path.Combine(gameSequenceExtractedDir, "arc", "timg", tplName);
+                            File.Copy(mapIconTpl, mapIconTplCopy);
+                        }
+                    });
+                    convertPngFileTasks.Add(ExeWrapper.convertPngToTpl(mapIconPng, toTmpDirectory(mapIconPng, null, ".tpl"), ct, progress, minProgress3, maxProgress3));
+                }
+            }
+
+            // convert the brlyt files to xmlyt, inject the map icons and convert it back
+            List<Task> injectMapIconsInBrlytTasks = new List<Task>();
+            foreach (var gameSequenceFile in gameSequenceFiles)
+            {
+                var gameSequenceExtractedDir = toTmpDirectory(gameSequenceFile, null, "_d");
+                var brlytFile = Path.Combine(gameSequenceExtractedDir, "arc", "blyt", "ui_menu_19_00a.brlyt");
+                var xmlytFile = toTmpDirectory(brlytFile, gameSequenceExtractedDir, ".xmlyt");
+                Task task1 = ExeWrapper.convertBryltToXmlyt(brlytFile, xmlytFile, ct, null, -1, -1);
+                Task task2 = task1.ContinueWith((t1) => Ui_menu_19_00a_XMLYT.injectMapIcons(xmlytFile, mapIconToTplName));
+                Task task3 = task2.ContinueWith((t2) => ExeWrapper.convertXmlytToBrylt(xmlytFile, brlytFile, ct, progress, minProgress4, maxProgress4));
+                // Task task4 = task3.ContinueWith((t3) => File.Delete(xmlytFile));
+                injectMapIconsInBrlytTasks.Add(task3);
+            }
+
+            await Task.WhenAll(injectMapIconsInBrlytTasks);
+            await Task.WhenAll(convertPngFileTasks);
+
+            // delete the unneeded png and tpl files
+            /*
+            foreach (var mapDescriptor in mapDescriptors)
+            {
+                var mapIcon = mapDescriptor.MapIcon;
+            if (string.IsNullOrEmpty(mapIcon))
+                    continue;
+                var mapIconPng = toTmpDirectory(mapIcon, null, ".png");
+                var mapIconTpl = toTmpDirectory(mapIcon, null, ".tpl");
+                if (File.Exists(mapIconPng))
+                {
+                    File.Delete(mapIconPng);
+                }
+                if (File.Exists(mapIconTpl))
+                {
+                    File.Delete(mapIconTpl);
+                }
+            }*/
+
+
+            progressBar.SetProgress(15, "Ex.");
+
+            return true;
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -149,7 +270,7 @@ namespace CustomStreetManager
         private string reloadUIMessages(List<MapDescriptor> mapDescriptors, AddressConstants data)
         {
             string warnings = "";
-            foreach(string locale in Locale.ALL_WITHOUT_UK)
+            foreach (string locale in Locale.ALL_WITHOUT_UK)
             {
                 ui_messages[fileSet.ui_message_csv[locale]] = new UI_Message(fileSet.ui_message_csv[locale], locale);
             }
@@ -194,9 +315,17 @@ namespace CustomStreetManager
 
         private async void ReloadWbfsIsoFile()
         {
+            var tokenSource2 = new CancellationTokenSource();
+            CancellationToken ct = tokenSource2.Token;
+
             ProgressBar progressBar = new ProgressBar();
             progressBar.Show(this);
             progressBar.SetProgress(0, "Extract relevant files from iso/wbfs...");
+            progressBar.callback = (b) => tokenSource2?.Cancel();
+            var progress = new Progress<ProgressInfo>(progressInfo =>
+            {
+                progressBar.update(progressInfo);
+            });
 
             if (setInputISOLocation.Text == "None")
             {
@@ -204,15 +333,14 @@ namespace CustomStreetManager
                 progressBar.EnableButton();
                 return;
             }
-            var tokenSource2 = new CancellationTokenSource();
-            CancellationToken ct = tokenSource2.Token;
+
 
             try
             {
-                fileSet = await ExeWrapper.extractFiles(setInputISOLocation.Text, ct, progressBar.update, 0, 40);
+                fileSet = await ExeWrapper.extractFiles(setInputISOLocation.Text, ct, progress, 0, 40);
 
                 progressBar.SetProgressBarLabel("Detect the sections in main.dol file...");
-                List<MainDolSection> sections = await ExeWrapper.readSections(fileSet.main_dol, ct, progressBar.update, 40, 45);
+                List<MainDolSection> sections = await ExeWrapper.readSections(fileSet.main_dol, ct, progress, 40, 45);
                 mainDol = new MainDol(sections);
 
                 progressBar.SetProgressBarLabel("Read data from main.dol file...");
@@ -233,7 +361,7 @@ namespace CustomStreetManager
 
                 progressBar.SetProgress(50, "Extract WBFS/ISO...");
 
-                string cacheDirectory = await ExeWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 50, 100);
+                string cacheDirectory = await ExeWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progress, 50, 100);
 
                 fileSet.game_sequence_arc[Locale.EN] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langEN", "game_sequence_EN.arc");
                 fileSet.game_sequence_arc[Locale.DE] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langDE", "game_sequence_DE.arc");
@@ -264,7 +392,7 @@ namespace CustomStreetManager
             }
             finally
             {
-                tokenSource2.Dispose();
+               // tokenSource2.Dispose();
             }
             updateDataGridData(null, null);
         }
@@ -482,7 +610,7 @@ namespace CustomStreetManager
                     var dir = Path.GetDirectoryName(openFileDialog1.FileName);
 
                     var name = Path.GetFileNameWithoutExtension(mapDescriptorImportFile);
-                    if(name.ToLower() == "readme")
+                    if (name.ToLower() == "readme")
                     {
                         name = Path.GetFileName(dir);
                     }
@@ -529,6 +657,14 @@ namespace CustomStreetManager
                     {
                         importFile = Path.Combine(dir, frbFileName + ".frb");
                         importFileTmp = Path.Combine(fileSet.param_folder, frbFileName + ".frb");
+                        File.Copy(importFile, importFileTmp, true);
+                        progressBar.appendText("Imported " + importFile + Environment.NewLine);
+                    }
+                    var mapIcon = mapDescriptorImport.MapIcon;
+                    if (mapIcon != null)
+                    {
+                        importFile = Path.Combine(dir, mapIcon + ".png");
+                        importFileTmp = toTmpDirectory(importFile, null, ".png");
                         File.Copy(importFile, importFileTmp, true);
                         progressBar.appendText("Imported " + importFile + Environment.NewLine);
                     }

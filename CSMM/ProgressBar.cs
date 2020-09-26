@@ -62,6 +62,25 @@ namespace CustomStreetManager
             this.Close();
         }
 
+        public void update(ProgressInfo progressInfo)
+        {
+            if (progressInfo.progress > 0)
+            {
+                SetProgressBarValue(progressInfo.progress);
+            }
+            string lastLine = "";
+            if (textBox.Lines.Length >= 2)
+            {
+                lastLine = textBox.Lines[textBox.Lines.Length - 2];
+            }
+            if (progressInfo.stdLine != null)
+            {
+                if (lastLine.ToLower() != progressInfo.stdLine.ToLower())
+                    textBox.AppendText(progressInfo.stdLine + Environment.NewLine);
+            }
+            Update();
+        }
+
         internal void update(int percentage, string standardOutput, string errorOutput)
         {
             if (percentage != -1)

@@ -139,7 +139,12 @@ namespace FSEditor.MapDescriptor
                     {
                         mapDescriptor.MapIconAddrAddr = 0;
                         var number = Regex.Match(mapDescriptor.Background, @"\d+").Value;
-                        mapDescriptor.MapIcon = "p_bg_" + number;
+                        // the actual entries are p_bg_001, p_bg_002, etc. 
+                        // however, this is annoying since all the other backgrounds are named bg101, bg102, etc. 
+                        // but for the map icons in the brlyt file they are defined with an underscore in between
+                        // we will overwrite this with our own naming convention -> p_bgXXX instead of p_bg_XXX
+                        // this leads to easier handling of the modification of brlyt
+                        mapDescriptor.MapIcon = "p_bg" + number;
                     }
                 }
             }
@@ -172,7 +177,6 @@ namespace FSEditor.MapDescriptor
 
             return mapDescriptors;
         }
-
         public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors)
         {
             if (mapDescriptors.Count != 48)
