@@ -18,9 +18,11 @@ namespace CustomStreetManager
 {
     class WitWrapper
     {
-        private static readonly string[] requiredFiles = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
+        private static readonly string[] requiredFilesWit = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll"};
+        private static readonly string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll"};
+        private static readonly string[] requiredFilesBenzin = new string[] { "benzin.exe", "cyggcc_s-1.dll", "cygwin1.dll" };
 
-        private static Boolean witExists()
+        private static Boolean requiredFilesExist(string[] requiredFiles)
         {
             foreach (string requiredFile in requiredFiles)
             {
@@ -32,9 +34,9 @@ namespace CustomStreetManager
             return true;
         }
 
-        private static void downloadWit()
+        private static void downloadAndExtractZip(string downloadUrl, string[] requiredFiles)
         {
-            string zipFileName = "wit.zip";
+            string zipFileName = "tmp.zip";
             string zipFilePath = Path.Combine(Directory.GetCurrentDirectory(), zipFileName);
             string extractPath = Directory.GetCurrentDirectory();
             using (var client = new WebClient())
@@ -59,15 +61,20 @@ namespace CustomStreetManager
             File.Delete(zipFilePath);
         }
 
+        private static void downloadWit()
+        {
+            downloadAndExtractZip("https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", requiredFilesWit);
+        }
+
         public static void makeSureWitInstalled()
         {
-            if (!witExists())
+            if (!requiredFilesExist(requiredFilesWit))
             {
                 DialogResult dialogResult = MessageBox.Show("This application relies on WIT for patching. It is currently not residing next to this application. Do you want to automatically download WIT and extract the needed files next to this application from https://wit.wiimm.de/?", "Install WIT", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
                     downloadWit();
-                    if (witExists())
+                    if (requiredFilesExist(requiredFilesWit))
                     {
                         MessageBox.Show("WIT has been extracted next to this application.");
                     }
@@ -203,13 +210,13 @@ namespace CustomStreetManager
 
         public static async Task<string> extractFullIsoAsync(string inputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)
         {
-            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
-            if (!Directory.Exists(tmpExtract))
+            string cacheExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
+            if (!Directory.Exists(cacheExtract))
             {
-                string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + tmpExtract + "\"";
-                return await callWit(arguments, cancelToken, update, progressMin, progressMax);
+                string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + cacheExtract + "\"";
+                await callWit(arguments, cancelToken, update, progressMin, progressMax);
             }
-            return null;
+            return cacheExtract;
         }
 
         public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, Action<int, string, string> update, int progressMin, int progressMax)

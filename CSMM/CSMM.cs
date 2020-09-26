@@ -73,7 +73,8 @@ namespace CustomStreetManager
             File.Copy(fileSet.main_dol, tempMainDol, true);
 
             try
-            {
+            {             
+
                 progressBar.SetProgress(0, "Writing data to main.dol...");
                 // HACK: expand the description message table
                 using (Stream baseStream = File.Open(tempMainDol, FileMode.Open))
@@ -86,7 +87,6 @@ namespace CustomStreetManager
                 }
                 // everything went through successfully, copy the temp file
                 File.Copy(tempMainDol, fileSet.main_dol, true);
-                File.Delete(tempMainDol);
 
                 progressBar.SetProgress(5, "Writing localization files...");
                 foreach (var entry in ui_messages)
@@ -117,6 +117,7 @@ namespace CustomStreetManager
             }
             finally
             {
+                File.Delete(tempMainDol);
                 tokenSource2.Dispose();
             }
         }
@@ -233,7 +234,23 @@ namespace CustomStreetManager
 
                 progressBar.SetProgress(40, "Extract WBFS/ISO...");
 
-                await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 40, 100);
+                string cacheDirectory = await WitWrapper.extractFullIsoAsync(setInputISOLocation.Text, ct, progressBar.update, 40, 100);
+
+                fileSet.game_sequence_arc[Locale.EN] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langEN", "game_sequence_EN.arc");
+                fileSet.game_sequence_arc[Locale.DE] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langDE", "game_sequence_DE.arc");
+                fileSet.game_sequence_arc[Locale.ES] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langES", "game_sequence_ES.arc");
+                fileSet.game_sequence_arc[Locale.FR] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langFR", "game_sequence_FR.arc");
+                fileSet.game_sequence_arc[Locale.IT] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langIT", "game_sequence_IT.arc");
+                fileSet.game_sequence_arc[Locale.UK] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langUK", "game_sequence_UK.arc");
+                fileSet.game_sequence_arc[Locale.JP] = Path.Combine(cacheDirectory, "DATA", "files", "game", "game_sequence.arc");
+                fileSet.game_sequence_wifi_arc[Locale.EN] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langEN", "game_sequence_wifi_EN.arc");
+                fileSet.game_sequence_wifi_arc[Locale.DE] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langDE", "game_sequence_wifi_DE.arc");
+                fileSet.game_sequence_wifi_arc[Locale.ES] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langES", "game_sequence_wifi_ES.arc");
+                fileSet.game_sequence_wifi_arc[Locale.FR] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langFR", "game_sequence_wifi_FR.arc");
+                fileSet.game_sequence_wifi_arc[Locale.IT] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langIT", "game_sequence_wifi_IT.arc");
+                fileSet.game_sequence_wifi_arc[Locale.UK] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langUK", "game_sequence_wifi_UK.arc");
+                fileSet.game_sequence_wifi_arc[Locale.JP] = Path.Combine(cacheDirectory, "DATA", "files", "game", "game_sequence_wifi.arc");
+
 
                 progressBar.SetProgress(100, "Loaded successfully.");
             }

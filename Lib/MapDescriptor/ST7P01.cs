@@ -53,6 +53,10 @@ namespace FSEditor.MapDescriptor
 
         public void writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable)
         {
+            // note: To add custom icons, the following files need to be editted as well:
+            // - ui_menu_19_00a.brlyt
+            // - 
+
             // custom map icon hack
             // bl GetMapOrigin                                     -> bl GetMapDifficulty
             stream.Seek(toFileAddress(0x8021e77c), SeekOrigin.Begin); stream.Write(0x4bff3629);
