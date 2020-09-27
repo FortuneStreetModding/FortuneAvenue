@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -35,7 +35,8 @@ namespace CustomStreetManager
 
         public void EnableButton()
         {
-            cancelButton.Enabled = true;
+            if (!cancelButton.IsDisposed)
+                cancelButton.Enabled = true;
         }
 
         public void ShowCheckbox(string text, bool isChecked)
@@ -71,7 +72,8 @@ namespace CustomStreetManager
 
         public void appendText(string text)
         {
-            textBox.AppendText(text);
+            if (!textBox.IsDisposed)
+                textBox.AppendText(text);
         }
 
         private void ProgressBar_FormClosed(object sender, FormClosedEventArgs e)

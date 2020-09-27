@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using FSEditor.FSData;
 using CliWrap;
+using CliWrap.Buffered;
 
 namespace CustomStreetManager
 {
@@ -101,24 +102,24 @@ namespace CustomStreetManager
             }
             return true;
         }
-        private static async Task<bool> makeSureWitInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<bool> makeSureWitInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string[] requiredFilesWit = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
             return await makeSureInstalled("Wiimms ISO Tools", requiredFilesWit, "https://wit.wiimm.de/", "https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
-        private static async Task<bool> makeSureWszstInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<bool> makeSureWszstInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
             return await makeSureInstalled("Wiimms SZS Toolset", requiredFilesWszst, "https://szs.wiimm.de", "https://szs.wiimm.de/download/szs-v2.19b-r8243-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
-        private static async Task<bool> makeSureBenzinInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<bool> makeSureBenzinInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string[] requiredFilesBenzin = new string[] { "benzin.exe", "cygwin1.dll" };
             return await makeSureInstalled("Benzin", requiredFilesBenzin, "https://github.com/Deflaktor/benzin", "https://github.com/Deflaktor/benzin/releases/download/2.1.11Beta/benzin-2.1.11BETA-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         private static void parsePercentageValue(string line, IProgress<ProgressInfo> progress)
         {
-            Match match = Regex.Match(line, @"\D(\d\d?)%");
+            Match match = Regex.Match(line, @"(\d\d\d?)%");
             if (match.Success && match.Groups.Count == 2)
             {
                 var percentage = match.Groups[1].Value;
@@ -129,43 +130,52 @@ namespace CustomStreetManager
         {
             string executablePath = Path.Combine(Directory.GetCurrentDirectory(), exeFileName);
             var stdOut = Console.OpenStandardOutput();
+            var stdErr = Console.OpenStandardError();
             return Cli.Wrap(executablePath)
                 .WithWorkingDirectory(Directory.GetCurrentDirectory())
                 .WithArguments(arguments)
+                .WithValidation(CommandResultValidation.None)
                 .WithStandardOutputPipe(
                     PipeTarget.Merge(
                         PipeTarget.ToDelegate((line) => parsePercentageValue(line, progress)),
                         PipeTarget.ToStringBuilder(resultBuilder),
                         PipeTarget.ToStream(stdOut)
                     )
+                )
+                .WithStandardErrorPipe(
+                    PipeTarget.Merge(
+                        PipeTarget.ToDelegate((line) => parsePercentageValue(line, progress)),
+                        PipeTarget.ToStringBuilder(resultBuilder),
+                        PipeTarget.ToStream(stdErr)
+                    )
                 );
         }
         private static async Task<string> callWit(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            await makeSureWitInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 50)).ConfigureAwait(continueOnCapturedContext);
+            await makeSureWitInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("wit.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 50, 100)).ExecuteAsync(cancelToken);
+            var result = await prepareCliWrap("wit.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
             return resultBuilder.ToString();
         }
         private static async Task<string> callWszst(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 50)).ConfigureAwait(continueOnCapturedContext);
+            await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("wszst.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 50, 100)).ExecuteAsync(cancelToken);
+            var result = await prepareCliWrap("wszst.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
             return resultBuilder.ToString();
         }
         private static async Task<string> callWimgt(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 50)).ConfigureAwait(continueOnCapturedContext);
+            await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("wimgt.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 50, 100)).ExecuteAsync(cancelToken);
+            var result = await prepareCliWrap("wimgt.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
             return resultBuilder.ToString();
         }
         private static async Task<string> callBenzin(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            await makeSureBenzinInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 50)).ConfigureAwait(continueOnCapturedContext);
+            await makeSureBenzinInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("benzin.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 50, 100)).ExecuteAsync(cancelToken);
+            var result = await prepareCliWrap("benzin.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
             return resultBuilder.ToString();
         }
         internal static void copyRelevantFilesForPacking(FileSet fileSet, string inputFile)

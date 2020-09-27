@@ -24,7 +24,7 @@ namespace CustomStreetManager
     public partial class CSMM : Form
     {
         PatchProcess patchProcess;
-        readonly CancellationTokenSource tokenSource;
+        readonly CancellationTokenSource exitTokenSource;
 
         public CSMM()
         {
@@ -36,12 +36,12 @@ namespace CustomStreetManager
                 pi.SetValue(dataGridView1, true, null);
             }
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-            tokenSource = new CancellationTokenSource();
+            exitTokenSource = new CancellationTokenSource();
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            tokenSource.Cancel();
+            exitTokenSource.Cancel();
         }
 
         private void reset()
@@ -62,28 +62,39 @@ namespace CustomStreetManager
                 return;
             }
 
-            CancellationToken ct = tokenSource.Token;
-            ProgressBar progressBar = new ProgressBar();
-            progressBar.callback = (b) => tokenSource?.Cancel();
-            progressBar.Show(this);
-            var progress = new Progress<ProgressInfo>(progressInfo =>
+            using (var cancelTokenSource = new CancellationTokenSource())
+            using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
             {
-                progressBar.update(progressInfo);
-            });
+                CancellationToken ct = linkedTokenSource.Token;
+                ProgressBar progressBar = new ProgressBar();
+                progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                progressBar.Show(this);
+                var progress = new Progress<ProgressInfo>(progressInfo =>
+                {
+                    progressBar.update(progressInfo);
+                });
 
-            try
-            {
-                await patchProcess.saveWbfsIso(inputFile, outputFile, false, progress, ct);
-                progressBar.ShowCheckbox("Cleanup temporary files.", false);
-                progressBar.callback = (c) => { if (c) ExeWrapper.cleanup(inputFile); };
+                try
+                {
+                    await patchProcess.saveWbfsIso(inputFile, outputFile, false, progress, ct);
+
+                    Invoke((MethodInvoker)delegate {
+                        progressBar.ShowCheckbox("Cleanup temporary files.", false);
+                        progressBar.callback = (c) => { if (c) ExeWrapper.cleanup(inputFile); };
+                    });
+                }
+                catch (Exception e2)
+                {
+                    Invoke((MethodInvoker)delegate {
+                        progressBar.appendText(e2.Message);
+                        progressBar.appendText(Environment.NewLine + Environment.NewLine + e2.ToString());
+                        progressBar.EnableButton();
+                    });
+
+                    Console.Error.WriteLine(e2.ToString());
+                }
             }
-            catch (Exception e2)
-            {
-                progressBar.appendText(e2.Message);
-                progressBar.appendText(Environment.NewLine + Environment.NewLine + e2.ToString());
-                progressBar.EnableButton();
-                Console.Error.WriteLine(e2.ToString());
-            }
+
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -112,35 +123,39 @@ namespace CustomStreetManager
 
         private async void ReloadWbfsIsoFile()
         {
-            CancellationToken ct = tokenSource.Token;
-            ProgressBar progressBar = new ProgressBar();
-            progressBar.callback = (b) => tokenSource?.Cancel();
-            progressBar.Show(this);
-            var progress = new Progress<ProgressInfo>(progressInfo =>
+            using (var cancelTokenSource = new CancellationTokenSource())
+            using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
             {
-                progressBar.update(progressInfo);
-            });
+                CancellationToken ct = linkedTokenSource.Token;
+                ProgressBar progressBar = new ProgressBar();
+                progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                progressBar.Show(this);
+                var progress = new Progress<ProgressInfo>(progressInfo =>
+                {
+                    progressBar.update(progressInfo);
+                });
 
-            var inputWbfsIso = setInputISOLocation.Text;
-            patchProcess = new PatchProcess();
-            try
-            {
-                var mapDescriptors = await patchProcess.ReloadWbfsIsoFile(inputWbfsIso, progress, ct);
+                var inputWbfsIso = setInputISOLocation.Text;
+                patchProcess = new PatchProcess();
+                try
+                {
+                    var mapDescriptors = await patchProcess.ReloadWbfsIsoFile(inputWbfsIso, progress, ct);
 
-                Go.Enabled = false;
-                BindingSource bs = new BindingSource();
-                bs.DataSource = mapDescriptors;
-                dataGridView1.DataSource = bs;
+                    Go.Enabled = false;
+                    BindingSource bs = new BindingSource();
+                    bs.DataSource = mapDescriptors;
+                    dataGridView1.DataSource = bs;
+                }
+                catch (Exception e)
+                {
+                    reset();
+                    progressBar.appendText(e.Message);
+                    progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
+                    progressBar.EnableButton();
+                    Console.Error.WriteLine(e.ToString());
+                }
+                updateDataGridData(null, null);
             }
-            catch (Exception e)
-            {
-                reset();
-                progressBar.appendText(e.Message);
-                progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
-                progressBar.EnableButton();
-                Console.Error.WriteLine(e.ToString());
-            }
-            updateDataGridData(null, null);
         }
 
 
@@ -177,7 +192,7 @@ namespace CustomStreetManager
         private void updateDataGridData(object sender, EventArgs e)
         {
             BindingSource bs = dataGridView1.DataSource as BindingSource;
-            if (patchProcess.mapDescriptors != null)
+            if (patchProcess != null && patchProcess.mapDescriptors != null)
             {
                 if (checkBox1.Checked)
                 {
@@ -232,38 +247,42 @@ namespace CustomStreetManager
 
             if (saveFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(saveFileDialog1.FileName))
             {
-                CancellationToken ct = tokenSource.Token;
-                ProgressBar progressBar = new ProgressBar();
-                progressBar.callback = (b) => tokenSource?.Cancel();
-                progressBar.Show(this);
-                var progress = new Progress<ProgressInfo>(progressInfo =>
+                using (var cancelTokenSource = new CancellationTokenSource())
+                using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
                 {
-                    progressBar.update(progressInfo);
-                });
-
-                bool overwrite = false;
-
-            tryExportMd:
-                try
-                {
-                    string extractedFiles = await patchProcess.exportMd(saveFileDialog1.FileName, mapDescriptor, overwrite, progress, ct);
-                    progressBar.appendText(extractedFiles);
-                }
-                catch (FileAlreadyExistException e1)
-                {
-                    DialogResult dialogResult = MessageBox.Show(e1.Message, "Files already exist", MessageBoxButtons.OKCancel);
-                    if (dialogResult == DialogResult.OK)
+                    CancellationToken ct = linkedTokenSource.Token;
+                    ProgressBar progressBar = new ProgressBar();
+                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                    progressBar.Show(this);
+                    var progress = new Progress<ProgressInfo>(progressInfo =>
                     {
-                        overwrite = true;
-                        goto tryExportMd;
+                        progressBar.update(progressInfo);
+                    });
+
+                    bool overwrite = false;
+
+                tryExportMd:
+                    try
+                    {
+                        string extractedFiles = await patchProcess.exportMd(saveFileDialog1.FileName, mapDescriptor, overwrite, progress, ct);
+                        progressBar.appendText(extractedFiles);
                     }
-                }
-                catch (Exception e)
-                {
-                    progressBar.appendText(e.Message);
-                    progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
-                    progressBar.EnableButton();
-                    Console.Error.WriteLine(e.ToString());
+                    catch (FileAlreadyExistException e1)
+                    {
+                        DialogResult dialogResult = MessageBox.Show(e1.Message, "Files already exist", MessageBoxButtons.OKCancel);
+                        if (dialogResult == DialogResult.OK)
+                        {
+                            overwrite = true;
+                            goto tryExportMd;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        progressBar.appendText(e.Message);
+                        progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
+                        progressBar.EnableButton();
+                        Console.Error.WriteLine(e.ToString());
+                    }
                 }
             }
         }
@@ -276,28 +295,32 @@ namespace CustomStreetManager
 
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
-                CancellationToken ct = tokenSource.Token;
-                ProgressBar progressBar = new ProgressBar();
-                progressBar.callback = (b) => tokenSource?.Cancel();
-                progressBar.Show(this);
-                var progress = new Progress<ProgressInfo>(progressInfo =>
+                using (var cancelTokenSource = new CancellationTokenSource())
+                using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
                 {
-                    progressBar.update(progressInfo);
-                });
+                    CancellationToken ct = linkedTokenSource.Token;
+                    ProgressBar progressBar = new ProgressBar();
+                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                    progressBar.Show(this);
+                    var progress = new Progress<ProgressInfo>(progressInfo =>
+                    {
+                        progressBar.update(progressInfo);
+                    });
 
-                try
-                {
-                    patchProcess.importMd(openFileDialog1.FileName, mapDescriptor, progress, ct);
+                    try
+                    {
+                        patchProcess.importMd(openFileDialog1.FileName, mapDescriptor, progress, ct);
 
-                    Go.Enabled = true;
-                    updateDataGridData(null, null);
-                }
-                catch (Exception e)
-                {
-                    progressBar.appendText(e.Message);
-                    progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
-                    progressBar.EnableButton();
-                    Console.Error.WriteLine(e.ToString());
+                        Go.Enabled = true;
+                        updateDataGridData(null, null);
+                    }
+                    catch (Exception e)
+                    {
+                        progressBar.appendText(e.Message);
+                        progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
+                        progressBar.EnableButton();
+                        Console.Error.WriteLine(e.ToString());
+                    }
                 }
             }
         }

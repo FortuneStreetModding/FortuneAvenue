@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CustomStreetManager
@@ -35,7 +36,7 @@ namespace CustomStreetManager
         }
         public static int lerp(int min, int max, int value)
         {
-            return lerp(min / 100f, max / 100f, value / 100f);
+            return lerp(min, max, value / 100f);
         }
         public static IProgress<ProgressInfo> makeSubProgress(IProgress<ProgressInfo> progress, int minProgress, int maxProgress)
         {
@@ -52,6 +53,28 @@ namespace CustomStreetManager
                 progressInfo.progress = -1;
                 progress.Report(progressInfo);
             });
+        }
+
+        /**
+         * Useful for when a command line job does not report progress but we still want to show the user that work is being done.
+         */
+        public static async Task<bool> makeFakeProgress(IProgress<ProgressInfo> progress, CancellationToken ct)
+        {
+            for (int i = 1; i <= 100; i++)
+            {
+                try
+                {
+                    await Task.Delay(i * i + 15, ct).ConfigureAwait(false);
+                }
+                catch (TaskCanceledException e)
+                {
+                    return true;
+                }
+                if (ct.IsCancellationRequested)
+                    return true;
+                progress?.Report(i);
+            }
+            return true;
         }
     }
 }

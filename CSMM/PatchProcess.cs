@@ -54,9 +54,9 @@ namespace CustomStreetManager
                 throw new ArgumentNullException("Can't load wbfs or iso file as the input file name is not set.");
             }
 
-            fileSet = await ExeWrapper.extractFiles(inputWbfsIso, ct, ProgressInfo.makeSubProgress(progress, 0, 40));
+            fileSet = await ExeWrapper.extractFiles(inputWbfsIso, ct, ProgressInfo.makeSubProgress(progress, 0, 40)).ConfigureAwait(false);
             progress?.Report("Detect the sections in main.dol file...");
-            List<MainDolSection> sections = await ExeWrapper.readSections(fileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 40, 45));
+            List<MainDolSection> sections = await ExeWrapper.readSections(fileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 40, 45)).ConfigureAwait(false);
             mainDol = new MainDol(sections);
 
             progress?.Report("Read data from main.dol file...");
@@ -73,7 +73,7 @@ namespace CustomStreetManager
             progress?.Report(50);
             progress?.Report("Extract Iso...");
 
-            string cacheDirectory = await ExeWrapper.extractFullIsoAsync(inputWbfsIso, ct, ProgressInfo.makeSubProgress(progress, 50, 100));
+            string cacheDirectory = await ExeWrapper.extractFullIsoAsync(inputWbfsIso, ct, ProgressInfo.makeSubProgress(progress, 50, 100)).ConfigureAwait(false);
 
             fileSet.game_sequence_arc[Locale.EN] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langEN", "game_sequence_EN.arc");
             fileSet.game_sequence_arc[Locale.DE] = Path.Combine(cacheDirectory, "DATA", "files", "game", "langDE", "game_sequence_DE.arc");
@@ -175,12 +175,12 @@ namespace CustomStreetManager
         public async Task<bool> saveWbfsIso(string inputFile, string outputFile, bool cleanup, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             progress?.Report(new ProgressInfo(0, "Writing data to main.dol..."));
-            patchMainDol(fileSet.main_dol, ProgressInfo.makeSubProgress(progress, 0, 5), ct);
+            patchMainDol(fileSet.main_dol, ProgressInfo.makeSubProgress(progress, 0, 1), ct);
 
             // lets get to the map icons
-            _ = await injectMapIcons(ProgressInfo.makeSubProgress(progress, 5, 45), ct);
+            await injectMapIcons(ProgressInfo.makeSubProgress(progress, 1, 40), ct).ConfigureAwait(false);
 
-            progress.Report(new ProgressInfo(46, "Writing localization files..."));
+            progress.Report(new ProgressInfo(40, "Writing localization files..."));
             foreach (var entry in ui_messages)
             {
                 string fileSet_ui_message_csv = entry.Key;
@@ -188,10 +188,19 @@ namespace CustomStreetManager
                 ui_message.set(mapDescriptors);
                 ui_message.writeToFile(fileSet_ui_message_csv);
             }
-            progress.Report(new ProgressInfo(47, "Copying the modified files to be packed into the image..."));
-            ExeWrapper.copyRelevantFilesForPacking(fileSet, inputFile);
-            progress.Report(new ProgressInfo(48, "Packing ISO/WBFS file..."));
-            await ExeWrapper.packFullIso(inputFile, outputFile, ct, ProgressInfo.makeSubProgress(progress, 50, 100));
+
+            using (CancellationTokenSource source = new CancellationTokenSource())
+            {
+                // start fake progress
+                progress.Report(new ProgressInfo(45, "Copying the modified files to be packed into the image..."));
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, 60), source.Token);
+                ExeWrapper.copyRelevantFilesForPacking(fileSet, inputFile);
+                source.Cancel();
+                await fakeProgressTask.ConfigureAwait(false);
+            }
+
+            progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
+            await ExeWrapper.packFullIso(inputFile, outputFile, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
 
             if (cleanup)
             {
@@ -201,31 +210,15 @@ namespace CustomStreetManager
             return true;
         }
 
-        /**
-         * Useful for when a command line job does not report progress but we still want to show the user that work is being done.
-         */
-        private async Task<bool> makeFakeProgress(IProgress<ProgressInfo> progress, CancellationToken ct)
-        {
-            for (int i = 1; i <= 100; i++)
-            {
-                try
-                {
-                    await Task.Delay(i * 100, ct);
-                }
-                catch (TaskCanceledException e)
-                {
-                    return true;
-                }
-                if (ct.IsCancellationRequested)
-                    return true;
-                progress.Report(i);
-            }
-            return true;
-        }
-
         private async Task<bool> injectMapIcons(IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            progress.Report(new ProgressInfo(5, "Extract game_sequence files..."));
+            progress.Report("Checking needed installations...");
+
+            await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 5)).ConfigureAwait(false);
+            await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 5, 10)).ConfigureAwait(false);
+
+            progress.Report(new ProgressInfo(10, "Extract game_sequence files..."));
+
             // throw together the game_sequence and game_sequence_wifi files
             List<string> gameSequenceFiles = new List<string>();
             gameSequenceFiles.AddRange(fileSet.game_sequence_arc.Values);
@@ -234,7 +227,7 @@ namespace CustomStreetManager
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                var fakeProgressTask = makeFakeProgress(ProgressInfo.makeSubProgress(progress, 0, 25), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 10, 40), source.Token);
 
                 // extract the arc files
                 List<Task<string>> extractArcFileTasks = new List<Task<string>>();
@@ -242,14 +235,14 @@ namespace CustomStreetManager
                 {
                     extractArcFileTasks.Add(ExeWrapper.extractArcFile(gameSequenceFile, toTmpDirectory(gameSequenceFile, null, "_d"), ct, ProgressInfo.makeNoProgress(progress)));
                 }
-                await Task.WhenAll(extractArcFileTasks);
+                await Task.WhenAll(extractArcFileTasks).ConfigureAwait(false);
                 source.Cancel();
-                await fakeProgressTask;
+                await fakeProgressTask.ConfigureAwait(false);
             }
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                var fakeProgressTask = makeFakeProgress(ProgressInfo.makeSubProgress(progress, 25, 75), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 40, 80), source.Token);
 
                 // convert the png files to tpl and copy them to the correct location
                 Dictionary<string, string> mapIconToTplName = new Dictionary<string, string>();
@@ -296,10 +289,10 @@ namespace CustomStreetManager
                     // Task task4 = task3.ContinueWith((t3) => File.Delete(xmlytFile));
                     injectMapIconsInBrlytTasks.Add(task3);
                 }
-                await Task.WhenAll(injectMapIconsInBrlytTasks);
-                await Task.WhenAll(convertPngFileTasks);
+                await Task.WhenAll(injectMapIconsInBrlytTasks).ConfigureAwait(false);
+                await Task.WhenAll(convertPngFileTasks).ConfigureAwait(false);
                 source.Cancel();
-                await fakeProgressTask;
+                await fakeProgressTask.ConfigureAwait(false);
             }
 
             // delete the unneeded png and tpl files
@@ -321,7 +314,7 @@ namespace CustomStreetManager
                 }
             }*/
 
-            progress.Report(new ProgressInfo(100, "Done"));
+            progress.Report(100);
 
             return true;
         }
@@ -406,7 +399,7 @@ namespace CustomStreetManager
             using (FileStream fs = File.Create(fileNameMd))
             {
                 byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.generateMapDescriptorFileContent());
-                await fs.WriteAsync(content, 0, content.Length);
+                await fs.WriteAsync(content, 0, content.Length).ConfigureAwait(false);
             }
             extractedFiles += fileNameMd + Environment.NewLine;
 
