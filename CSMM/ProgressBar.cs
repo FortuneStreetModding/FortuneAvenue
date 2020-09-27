@@ -19,18 +19,6 @@ namespace CustomStreetManager
             InitializeComponent();
         }
 
-        public void SetProgress(int num, string label)
-        {
-            SetProgressBarLabel(label);
-            SetProgressBarValue(num);
-        }
-
-        public void SetProgressBarLabel(string text)
-        {
-            progressLabel.Text = text;
-            progressLabel.Update();
-        }
-
         public void SetProgressBarValue(int num)
         {
             if (num != 100)
@@ -77,30 +65,6 @@ namespace CustomStreetManager
             {
                 if (lastLine.ToLower() != progressInfo.stdLine.ToLower())
                     textBox.AppendText(progressInfo.stdLine + Environment.NewLine);
-            }
-            Update();
-        }
-
-        internal void update(int percentage, string standardOutput, string errorOutput)
-        {
-            if (percentage != -1)
-            {
-                SetProgressBarValue(percentage);
-            }
-            string lastLine = "";
-            if (textBox.Lines.Length >= 2)
-            {
-                lastLine = textBox.Lines[textBox.Lines.Length - 2];
-            }
-            if (standardOutput != null)
-            {
-                if(lastLine.ToLower() != standardOutput.ToLower())
-                    textBox.AppendText(standardOutput + Environment.NewLine);
-            }
-            if (errorOutput != null)
-            {
-                if (lastLine.ToLower() != errorOutput.ToLower())
-                    textBox.AppendText(errorOutput + Environment.NewLine);
             }
             Update();
         }

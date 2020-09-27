@@ -30,7 +30,6 @@
         {
             this.mapReplaceProgressBar = new System.Windows.Forms.ProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.progressLabel = new System.Windows.Forms.Label();
             this.textBox = new System.Windows.Forms.TextBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
@@ -62,24 +61,13 @@
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
-            // progressLabel
-            // 
-            this.progressLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressLabel.Location = new System.Drawing.Point(10, 11);
-            this.progressLabel.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.progressLabel.Name = "progressLabel";
-            this.progressLabel.Size = new System.Drawing.Size(401, 26);
-            this.progressLabel.TabIndex = 2;
-            this.progressLabel.Text = "label1";
-            this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // textBox
             // 
-            this.textBox.Location = new System.Drawing.Point(13, 51);
+            this.textBox.Location = new System.Drawing.Point(13, 12);
             this.textBox.Multiline = true;
             this.textBox.Name = "textBox";
             this.textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox.Size = new System.Drawing.Size(396, 72);
+            this.textBox.Size = new System.Drawing.Size(396, 111);
             this.textBox.TabIndex = 3;
             // 
             // checkBox1
@@ -101,7 +89,6 @@
             this.ClientSize = new System.Drawing.Size(421, 221);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.textBox);
-            this.Controls.Add(this.progressLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.mapReplaceProgressBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -121,7 +108,6 @@
 
         private System.Windows.Forms.ProgressBar mapReplaceProgressBar;
         private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.Label progressLabel;
         private System.Windows.Forms.TextBox textBox;
         private System.Windows.Forms.CheckBox checkBox1;
     }

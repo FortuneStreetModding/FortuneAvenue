@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BrawlLib.SSBB.ResourceNodes;
-using BrawlLib.Wii.Animations;
 using System.Xml;
 using System.IO;
 
