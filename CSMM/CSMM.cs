@@ -66,8 +66,8 @@ namespace CustomStreetManager
             using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
             {
                 CancellationToken ct = linkedTokenSource.Token;
-                ProgressBar progressBar = new ProgressBar();
-                progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                ProgressBar progressBar = new ProgressBar(verboseToolStripMenuItem.Checked);
+                progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException) { } };
                 progressBar.Show(this);
                 var progress = new Progress<ProgressInfo>(progressInfo =>
                 {
@@ -127,8 +127,8 @@ namespace CustomStreetManager
             using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
             {
                 CancellationToken ct = linkedTokenSource.Token;
-                ProgressBar progressBar = new ProgressBar();
-                progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                ProgressBar progressBar = new ProgressBar(verboseToolStripMenuItem.Checked);
+                progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException) { } };
                 progressBar.Show(this);
                 var progress = new Progress<ProgressInfo>(progressInfo =>
                 {
@@ -251,8 +251,8 @@ namespace CustomStreetManager
                 using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
                 {
                     CancellationToken ct = linkedTokenSource.Token;
-                    ProgressBar progressBar = new ProgressBar();
-                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                    ProgressBar progressBar = new ProgressBar(verboseToolStripMenuItem.Checked);
+                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException) { } };
                     progressBar.Show(this);
                     var progress = new Progress<ProgressInfo>(progressInfo =>
                     {
@@ -299,8 +299,8 @@ namespace CustomStreetManager
                 using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
                 {
                     CancellationToken ct = linkedTokenSource.Token;
-                    ProgressBar progressBar = new ProgressBar();
-                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException _) { } };
+                    ProgressBar progressBar = new ProgressBar(verboseToolStripMenuItem.Checked);
+                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException) { } };
                     progressBar.Show(this);
                     var progress = new Progress<ProgressInfo>(progressInfo =>
                     {

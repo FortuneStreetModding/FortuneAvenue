@@ -10,24 +10,30 @@ namespace CustomStreetManager
     public struct ProgressInfo
     {
         public int progress;
-        public string stdLine;
-        public string errLine;
+        public string line;
+        public bool verbose;
 
         public ProgressInfo(int progress, string text)
         {
             this.progress = progress;
-            this.stdLine = text;
-            errLine = null;
+            this.line = text;
+            this.verbose = false;
+        }
+        public ProgressInfo(int progress, string text, bool verbose)
+        {
+            this.progress = progress;
+            this.line = text;
+            this.verbose = true;
         }
 
         public static implicit operator ProgressInfo(int value)
         {
-            return new ProgressInfo() { progress = value, stdLine = null, errLine = null };
+            return new ProgressInfo() { progress = value, line = null, verbose = false };
         }
 
         public static implicit operator ProgressInfo(string value)
         {
-            return new ProgressInfo() { progress = -1, stdLine = value, errLine = null };
+            return new ProgressInfo() { progress = -1, line = value, verbose = false };
         }
 
         public static int lerp(float v0, float v1, float t)
@@ -64,9 +70,9 @@ namespace CustomStreetManager
             {
                 try
                 {
-                    await Task.Delay(i * i + 15, ct).ConfigureAwait(false);
+                    await Task.Delay(i * i / 8 + i / 2 + 15, ct).ConfigureAwait(false);
                 }
-                catch (TaskCanceledException e)
+                catch (TaskCanceledException)
                 {
                     return true;
                 }

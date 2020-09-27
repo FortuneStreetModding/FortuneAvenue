@@ -214,10 +214,10 @@ namespace CustomStreetManager
         {
             progress.Report("Checking needed installations...");
 
-            await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 5)).ConfigureAwait(false);
-            await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 5, 10)).ConfigureAwait(false);
+            await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
+            await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(false);
 
-            progress.Report(new ProgressInfo(10, "Extract game_sequence files..."));
+            progress.Report(new ProgressInfo(2, "Extract game_sequence files..."));
 
             // throw together the game_sequence and game_sequence_wifi files
             List<string> gameSequenceFiles = new List<string>();
@@ -227,7 +227,7 @@ namespace CustomStreetManager
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 10, 40), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 2, 50), source.Token);
 
                 // extract the arc files
                 List<Task<string>> extractArcFileTasks = new List<Task<string>>();
@@ -242,7 +242,7 @@ namespace CustomStreetManager
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 40, 80), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 50, 100), source.Token);
 
                 // convert the png files to tpl and copy them to the correct location
                 Dictionary<string, string> mapIconToTplName = new Dictionary<string, string>();

@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Threading;
 using FSEditor.FSData;
-using CliWrap;
-using CliWrap.Buffered;
 
 namespace CustomStreetManager
 {
@@ -119,64 +117,98 @@ namespace CustomStreetManager
         }
         private static void parsePercentageValue(string line, IProgress<ProgressInfo> progress)
         {
+            var pi = new ProgressInfo();
+            pi.progress = -1;
+            pi.line = line;
+            pi.verbose = true;
             Match match = Regex.Match(line, @"(\d\d\d?)%");
             if (match.Success && match.Groups.Count == 2)
             {
                 var percentage = match.Groups[1].Value;
-                progress?.Report(int.Parse(percentage));
+                pi.progress = int.Parse(percentage);
             }
+            progress?.Report(pi);
         }
-        private static Command prepareCliWrap(string exeFileName, string arguments, StringBuilder resultBuilder, IProgress<ProgressInfo> progress)
+
+        private static async Task<string> execute(ProcessStartInfo psi, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string executablePath = Path.Combine(Directory.GetCurrentDirectory(), exeFileName);
-            var stdOut = Console.OpenStandardOutput();
-            var stdErr = Console.OpenStandardError();
-            return Cli.Wrap(executablePath)
-                .WithWorkingDirectory(Directory.GetCurrentDirectory())
-                .WithArguments(arguments)
-                .WithValidation(CommandResultValidation.None)
-                .WithStandardOutputPipe(
-                    PipeTarget.Merge(
-                        PipeTarget.ToDelegate((line) => parsePercentageValue(line, progress)),
-                        PipeTarget.ToStringBuilder(resultBuilder),
-                        PipeTarget.ToStream(stdOut)
-                    )
-                )
-                .WithStandardErrorPipe(
-                    PipeTarget.Merge(
-                        PipeTarget.ToDelegate((line) => parsePercentageValue(line, progress)),
-                        PipeTarget.ToStringBuilder(resultBuilder),
-                        PipeTarget.ToStream(stdErr)
-                    )
-                );
+            var exitCode = 0;
+            string output = "";
+            string error = "";
+            using (Process process = Process.Start(psi))
+            {
+                var stdOut = process.StandardOutput;
+                var stdErr = process.StandardError;
+                while (!process.HasExited)
+                {
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        process.Kill();
+                        break;
+                    }
+                    string line;
+                    while ((line = await stdOut.ReadLineAsync()) != null)
+                    {
+                        parsePercentageValue(line, progress);
+                        Console.Out.WriteLine(line);
+                        output += line + Environment.NewLine;
+                    }
+                    while ((line = await stdErr.ReadLineAsync()) != null)
+                    {
+                        parsePercentageValue(line, progress);
+                        Console.Error.WriteLine(line);
+                        output += line + Environment.NewLine;
+                    }
+                    await Task.Delay(100);
+                }
+                exitCode = process.ExitCode;
+            }
+
+            if (exitCode != 0)
+            {
+                throw new ApplicationException(psi.FileName + " returned non-zero exit code: " + exitCode + ". Output: " + error);
+            }
+
+            return output;
         }
+
+        private static ProcessStartInfo preparePsi(string executable, string arguments)
+        {
+            string executablePath = Path.Combine(Directory.GetCurrentDirectory(), executable);
+            ProcessStartInfo psi = new ProcessStartInfo(executablePath, arguments);
+            psi.CreateNoWindow = true;
+            psi.UseShellExecute = false;
+            psi.WorkingDirectory = Directory.GetCurrentDirectory();
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
+            psi.StandardOutputEncoding = Encoding.UTF8;
+            psi.StandardErrorEncoding = Encoding.UTF8;
+            return psi;
+        }
+
         private static async Task<string> callWit(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureWitInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("wit.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
-            return resultBuilder.ToString();
+            var psi = preparePsi("wit.exe", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callWszst(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("wszst.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
-            return resultBuilder.ToString();
+            var psi = preparePsi("wszst.exe", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callWimgt(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("wimgt.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
-            return resultBuilder.ToString();
+            var psi = preparePsi("wimgt.exe", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callBenzin(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureBenzinInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            StringBuilder resultBuilder = new StringBuilder();
-            var result = await prepareCliWrap("benzin.exe", arguments, resultBuilder, ProgressInfo.makeSubProgress(progress, 10, 100)).ExecuteBufferedAsync(cancelToken);
-            return resultBuilder.ToString();
+            var psi = preparePsi("benzin.exe", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         internal static void copyRelevantFilesForPacking(FileSet fileSet, string inputFile)
         {

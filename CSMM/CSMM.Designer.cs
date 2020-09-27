@@ -46,6 +46,9 @@ namespace CustomStreetManager
             this.deflaktorsASMHacksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeIntroMenuAndMapBgmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.patchToWiimmfiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.verboseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.setOutputLocationButton = new System.Windows.Forms.Button();
             this.setOutputPathLabel = new System.Windows.Forms.Label();
@@ -73,7 +76,6 @@ namespace CustomStreetManager
             this.ImportMd = new System.Windows.Forms.DataGridViewButtonColumn();
             this.mapDescriptorBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.Go = new System.Windows.Forms.Button();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -105,6 +107,7 @@ namespace CustomStreetManager
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.optionsToolStripMenuItem,
+            this.settingsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -163,6 +166,29 @@ namespace CustomStreetManager
             this.patchToWiimmfiToolStripMenuItem.Name = "patchToWiimmfiToolStripMenuItem";
             this.patchToWiimmfiToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
             this.patchToWiimmfiToolStripMenuItem.Text = "Wiimmfi";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
+            this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.verboseToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 22);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // verboseToolStripMenuItem
+            // 
+            this.verboseToolStripMenuItem.CheckOnClick = true;
+            this.verboseToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.verboseToolStripMenuItem.Name = "verboseToolStripMenuItem";
+            this.verboseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.verboseToolStripMenuItem.Text = "Verbose";
             // 
             // setOutputLocationButton
             // 
@@ -424,13 +450,6 @@ namespace CustomStreetManager
             this.Go.UseVisualStyleBackColor = true;
             this.Go.Click += new System.EventHandler(this.Go_Click);
             // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
-            this.helpToolStripMenuItem.Text = "Help";
-            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
-            // 
             // CSMM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -499,6 +518,8 @@ namespace CustomStreetManager
         private System.Windows.Forms.DataGridViewButtonColumn Export;
         private System.Windows.Forms.DataGridViewButtonColumn ImportMd;
         private ToolStripMenuItem helpToolStripMenuItem;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem verboseToolStripMenuItem;
     }
 }
 

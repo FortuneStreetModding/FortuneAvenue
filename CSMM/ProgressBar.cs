@@ -13,14 +13,18 @@ namespace CustomStreetManager
     public partial class ProgressBar : Form
     {
         public Action<bool> callback;
+        public bool verbose;
 
-        public ProgressBar()
+        public ProgressBar(bool verbose)
         {
             InitializeComponent();
+            this.verbose = verbose;
         }
 
         public void SetProgressBarValue(int num)
         {
+            if (IsDisposed)
+                return;
             if (num != 100)
             {
                 mapReplaceProgressBar.Value = num + 1;
@@ -41,6 +45,8 @@ namespace CustomStreetManager
 
         public void ShowCheckbox(string text, bool isChecked)
         {
+            if (IsDisposed)
+                return;
             checkBox1.Text = text;
             checkBox1.Checked = isChecked;
             checkBox1.Visible = true;
@@ -53,6 +59,8 @@ namespace CustomStreetManager
 
         public void update(ProgressInfo progressInfo)
         {
+            if (IsDisposed)
+                return;
             if (progressInfo.progress > 0)
             {
                 SetProgressBarValue(progressInfo.progress);
@@ -62,10 +70,15 @@ namespace CustomStreetManager
             {
                 lastLine = textBox.Lines[textBox.Lines.Length - 2];
             }
-            if (progressInfo.stdLine != null)
+            if (progressInfo.line != null)
             {
-                if (lastLine.ToLower() != progressInfo.stdLine.ToLower())
-                    textBox.AppendText(progressInfo.stdLine + Environment.NewLine);
+                if (lastLine.ToLower() != progressInfo.line.ToLower())
+                {
+                    if (verbose && progressInfo.verbose || !progressInfo.verbose)
+                    {
+                        textBox.AppendText(progressInfo.line + Environment.NewLine);
+                    }
+                }
             }
             Update();
         }

@@ -1,4 +1,6 @@
-﻿namespace CustomStreetManager
+﻿using System.Drawing;
+
+namespace CustomStreetManager
 {
     partial class ProgressBar
     {
@@ -39,10 +41,10 @@
             this.mapReplaceProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.mapReplaceProgressBar.BackColor = System.Drawing.SystemColors.ControlDark;
             this.mapReplaceProgressBar.ForeColor = System.Drawing.Color.DarkOrchid;
-            this.mapReplaceProgressBar.Location = new System.Drawing.Point(13, 140);
+            this.mapReplaceProgressBar.Location = new System.Drawing.Point(13, 266);
             this.mapReplaceProgressBar.Margin = new System.Windows.Forms.Padding(1);
             this.mapReplaceProgressBar.Name = "mapReplaceProgressBar";
-            this.mapReplaceProgressBar.Size = new System.Drawing.Size(396, 28);
+            this.mapReplaceProgressBar.Size = new System.Drawing.Size(680, 28);
             this.mapReplaceProgressBar.Step = 20;
             this.mapReplaceProgressBar.TabIndex = 0;
             this.mapReplaceProgressBar.Value = 1;
@@ -52,10 +54,10 @@
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Enabled = false;
-            this.cancelButton.Location = new System.Drawing.Point(197, 179);
+            this.cancelButton.Location = new System.Drawing.Point(199, 306);
             this.cancelButton.Margin = new System.Windows.Forms.Padding(1);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(212, 32);
+            this.cancelButton.Size = new System.Drawing.Size(494, 32);
             this.cancelButton.TabIndex = 1;
             this.cancelButton.Text = "Close";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -63,17 +65,18 @@
             // 
             // textBox
             // 
+            this.textBox.Font = new System.Drawing.Font("Courier New", 8.25F);
             this.textBox.Location = new System.Drawing.Point(13, 12);
             this.textBox.Multiline = true;
             this.textBox.Name = "textBox";
             this.textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox.Size = new System.Drawing.Size(396, 111);
+            this.textBox.Size = new System.Drawing.Size(680, 239);
             this.textBox.TabIndex = 3;
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(13, 188);
+            this.checkBox1.Location = new System.Drawing.Point(13, 315);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(80, 17);
             this.checkBox1.TabIndex = 4;
@@ -86,7 +89,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(421, 221);
+            this.ClientSize = new System.Drawing.Size(703, 348);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.textBox);
             this.Controls.Add(this.cancelButton);
