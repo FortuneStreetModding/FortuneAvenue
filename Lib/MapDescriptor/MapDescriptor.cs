@@ -74,9 +74,7 @@ namespace FSEditor.MapDescriptor
         public Character TourOpponent2 { get; set; }
         public Character TourOpponent3 { get; set; }
         public UInt32 TourClearRank { get; set; }
-        public UInt32 TourDifficulty { get; set; }
-        public UInt32 TourGeneralPlayTime { get; set; }
-        public UInt32 MapIconAddr { get; set; }
+        public UInt32 MapIconAddrAddr { get; set; }
         public string MapIcon { get; internal set; }
 
         public MapDescriptor()
@@ -86,20 +84,20 @@ namespace FSEditor.MapDescriptor
             VentureCard = new byte[130];
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
-        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress)
+        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress, AddressConstants data)
         {
             SwitchRotationOriginPoints.Clear();
             // Special case handling: in the original game these values are initialized at run time only. So we need to hardcode them:
-            if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON) // magmageddon
+            if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON()) // magmageddon
             {
                 // no points
             }
-            else if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_COLLOSUS) // collosus
+            else if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_COLLOSUS()) // collosus
             {
                 SwitchRotationOriginPoints[0] = new OriginPoint(-288, -32);
                 SwitchRotationOriginPoints[1] = new OriginPoint(288, -32);
             }
-            else if (MapSwitchParamAddr == MainDol.MAP_SWITCH_PARAM_ADDR_OBSERVATORY) // observatory
+            else if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_OBSERVATORY()) // observatory
             {
                 SwitchRotationOriginPoints[0] = new OriginPoint(0, 0);
             }
@@ -162,7 +160,7 @@ namespace FSEditor.MapDescriptor
             // ignore BG Sequence
             UInt32 BGSequenceAddr = stream.ReadUInt32();
         }
-        public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr)
+        public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr, UInt32 bgSequenceMarioStadium)
         {
             stream.Write(Name_MSG_ID);
             stream.Write(BGMID);
@@ -178,7 +176,7 @@ namespace FSEditor.MapDescriptor
             stream.Write(loopingModeParamAddr);
             stream.Seek(4, SeekOrigin.Current); // skip MapOriginID
             // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
-            stream.Write(Background == "bg004" ? MainDol.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM : (UInt32)0);
+            stream.Write(Background == "bg004" ? bgSequenceMarioStadium : (UInt32)0);
         }
         public void readMapDefaultsFromStream(EndianBinaryReader stream)
         {
@@ -189,10 +187,10 @@ namespace FSEditor.MapDescriptor
             TourOpponent2 = (Character)stream.ReadUInt32();
             TourOpponent3 = (Character)stream.ReadUInt32();
             TourClearRank = stream.ReadUInt32();
-            TourDifficulty = stream.ReadUInt32();
-            TourGeneralPlayTime = stream.ReadUInt32();
+            MapIconAddrAddr = stream.ReadUInt32(); // this is normally TourMapDifficulty, but since it is unused it has been repurposed so that each map can have a unique icon
+            var TourGeneralPlayTime = stream.ReadUInt32(); // ignore unused tour general play time
         }
-        public void writeMapDefaults(EndianBinaryWriter stream)
+        public void writeMapDefaults(EndianBinaryWriter stream, UInt32 mapIconAddrAddr)
         {
             stream.Write(TargetAmount);
             stream.Write(TourBankruptcyLimit);
@@ -201,8 +199,8 @@ namespace FSEditor.MapDescriptor
             stream.Write((UInt32)TourOpponent2);
             stream.Write((UInt32)TourOpponent3);
             stream.Write(TourClearRank);
-            stream.Write(TourDifficulty);
-            stream.Write(TourGeneralPlayTime);
+            stream.Write(mapIconAddrAddr); // stream.Write(TourDifficulty);
+            stream.Write(0); // stream.Write(TourGeneralPlayTime);
         }
 
         public void readVentureCardTableFromStream(EndianBinaryReader stream)
@@ -290,14 +288,15 @@ namespace FSEditor.MapDescriptor
             Description,
             KeyValueTable,
             BackgroundTable,
+            IconTable,
             BGMTable,
             VentureCardTable
         }
-        public void readMapDescriptorFromFile(string fileName)
+        public void readMapDescriptorFromFile(string fileName, string name)
         {
             string[] lines = File.ReadAllLines(fileName);
             MapDescriptor mapDescriptor = new MapDescriptor();
-            mapDescriptor.InternalName = Path.GetFileNameWithoutExtension(fileName);
+            mapDescriptor.InternalName = name;
             if (lines[0].StartsWith("# "))
             {
                 mapDescriptor.Name[Locale.EN] = lines[0].Replace("#", "").Trim();
@@ -351,6 +350,17 @@ namespace FSEditor.MapDescriptor
                         if (flaggedValueOrNull != null)
                         {
                             Background = flaggedValueOrNull;
+                        }
+                    }
+                    break;
+                case MDParserState.IconTable:
+                    columns = line.Split('|');
+                    if (columns.Length > 1)
+                    {
+                        string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
+                        if (flaggedValueOrNull != null)
+                        {
+                            MapIcon = flaggedValueOrNull;
                         }
                     }
                     break;
@@ -411,12 +421,6 @@ namespace FSEditor.MapDescriptor
                     break;
                 case "tourclearrank":
                     TourClearRank = UInt32.Parse(keyValuePair.Value);
-                    break;
-                case "tourdifficulty":
-                    TourDifficulty = UInt32.Parse(keyValuePair.Value);
-                    break;
-                case "tourgeneralplaytime":
-                    TourGeneralPlayTime = UInt32.Parse(keyValuePair.Value);
                     break;
                 case "initialcash":
                     InitialCash = UInt32.Parse(keyValuePair.Value);
@@ -581,6 +585,10 @@ namespace FSEditor.MapDescriptor
                 {
                     return MDParserState.BackgroundTable;
                 }
+                else if (headingText.Contains("icon"))
+                {
+                    return MDParserState.IconTable;
+                }
                 else if (headingText.Contains("card"))
                 {
                     return MDParserState.VentureCardTable;
@@ -604,8 +612,22 @@ namespace FSEditor.MapDescriptor
             BGMID = mapDescriptor.BGMID;
             foreach (string locale in Locale.ALL_WITHOUT_UK)
             {
-                Name[locale] = mapDescriptor.Name[locale];
-                Desc[locale] = mapDescriptor.Desc[locale];
+                if (mapDescriptor.Name.ContainsKey(locale))
+                {
+                    Name[locale] = mapDescriptor.Name[locale];
+                }
+                else
+                {
+                    Name[locale] = mapDescriptor.Name[Locale.EN];
+                }
+                if (mapDescriptor.Desc.ContainsKey(locale))
+                {
+                    Desc[locale] = mapDescriptor.Desc[locale];
+                }
+                else
+                {
+                    Desc[locale] = mapDescriptor.Desc[Locale.EN];
+                }
             }
 
             for (int i = 0; i < VentureCard.Length; i++)
@@ -629,8 +651,8 @@ namespace FSEditor.MapDescriptor
             TourOpponent2 = mapDescriptor.TourOpponent2;
             TourOpponent3 = mapDescriptor.TourOpponent3;
             TourClearRank = mapDescriptor.TourClearRank;
-            TourDifficulty = mapDescriptor.TourDifficulty;
-            TourGeneralPlayTime = mapDescriptor.TourGeneralPlayTime;
+
+            MapIcon = mapDescriptor.MapIcon;
         }
 
         public string generateMapDescriptorFileContent()

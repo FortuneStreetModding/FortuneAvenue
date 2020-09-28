@@ -19,27 +19,41 @@
         <local:SquareComboBoxConverter x:Key="SquareComboBoxConverter"/>
         <DrawingBrush x:Key="CanvasGrid"/>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="New_Click"/>
+        <CommandBinding Command="Open" Executed="Open_Click"/>
+        <CommandBinding Command="Save" Executed="Save_Click"/>
+        <CommandBinding Command="SaveAs" Executed="SaveAs_Click"/>
+        <CommandBinding Command="Help" Executed="Help_Click"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="New"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="Open"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="Save"/>
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="SaveAs"/>
+        <KeyBinding Key="F1" Modifiers="Control" Command="Help"/>
+    </Window.InputBindings>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Background="#ffebebeb" LastChildFill="False">
             <Menu>
                 <MenuItem Header="File">
-                    <MenuItem Header="New"  Click="New_Click"/>
+                    <MenuItem Header="New"  Command="New"/>
                     <Separator/>
-                    <MenuItem Header="Open..." Click="Open_Click"/>
+                    <MenuItem Header="Open..." Command="Open"/>
                     <Separator/>
-                    <MenuItem Header="Save" Click="Save_Click"/>
-                    <MenuItem Header="Save As..." Click="SaveAs_Click" />
+                    <MenuItem Header="Save" Command="Save"/>
+                    <MenuItem Header="Save As..." Command="SaveAs" />
                     <Separator/>
                     <MenuItem Header="Exit" Click="Exit_Click"/>
                 </MenuItem>
                 <MenuItem Header="Tools">
                     <MenuItem Header="Stock Prices" Click="StockPrices_Click"/>
-                    <MenuItem Header="Create Paths" Click="Autopath_Click"/>
                     <MenuItem Header="Verify Board" Click="Verify_Click"/>
+                    <MenuItem Header="Create Paths" Click="Autopath_Click"/>
                     <MenuItem Header="Open CSMM" Click="openCSMM"/>
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="Show Help Dialog" Click="Help_Click"/>
+                    <MenuItem Header="Show Help Dialog" Command="Help"/>
                     <MenuItem Header="About" Click="About_Click"/>
                 </MenuItem>
             </Menu>

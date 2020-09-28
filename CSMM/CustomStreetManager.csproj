@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>CustomStreetManager</RootNamespace>
     <AssemblyName>CustomStreetManager</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -68,8 +68,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PatchProcess.cs" />
+    <Compile Include="ProgressInfo.cs" />
+    <Compile Include="FileSet.cs" />
     <Compile Include="MapEntry.cs" />
-    <Compile Include="WitWrapper.cs" />
+    <Compile Include="ExeWrapper.cs" />
     <Compile Include="CSMM.cs">
       <SubType>Form</SubType>
     </Compile>

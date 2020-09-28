@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,25 +12,19 @@ namespace CustomStreetManager
 {
     public partial class ProgressBar : Form
     {
-        public ProgressBar()
+        public Action<bool> callback;
+        public bool verbose;
+
+        public ProgressBar(bool verbose)
         {
             InitializeComponent();
-        }
-
-        public void SetProgress(int num, string label)
-        {
-            SetProgressBarLabel(label);
-            SetProgressBarValue(num);
-        }
-
-        public void SetProgressBarLabel(string text)
-        {
-            progressLabel.Text = text;
-            progressLabel.Update();
+            this.verbose = verbose;
         }
 
         public void SetProgressBarValue(int num)
         {
+            if (IsDisposed)
+                return;
             if (num != 100)
             {
                 mapReplaceProgressBar.Value = num + 1;
@@ -45,7 +39,17 @@ namespace CustomStreetManager
 
         public void EnableButton()
         {
-            cancelButton.Enabled = true;
+            if (!cancelButton.IsDisposed)
+                cancelButton.Enabled = true;
+        }
+
+        public void ShowCheckbox(string text, bool isChecked)
+        {
+            if (IsDisposed)
+                return;
+            checkBox1.Text = text;
+            checkBox1.Checked = isChecked;
+            checkBox1.Visible = true;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -53,30 +57,41 @@ namespace CustomStreetManager
             this.Close();
         }
 
-        internal void update(int percentage, string standardOutput, string errorOutput)
+        public void update(ProgressInfo progressInfo)
         {
-            if (percentage != -1)
+            if (IsDisposed)
+                return;
+            if (progressInfo.progress > 0)
             {
-                SetProgressBarValue(percentage);
+                SetProgressBarValue(progressInfo.progress);
             }
-            if (standardOutput != null)
+            string lastLine = "";
+            if (textBox.Lines.Length >= 2)
             {
-                textBox.AppendText(standardOutput + Environment.NewLine);
+                lastLine = textBox.Lines[textBox.Lines.Length - 2];
             }
-            if (errorOutput != null)
+            if (progressInfo.line != null)
             {
-                textBox.AppendText(errorOutput + Environment.NewLine);
+                if (lastLine.ToLower() != progressInfo.line.ToLower())
+                {
+                    if (verbose && progressInfo.verbose || !progressInfo.verbose)
+                    {
+                        textBox.AppendText(progressInfo.line + Environment.NewLine);
+                    }
+                }
             }
             Update();
         }
 
         public void appendText(string text)
         {
-            textBox.AppendText(text);
+            if (!textBox.IsDisposed)
+                textBox.AppendText(text);
         }
 
         private void ProgressBar_FormClosed(object sender, FormClosedEventArgs e)
         {
+            callback?.Invoke(checkBox1.Checked);
         }
     }
 }

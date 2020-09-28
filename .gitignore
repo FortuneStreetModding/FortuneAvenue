@@ -3,3 +3,5 @@ obj
 *.suo
 *.user
 MapDescriptorTemplate.cs
+packages
+.vs
