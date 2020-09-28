@@ -1,4 +1,4 @@
-﻿using MiscUtil.IO;
+using MiscUtil.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

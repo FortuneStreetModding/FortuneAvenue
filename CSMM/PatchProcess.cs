@@ -5,6 +5,7 @@ using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -217,7 +218,7 @@ namespace CustomStreetManager
             await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
             await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(false);
 
-            progress.Report(new ProgressInfo(2, "Extract game_sequence files..."));
+            progress.Report("Extract game_sequence files...");
 
             // throw together the game_sequence and game_sequence_wifi files
             List<string> gameSequenceFiles = new List<string>();
@@ -227,7 +228,7 @@ namespace CustomStreetManager
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 2, 50), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 2, 33), source.Token);
 
                 // extract the arc files
                 List<Task<string>> extractArcFileTasks = new List<Task<string>>();
@@ -239,10 +240,11 @@ namespace CustomStreetManager
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }
+            progress.Report("Convert map icons and inject them...");
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 50, 100), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 33, 66), source.Token);
 
                 // convert the png files to tpl and copy them to the correct location
                 Dictionary<string, string> mapIconToTplName = new Dictionary<string, string>();
@@ -252,29 +254,42 @@ namespace CustomStreetManager
                     var mapIcon = mapDescriptor.MapIcon;
                     if (string.IsNullOrEmpty(mapIcon))
                         continue;
-                    var mapIconPng = toTmpDirectory(mapIcon, null, ".png");
-                    var mapIconTpl = toTmpDirectory(mapIcon, null, ".tpl");
-                    var tplName = Ui_menu_19_00a_XMLYT.constructMapIconTplName(mapIcon);
-                    if (!mapIconToTplName.ContainsKey(mapIcon))
+                    var vanillaResult = from row in Database.getMapIconTable().AsEnumerable()
+                                        where row.Field<string>("Entry") == mapIcon
+                                        select row;
+                    if (vanillaResult.Any())
                     {
-                        mapIconToTplName.Add(mapIcon, tplName);
-                    }
-                    if (File.Exists(mapIconPng))
-                    {
-                        Task task1 = ExeWrapper.convertPngToTpl(mapIconPng, mapIconTpl, ct, ProgressInfo.makeNoProgress(progress));
-                        Task task2 = task1.ContinueWith((t1) =>
+                        if (!mapIconToTplName.ContainsKey(mapIcon))
                         {
-                            foreach (var gameSequenceFile in gameSequenceFiles)
+                            var tplName = vanillaResult.Single().Field<string>("Map Icon");
+                            mapIconToTplName.Add(mapIcon, tplName + ".tpl");
+                        }
+                    }
+                    else
+                    {
+                        var mapIconPng = toTmpDirectory(mapIcon, null, ".png");
+                        var mapIconTpl = toTmpDirectory(mapIcon, null, ".tpl");
+                        var tplName = Ui_menu_19_00a_XMLYT.constructMapIconTplName(mapIcon);
+                        if (!mapIconToTplName.ContainsKey(mapIcon))
+                        {
+                            mapIconToTplName.Add(mapIcon, tplName);
+                        }
+                        if (File.Exists(mapIconPng))
+                        {
+                            Task task1 = ExeWrapper.convertPngToTpl(mapIconPng, mapIconTpl, ct, ProgressInfo.makeNoProgress(progress));
+                            Task task2 = task1.ContinueWith((t1) =>
                             {
-                                var gameSequenceExtractedDir = toTmpDirectory(gameSequenceFile, null, "_d");
-                                var mapIconTplCopy = Path.Combine(gameSequenceExtractedDir, "arc", "timg", tplName);
-                                File.Copy(mapIconTpl, mapIconTplCopy);
-                            }
-                        });
-                        convertPngFileTasks.Add(task2);
+                                foreach (var gameSequenceFile in gameSequenceFiles)
+                                {
+                                    var gameSequenceExtractedDir = toTmpDirectory(gameSequenceFile, null, "_d");
+                                    var mapIconTplCopy = Path.Combine(gameSequenceExtractedDir, "arc", "timg", tplName);
+                                    File.Copy(mapIconTpl, mapIconTplCopy, true);
+                                }
+                            });
+                            convertPngFileTasks.Add(task2);
+                        }
                     }
                 }
-
 
                 // convert the brlyt files to xmlyt, inject the map icons and convert it back
                 List<Task> injectMapIconsInBrlytTasks = new List<Task>();
@@ -291,6 +306,32 @@ namespace CustomStreetManager
                 }
                 await Task.WhenAll(injectMapIconsInBrlytTasks).ConfigureAwait(false);
                 await Task.WhenAll(convertPngFileTasks).ConfigureAwait(false);
+                source.Cancel();
+                await fakeProgressTask.ConfigureAwait(false);
+            }
+            // strange phenomenon: when converting the xmlyt files back to brlyt using benzin, sometimes the first byte is not correctly written. This fixes it as the first byte must be an 'R'.
+            foreach (var gameSequenceFile in gameSequenceFiles)
+            {
+                var gameSequenceExtractedDir = toTmpDirectory(gameSequenceFile, null, "_d");
+                var brlytFile = Path.Combine(gameSequenceExtractedDir, "arc", "blyt", "ui_menu_19_00a.brlyt");
+                byte[] data = File.ReadAllBytes(brlytFile);
+                data[0] = (byte) 'R';
+                File.WriteAllBytes(brlytFile, data);
+            }
+
+            progress.Report("Pack game_sequence files...");
+            using (CancellationTokenSource source = new CancellationTokenSource())
+            {
+                // start fake progress
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 66, 100), source.Token);
+
+                // extract the arc files
+                List<Task<string>> packArcFileTasks = new List<Task<string>>();
+                foreach (var gameSequenceFile in gameSequenceFiles)
+                {
+                    packArcFileTasks.Add(ExeWrapper.packDfolderToArc(toTmpDirectory(gameSequenceFile, null, "_d"), gameSequenceFile, ct, ProgressInfo.makeNoProgress(progress)));
+                }
+                await Task.WhenAll(packArcFileTasks).ConfigureAwait(false);
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }

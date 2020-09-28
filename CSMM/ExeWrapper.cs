@@ -338,7 +338,7 @@ namespace CustomStreetManager
         }
         public static async Task<string> packDfolderToArc(string destFolder, string arcFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "CREATE --verbose \"" + destFolder + "\" --dest \"" + arcFile + "\"";
+            string arguments = "CREATE --overwrite --verbose \"" + destFolder + "\" --dest \"" + arcFile + "\"";
             return await callWszst(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         public static async Task<string> convertBryltToXmlyt(string bryltFile, string xmlytFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
