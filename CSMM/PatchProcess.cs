@@ -254,7 +254,7 @@ namespace CustomStreetManager
                     var mapIcon = mapDescriptor.MapIcon;
                     if (string.IsNullOrEmpty(mapIcon))
                         continue;
-                    var vanillaResult = from row in Database.getMapIconTable().AsEnumerable()
+                    var vanillaResult = from row in VanillaDatabase.getMapIconTable().AsEnumerable()
                                         where row.Field<string>("Entry") == mapIcon
                                         select row;
                     if (vanillaResult.Any())
