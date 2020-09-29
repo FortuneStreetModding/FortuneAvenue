@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CustomStreetManager
 {
-    public class FileSet
+    public class DataFileSet
     {
         public string main_dol
         { get; set; }

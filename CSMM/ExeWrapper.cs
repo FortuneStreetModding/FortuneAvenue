@@ -210,7 +210,7 @@ namespace CustomStreetManager
             var psi = preparePsi("benzin.exe", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
-        internal static void copyRelevantFilesForPacking(FileSet fileSet, string inputFile)
+        internal static void copyRelevantFilesForPacking(DataFileSet fileSet, string inputFile)
         {
             string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
             string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile), "DATA");
@@ -227,7 +227,7 @@ namespace CustomStreetManager
                 SearchOption.AllDirectories))
                 File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
         }
-        public static async Task<FileSet> extractFiles(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<DataFileSet> extractFiles(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
             if (Directory.Exists(tmpDirectory))
@@ -238,7 +238,7 @@ namespace CustomStreetManager
             string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
 
-            FileSet fileSet = new FileSet();
+            DataFileSet fileSet = new DataFileSet();
             fileSet.main_dol = Path.Combine(tmpDirectory, "sys", "main.dol");
             fileSet.ui_message_csv[Locale.DE] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.de.csv");
             fileSet.ui_message_csv[Locale.EN] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.en.csv");

@@ -16,7 +16,7 @@ namespace CustomStreetManager
 {
     public class PatchProcess
     {
-        public FileSet fileSet;
+        public DataFileSet fileSet;
         public List<MapDescriptor> mapDescriptors;
         public MainDol mainDol;
         public Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
