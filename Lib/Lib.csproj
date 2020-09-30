@@ -66,7 +66,7 @@
     <Compile Include="MapDescriptor\AddressConstants.cs" />
     <Compile Include="MapDescriptor\ST7E01.cs" />
     <Compile Include="MapDescriptor\Ui_menu_19_00a_XMLYT.cs" />
-    <Compile Include="MapDescriptor\Database.cs" />
+    <Compile Include="MapDescriptor\VanillaDatabase.cs" />
     <Compile Include="MapDescriptor\ST7P01.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplate.cs">

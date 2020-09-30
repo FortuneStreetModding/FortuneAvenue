@@ -41,27 +41,37 @@ namespace FSEditor.MapDescriptor
         {
             DataTable table = new DataTable();
             table.Columns.Add("Map Icon", typeof(string));
-            table.Columns.Add("Entry", typeof(string));
+            table.Columns.Add("Map Tpl", typeof(string));
             table.Columns.Add("Description", typeof(string));
-            table.Rows.Add("ui_menu007_bg101", "p_bg_101", "Trodain Castle");
-            table.Rows.Add("ui_menu007_bg109", "p_bg_109", "The Observatory");
-            table.Rows.Add("ui_menu007_bg102", "p_bg_102", "Ghost Ship");
-            table.Rows.Add("ui_menu007_bg105", "p_bg_105", "Slimenia");
-            table.Rows.Add("ui_menu007_bg104", "p_bg_104", "Mt. Magmageddon");
-            table.Rows.Add("ui_menu007_bg106", "p_bg_106", "Robbin' Hood Ruins");
-            table.Rows.Add("ui_menu007_bg004", "p_bg_004", "Mario Stadium");
-            table.Rows.Add("ui_menu007_bg008", "p_bg_008", "Starship Mario");
-            table.Rows.Add("ui_menu007_bg002", "p_bg_002", "Mario Circuit");
-            table.Rows.Add("ui_menu007_bg001", "p_bg_001", "Yoshi's Island");
-            table.Rows.Add("ui_menu007_bg005", "p_bg_005", "Delfino Plaza");
-            table.Rows.Add("ui_menu007_bg003", "p_bg_003", "Peach's Castle");
-            table.Rows.Add("ui_menu007_bg107", "p_bg_107", "Alefgard");
-            table.Rows.Add("ui_menu007_bg006", "p_bg_006", "Super Mario Bros");
-            table.Rows.Add("ui_menu007_bg007", "p_bg_007", "Bowser's Castle");
-            table.Rows.Add("ui_menu007_bg009", "p_bg_009", "Good Egg Galaxy");
-            table.Rows.Add("ui_menu007_bg103", "p_bg_103", "The Colossus");
-            table.Rows.Add("ui_menu007_bg108", "p_bg_108", "Alltrades Abbey");
+            table.Rows.Add("p_bg_101", "ui_menu007_bg101", "Trodain Castle");
+            table.Rows.Add("p_bg_109", "ui_menu007_bg109", "The Observatory");
+            table.Rows.Add("p_bg_102", "ui_menu007_bg102", "Ghost Ship");
+            table.Rows.Add("p_bg_105", "ui_menu007_bg105", "Slimenia");
+            table.Rows.Add("p_bg_104", "ui_menu007_bg104", "Mt. Magmageddon");
+            table.Rows.Add("p_bg_106", "ui_menu007_bg106", "Robbin' Hood Ruins");
+            table.Rows.Add("p_bg_004", "ui_menu007_bg004", "Mario Stadium");
+            table.Rows.Add("p_bg_008", "ui_menu007_bg008", "Starship Mario");
+            table.Rows.Add("p_bg_002", "ui_menu007_bg002", "Mario Circuit");
+            table.Rows.Add("p_bg_001", "ui_menu007_bg001", "Yoshi's Island");
+            table.Rows.Add("p_bg_005", "ui_menu007_bg005", "Delfino Plaza");
+            table.Rows.Add("p_bg_003", "ui_menu007_bg003", "Peach's Castle");
+            table.Rows.Add("p_bg_107", "ui_menu007_bg107", "Alefgard");
+            table.Rows.Add("p_bg_006", "ui_menu007_bg006", "Super Mario Bros");
+            table.Rows.Add("p_bg_007", "ui_menu007_bg007", "Bowser's Castle");
+            table.Rows.Add("p_bg_009", "ui_menu007_bg009", "Good Egg Galaxy");
+            table.Rows.Add("p_bg_103", "ui_menu007_bg103", "The Colossus");
+            table.Rows.Add("p_bg_108", "ui_menu007_bg108", "Alltrades Abbey");
             return table;
+        }
+
+        public static string getVanillaTpl(string mapIcon)
+        {
+            var result = from row in VanillaDatabase.getMapIconTable().AsEnumerable()
+                         where row.Field<string>("Map Icon") == mapIcon
+                         select row;
+            if (result.Any())
+                return result.Single().Field<string>("Map Tpl");
+            return null;
         }
     }
 }
