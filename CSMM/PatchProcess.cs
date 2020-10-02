@@ -78,7 +78,7 @@ namespace CustomStreetManager
                 }
 
                 string tempPath = Path.Combine(destDirName, file.Name);
-                progress?.Report("Copy " + file.FullName + " to " + tempPath + "...");
+                progress?.Report(new ProgressInfo(-1, "Copy " + file.FullName + " to " + tempPath + "...", true));
                 file.CopyTo(tempPath, overwrite);
             }
 
