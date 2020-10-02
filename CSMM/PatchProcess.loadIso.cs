@@ -20,6 +20,7 @@ namespace CustomStreetManager
         {
             progress?.Report(0);
             progress?.Report("Extract iso/wbfs...");
+            cleanUp(false, true);
             if (string.IsNullOrWhiteSpace(inputWbfsIso) || inputWbfsIso.ToLower() == "none")
             {
                 throw new ArgumentNullException("Can't load wbfs or iso file as the input file name is not set.");

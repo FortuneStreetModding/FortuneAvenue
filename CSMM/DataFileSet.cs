@@ -16,6 +16,7 @@ namespace CustomStreetManager
         public readonly Dictionary<string, string> ui_message_csv;
         public string param_folder;
         public readonly Dictionary<string, string> game_sequence_arc;
+        public readonly Dictionary<string, string> game_sequence_wifi_arc;
 
         private static readonly DataFileSet baseFileSet = createBaseFileSet();
 
@@ -41,13 +42,13 @@ namespace CustomStreetManager
             fileSet.game_sequence_arc[Locale.UK] = Path.Combine("files", "game", "langUK", "game_sequence_UK.arc");
             fileSet.game_sequence_arc[Locale.JP] = Path.Combine("files", "game", "game_sequence.arc");
             // game_sequence_wifi
-            fileSet.game_sequence_arc[Locale.EN] = Path.Combine("files", "game", "langEN", "game_sequence_wifi_EN.arc");
-            fileSet.game_sequence_arc[Locale.DE] = Path.Combine("files", "game", "langDE", "game_sequence_wifi_DE.arc");
-            fileSet.game_sequence_arc[Locale.ES] = Path.Combine("files", "game", "langES", "game_sequence_wifi_ES.arc");
-            fileSet.game_sequence_arc[Locale.FR] = Path.Combine("files", "game", "langFR", "game_sequence_wifi_FR.arc");
-            fileSet.game_sequence_arc[Locale.IT] = Path.Combine("files", "game", "langIT", "game_sequence_wifi_IT.arc");
-            fileSet.game_sequence_arc[Locale.UK] = Path.Combine("files", "game", "langUK", "game_sequence_wifi_UK.arc");
-            fileSet.game_sequence_arc[Locale.JP] = Path.Combine("files", "game", "game_sequence_wifi.arc");
+            fileSet.game_sequence_wifi_arc[Locale.EN] = Path.Combine("files", "game", "langEN", "game_sequence_wifi_EN.arc");
+            fileSet.game_sequence_wifi_arc[Locale.DE] = Path.Combine("files", "game", "langDE", "game_sequence_wifi_DE.arc");
+            fileSet.game_sequence_wifi_arc[Locale.ES] = Path.Combine("files", "game", "langES", "game_sequence_wifi_ES.arc");
+            fileSet.game_sequence_wifi_arc[Locale.FR] = Path.Combine("files", "game", "langFR", "game_sequence_wifi_FR.arc");
+            fileSet.game_sequence_wifi_arc[Locale.IT] = Path.Combine("files", "game", "langIT", "game_sequence_wifi_IT.arc");
+            fileSet.game_sequence_wifi_arc[Locale.UK] = Path.Combine("files", "game", "langUK", "game_sequence_wifi_UK.arc");
+            fileSet.game_sequence_wifi_arc[Locale.JP] = Path.Combine("files", "game", "game_sequence_wifi.arc");
             return fileSet;
         }
 
@@ -55,6 +56,7 @@ namespace CustomStreetManager
         {
             ui_message_csv = new Dictionary<string, string>();
             game_sequence_arc = new Dictionary<string, string>();
+            game_sequence_wifi_arc = new Dictionary<string, string>();
             main_dol = null;
             param_folder = null;
             rootDir = null;
@@ -67,10 +69,12 @@ namespace CustomStreetManager
             param_folder = Path.Combine(dataDir, baseFileSet.param_folder);
             ui_message_csv = new Dictionary<string, string>();
             game_sequence_arc = new Dictionary<string, string>();
+            game_sequence_wifi_arc = new Dictionary<string, string>();
             foreach (string locale in baseFileSet.ui_message_csv.Keys)
             {
                 ui_message_csv[locale] = Path.Combine(dataDir, baseFileSet.ui_message_csv[locale]);
                 game_sequence_arc[locale] = Path.Combine(dataDir, baseFileSet.game_sequence_arc[locale]);
+                game_sequence_wifi_arc[locale] = Path.Combine(dataDir, baseFileSet.game_sequence_wifi_arc[locale]);
             }
         }
 
@@ -82,6 +86,7 @@ namespace CustomStreetManager
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(ui_message_csv[locale]));
                 Directory.CreateDirectory(Path.GetDirectoryName(game_sequence_arc[locale]));
+                Directory.CreateDirectory(Path.GetDirectoryName(game_sequence_wifi_arc[locale]));
             }
         }
 
@@ -92,6 +97,7 @@ namespace CustomStreetManager
             {
                 File.Copy(ui_message_csv[locale], destDataFileSet.ui_message_csv[locale], overwrite);
                 File.Copy(game_sequence_arc[locale], destDataFileSet.game_sequence_arc[locale], overwrite);
+                File.Copy(game_sequence_wifi_arc[locale], destDataFileSet.game_sequence_wifi_arc[locale], overwrite);
             }
             foreach (string file in filesToCopyInParamDir)
             {

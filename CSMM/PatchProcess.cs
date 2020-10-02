@@ -37,16 +37,58 @@ namespace CustomStreetManager
             }
             if (cleanCache)
             {
-                if (Directory.Exists(tmpFileSet.rootDir))
+                if (Directory.Exists(cacheFileSet.rootDir))
                 {
-                    Directory.Delete(tmpFileSet.rootDir, true);
+                    Directory.Delete(cacheFileSet.rootDir, true);
                 }
             }
             if (cleanRiivolution)
             {
-                if (Directory.Exists(tmpFileSet.rootDir))
+                if (Directory.Exists(riivFileSet.rootDir))
                 {
-                    Directory.Delete(tmpFileSet.rootDir, true);
+                    Directory.Delete(riivFileSet.rootDir, true);
+                }
+            }
+        }
+        // From: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
+        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            // If the destination directory doesn't exist, create it.       
+            Directory.CreateDirectory(destDirName);
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                string tempPath = Path.Combine(destDirName, file.Name);
+                progress?.Report("Copy " + file.FullName + " to " + tempPath + "...");
+                file.CopyTo(tempPath, overwrite);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string tempPath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, tempPath, copySubDirs, overwrite, progress, ct);
                 }
             }
         }

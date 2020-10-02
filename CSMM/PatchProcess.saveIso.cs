@@ -36,28 +36,17 @@ namespace CustomStreetManager
                 ui_message.writeToFile(riivFileSet.ui_message_csv[locale]);
             }
 
-            /* using (CancellationTokenSource source = new CancellationTokenSource())
-             {
-                 // start fake progress
-                 progress.Report(new ProgressInfo(45, "Copying the modified files to be packed into the image..."));
-                 var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, 60), source.Token);*/
-
-            var frbFilesToBeCopied = new HashSet<string>();
-            foreach (MapDescriptor mapDescriptor in mapDescriptors)
+            using (CancellationTokenSource source = new CancellationTokenSource())
             {
-                frbFilesToBeCopied.Add(mapDescriptor.FrbFile1 + ".frb");
-                if (!string.IsNullOrEmpty(mapDescriptor.FrbFile2))
-                    frbFilesToBeCopied.Add(mapDescriptor.FrbFile2 + ".frb");
-                if (!string.IsNullOrEmpty(mapDescriptor.FrbFile3))
-                    frbFilesToBeCopied.Add(mapDescriptor.FrbFile3 + ".frb");
-                if (!string.IsNullOrEmpty(mapDescriptor.FrbFile4))
-                    frbFilesToBeCopied.Add(mapDescriptor.FrbFile4 + ".frb");
-            }
+                // start fake progress
+                progress.Report(new ProgressInfo(45, "Copying the modified files to be packed into the image..."));
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, 60), source.Token);
 
-            riivFileSet.copy(frbFilesToBeCopied, cacheFileSet, true);
-            /*source.Cancel();
-            await fakeProgressTask.ConfigureAwait(false);
-        }*/
+                DirectoryCopy(riivFileSet.rootDir, cacheFileSet.rootDir, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                // riivFileSet.copy(frbFilesToBeCopied, cacheFileSet, true);
+                source.Cancel();
+                await fakeProgressTask.ConfigureAwait(false);
+            }
 
             progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
             await ExeWrapper.packFullIso(inputFile, outputFile, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
@@ -99,6 +88,49 @@ namespace CustomStreetManager
 
             progress.Report("Extract game_sequence files...");
 
+            // setup the directories for the game sequence files
+
+            /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their respective extraction path in the tmp directory */
+            var gameSequenceExtractPaths = new Dictionary<string, string>();
+            /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their respective temporary path for the converted ui_menu_19_00a.xmlyt path */
+            var gameSequenceToXmlytPaths = new Dictionary<string, string>();
+            /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their target path where they will be packed again */
+            var gameSequencePackPaths = new Dictionary<string, string>();
+            foreach (var entry in cacheFileSet.game_sequence_arc)
+            {
+                var locale = entry.Key;
+                var gameSequencePath = entry.Value;
+
+                var extractPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(extractPath));
+                gameSequenceExtractPaths.Add(gameSequencePath, extractPath);
+
+                var xmlytPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath) + ".ui_menu_19_00a.xmlyt");
+                Directory.CreateDirectory(Path.GetDirectoryName(xmlytPath));
+                gameSequenceToXmlytPaths.Add(gameSequencePath, xmlytPath);
+
+                var packPath = riivFileSet.game_sequence_arc[locale];
+                Directory.CreateDirectory(Path.GetDirectoryName(packPath));
+                gameSequencePackPaths.Add(gameSequencePath, packPath);
+            }
+            foreach (var entry in cacheFileSet.game_sequence_wifi_arc)
+            {
+                var locale = entry.Key;
+                var gameSequencePath = entry.Value;
+
+                var extractPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(extractPath));
+                gameSequenceExtractPaths.Add(gameSequencePath, extractPath);
+
+                var xmlytPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath) + ".ui_menu_19_00a.xmlyt");
+                Directory.CreateDirectory(Path.GetDirectoryName(xmlytPath));
+                gameSequenceToXmlytPaths.Add(gameSequencePath, xmlytPath);
+
+                var packPath = riivFileSet.game_sequence_wifi_arc[locale];
+                Directory.CreateDirectory(Path.GetDirectoryName(packPath));
+                gameSequencePackPaths.Add(gameSequencePath, packPath);
+            }
+
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
@@ -106,12 +138,11 @@ namespace CustomStreetManager
 
                 // extract the arc files
                 List<Task<string>> extractArcFileTasks = new List<Task<string>>();
-                foreach (var entry in cacheFileSet.game_sequence_arc)
+                foreach (var entry in gameSequenceExtractPaths)
                 {
-                    string locale = entry.Key;
-                    string gameSequenceFile = entry.Value;
-                    string tmpGameSequenceDir = Path.Combine(Path.GetDirectoryName(tmpFileSet.game_sequence_arc[locale]), Path.GetFileNameWithoutExtension(tmpFileSet.game_sequence_arc[locale]));
-                    extractArcFileTasks.Add(ExeWrapper.extractArcFile(gameSequenceFile, tmpGameSequenceDir, ct, ProgressInfo.makeNoProgress(progress)));
+                    string gameSequencePath = entry.Key;
+                    string gameSequenceExtractPath = entry.Value;
+                    extractArcFileTasks.Add(ExeWrapper.extractArcFile(gameSequencePath, gameSequenceExtractPath, ct, ProgressInfo.makeNoProgress(progress)));
                 }
                 await Task.WhenAll(extractArcFileTasks).ConfigureAwait(false);
                 source.Cancel();
@@ -156,12 +187,11 @@ namespace CustomStreetManager
                             Task task2 = task1.ContinueWith(async (t1) =>
                             {
                                 await t1.ConfigureAwait(false);
-                                foreach (var entry in cacheFileSet.game_sequence_arc)
+                                foreach (var entry in gameSequenceExtractPaths)
                                 {
-                                    string locale = entry.Key;
-                                    string gameSequenceFile = entry.Value;
-                                    string tmpGameSequenceDir = Path.Combine(Path.GetDirectoryName(tmpFileSet.game_sequence_arc[locale]), Path.GetFileNameWithoutExtension(tmpFileSet.game_sequence_arc[locale]));
-                                    var mapIconTplCopy = Path.Combine(tmpGameSequenceDir, "arc", "timg", tplName);
+                                    string gameSequencePath = entry.Key;
+                                    string gameSequenceExtractPath = entry.Value;
+                                    var mapIconTplCopy = Path.Combine(gameSequenceExtractPath, "arc", "timg", tplName);
                                     File.Copy(mapIconTpl, mapIconTplCopy, true);
                                 }
                             });
@@ -172,34 +202,33 @@ namespace CustomStreetManager
 
                 // convert the brlyt files to xmlyt, inject the map icons and convert it back
                 List<Task> injectMapIconsInBrlytTasks = new List<Task>();
-                foreach (var entry in cacheFileSet.game_sequence_arc)
+                foreach (var entry in gameSequenceExtractPaths)
                 {
-                    string locale = entry.Key;
-                    string gameSequenceFile = entry.Value;
-                    string tmpGameSequenceDir = Path.Combine(Path.GetDirectoryName(tmpFileSet.game_sequence_arc[locale]), Path.GetFileNameWithoutExtension(tmpFileSet.game_sequence_arc[locale]));
-                    var brlytFile = Path.Combine(tmpGameSequenceDir, "arc", "blyt", "ui_menu_19_00a.brlyt");
-                    var xmlytFile = Path.Combine(tmpFileSet.rootDir, Path.GetFileName(tmpGameSequenceDir) + "." + Path.GetFileNameWithoutExtension(brlytFile) + ".xmlyt");
+                    string gameSequencePath = entry.Key;
+                    string gameSequenceExtractPath = entry.Value;
+                    string xmlytFile = gameSequenceToXmlytPaths[gameSequencePath];
+                    var brlytFile = Path.Combine(gameSequenceExtractPath, "arc", "blyt", "ui_menu_19_00a.brlyt");
                     Task task1 = ExeWrapper.convertBryltToXmlyt(brlytFile, xmlytFile, ct, ProgressInfo.makeNoProgress(progress));
                     Task task2 = task1.ContinueWith(async (t1) => { await t1.ConfigureAwait(false); Ui_menu_19_00a_XMLYT.injectMapIcons(xmlytFile, mapIconToTplName); });
                     Task task3 = task2.ContinueWith(async (t2) => { await t2.ConfigureAwait(false); await ExeWrapper.convertXmlytToBrylt(xmlytFile, brlytFile, ct, ProgressInfo.makeNoProgress(progress)); });
-                    injectMapIconsInBrlytTasks.Add(task3);
+                    Task task4 = task3.ContinueWith(async (t3) =>
+                    {
+                        await t3;
+                        // strange phenomenon: when converting the xmlyt files back to brlyt using benzin, sometimes the first byte is not correctly written. This fixes it as the first byte must be an 'R'.
+                        await Task.Delay(500);
+                        using (var stream = File.OpenWrite(brlytFile))
+                        {
+                            stream.Seek(0, SeekOrigin.Begin);
+                            stream.WriteByte((byte)'R');
+                        }
+                    });
+                    injectMapIconsInBrlytTasks.Add(task4);
                 }
                 await Task.WhenAll(injectMapIconsInBrlytTasks).ConfigureAwait(false);
                 await Task.WhenAll(convertPngFileTasks).ConfigureAwait(false);
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }
-            // strange phenomenon: when converting the xmlyt files back to brlyt using benzin, sometimes the first byte is not correctly written. This fixes it as the first byte must be an 'R'.
-            foreach (var entry in cacheFileSet.game_sequence_arc)
-            {
-                string locale = entry.Key;
-                string tmpGameSequenceDir = Path.Combine(Path.GetDirectoryName(tmpFileSet.game_sequence_arc[locale]), Path.GetFileNameWithoutExtension(tmpFileSet.game_sequence_arc[locale]));
-                var brlytFile = Path.Combine(tmpGameSequenceDir, "arc", "blyt", "ui_menu_19_00a.brlyt");
-                byte[] data = File.ReadAllBytes(brlytFile);
-                data[0] = (byte)'R';
-                File.WriteAllBytes(brlytFile, data);
-            }
-
 
             progress.Report("Pack game_sequence files...");
             using (CancellationTokenSource source = new CancellationTokenSource())
@@ -207,15 +236,14 @@ namespace CustomStreetManager
                 // start fake progress
                 var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 66, 100), source.Token);
 
-                // extract the arc files
+                // pack the arc files
                 List<Task<string>> packArcFileTasks = new List<Task<string>>();
-                foreach (var entry in riivFileSet.game_sequence_arc)
+                foreach (var entry in gameSequenceExtractPaths)
                 {
-                    string locale = entry.Key;
-                    string gameSequenceFile = entry.Value;
-                    string tmpGameSequenceDir = Path.Combine(Path.GetDirectoryName(tmpFileSet.game_sequence_arc[locale]), Path.GetFileNameWithoutExtension(tmpFileSet.game_sequence_arc[locale]));
-                    Directory.CreateDirectory(Path.GetDirectoryName(gameSequenceFile));
-                    packArcFileTasks.Add(ExeWrapper.packDfolderToArc(tmpGameSequenceDir, gameSequenceFile, ct, ProgressInfo.makeNoProgress(progress)));
+                    string gameSequencePath = entry.Key;
+                    string gameSequenceExtractPath = entry.Value;
+                    string gameSequencePackPath = gameSequencePackPaths[gameSequencePath];
+                    packArcFileTasks.Add(ExeWrapper.packDfolderToArc(gameSequenceExtractPath, gameSequencePackPath, ct, ProgressInfo.makeNoProgress(progress)));
                 }
                 await Task.WhenAll(packArcFileTasks).ConfigureAwait(false);
                 source.Cancel();
