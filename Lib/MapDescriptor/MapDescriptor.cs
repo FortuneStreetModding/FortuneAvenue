@@ -84,7 +84,7 @@ namespace FSEditor.MapDescriptor
             VentureCard = new byte[130];
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
-        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress, AddressConstants data)
+        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress, ST7_Interface data)
         {
             SwitchRotationOriginPoints.Clear();
             // Special case handling: in the original game these values are initialized at run time only. So we need to hardcode them:

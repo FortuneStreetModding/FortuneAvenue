@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FSEditor.MapDescriptor
 {
-    class ST7P01 : AddressConstants
+    class ST7P01 : ST7_Interface
     {
         public uint VANILLA_FIRST_MAP_DESC_MESSAGE_ID() { return 4416; }
         public uint VANILLA_FIRST_MAP_NAME_MESSAGE_ID() { return 5433; }
@@ -51,11 +51,55 @@ namespace FSEditor.MapDescriptor
             return opcode == 0x3863fffd;
         }
 
+        public void writeHackExtendedVentureCardTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 ventureCardTableEntryCount, UInt32 ventureCardTableAddr)
+        {
+            // cmplwi r24,0x29                                     -> cmplwi r24,ventureCardTableCount-1
+            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r24((Int16)(ventureCardTableEntryCount - 1)));
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make32bitValue(ventureCardTableAddr);
+            // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
+            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r4(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r4(v.lower16Bit));
+        }
+        public bool isHackVentureCardTable(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make32bitValue(START_VENTURE_CARD_TABLE_VIRTUAL());
+            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin);
+            var opcode1 = stream.ReadUInt32();
+            stream.Seek(4, SeekOrigin.Current);
+            var opcode2 = stream.ReadUInt32();
+            return opcode1 == PowerPcAsm.lis_r4(v.upper16Bit) && opcode2 == PowerPcAsm.addi_r4(v.lower16Bit);
+        }
+
+        public bool isHackExtendedVentureCardTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
+        {
+            return false;
+        }
+        public void writeHackExtendedMapDescriptionTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
+        {
+        }
+        public bool isHackExtendedMapDescriptionTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress) {
+            return false;
+        }
+        public void writeHackExtendedMapDefaultsTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
+        {
+
+        }
+        public bool isHackExtendedMapDefaultsTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
+        {
+            return false;
+        }
+        public void writeHackExtendedMapSettingsTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
+        {
+
+        }
+        public bool isHackExtendedMapSettingsTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
+        {
+            return false;
+        }
+
         public void writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable)
         {
             // note: To add custom icons, the following files need to be editted as well:
-            // - ui_menu_19_00a.brlyt
-            // - 
+            // - ui_menu_19_00a.brlyt with game_sequence.arc and within game_sequence_wifi.arc
 
             // custom map icon hack
             // bl GetMapOrigin                                     -> bl GetMapDifficulty

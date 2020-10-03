@@ -17,7 +17,7 @@ namespace FSEditor.MapDescriptor
         private UInt32 unusedSpacePositionVirtual;
         public int totalBytesWritten;
         public int totalBytesLeft;
-        public AddressConstants data = new ST7P01();
+        public ST7_Interface data = new ST7P01();
 
         public MainDol(List<MainDolSection> sections)
         {

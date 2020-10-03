@@ -51,7 +51,7 @@ namespace CustomStreetManager
 
             return mapDescriptors;
         }
-        private string loadUIMessages(List<MapDescriptor> mapDescriptors, AddressConstants data, DataFileSet fileSet)
+        private string loadUIMessages(List<MapDescriptor> mapDescriptors, ST7_Interface data, DataFileSet fileSet)
         {
             string warnings = "";
             foreach (string locale in Locale.ALL_WITHOUT_UK)
