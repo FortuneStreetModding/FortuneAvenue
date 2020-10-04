@@ -8,6 +8,6 @@ namespace FSEditor.FSData
 	public enum RuleSet : UInt32
 	{
 		Standard = 0,
-		Basic = 1
+		Easy = 1
 	}
 }
