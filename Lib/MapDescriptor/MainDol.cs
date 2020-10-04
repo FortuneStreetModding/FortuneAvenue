@@ -163,7 +163,7 @@ namespace FSEditor.MapDescriptor
                 }
             }
 
-            int ventureCardTableCount = data.readVentureCardTableCount(binReader, toFileAddress);
+            int ventureCardTableCount = data.readVentureCardTableEntryCount(binReader, toFileAddress);
             binReader.Seek(toFileAddress(data.readVentureCardTableAddr(binReader, toFileAddress)), SeekOrigin.Begin);
             for (int i = 0; i < ventureCardTableCount; i++)
             {
@@ -185,19 +185,6 @@ namespace FSEditor.MapDescriptor
             unusedSpacePositionVirtual = data.UNUSED_SPACE_1_START_VIRTUAL();
             totalBytesWritten = 0;
             totalBytesLeft = 0;
-
-            data.writeHackExtendedMapDescriptions(stream, toFileAddress);
-
-            // HACK: remove the use of Map Difficulty and Map General Play Time to free up some space
-            /* stream.Seek(toFileAddress(0x801fd9b8), SeekOrigin.Begin);
-            stream.Write(NOP);
-            stream.Seek(toFileAddress(0x80187168), SeekOrigin.Begin);
-            stream.Write(NOP);
-            stream.Seek(toFileAddress(0x801fd8b0), SeekOrigin.Begin);
-            stream.Write(NOP);
-            stream.Seek(toFileAddress(0x801fd954), SeekOrigin.Begin);
-            stream.Write(NOP);
-            */
 
             stream.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
@@ -285,21 +272,17 @@ namespace FSEditor.MapDescriptor
                 stream.Seek(seek, SeekOrigin.Begin);
                 mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, data.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM());
             }
-
-            stream.Seek(toFileAddress(data.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            int j = 0;
-            for (int i = 0; i < 48; i++)
+            UInt32 mapDescriptionTableAddr;
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                if (mapDescriptors[i].ID < 18)
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                for (int i = 0; i < 48; i++)
                 {
                     stream.Write(mapDescriptors[i].Desc_MSG_ID);
-                    j++;
                 }
+                mapDescriptionTableAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
             }
-            if (j != 18 * 2)
-            {
-                throw new DataMisalignedException("Expected to write " + 18 * 2 + " Description Message Ids, but wrote " + j + ".");
-            }
+            data.writeHackExtendedMapDescriptions(stream, toFileAddress, (Int16)mapDescriptors.Count, mapDescriptionTableAddr);
 
             // Find out which map icons exist
             HashSet<string> allUniqueMapIcons = new HashSet<string>();

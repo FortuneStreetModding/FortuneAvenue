@@ -19,22 +19,15 @@ namespace CustomStreetManager
 
         public async Task<bool> saveWbfsIso(string inputFile, string outputFile, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            progress?.Report(new ProgressInfo(0, "Writing data to main.dol..."));
+            progress?.Report(new ProgressInfo(0, "Writing localization files..."));
+            writeLocalizationFiles();
 
-            patchMainDol(ProgressInfo.makeSubProgress(progress, 0, 1), ct);
+            progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
+            patchMainDol(ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
-            await injectMapIcons(ProgressInfo.makeSubProgress(progress, 1, 40), ct).ConfigureAwait(false);
-
-            progress.Report(new ProgressInfo(40, "Writing localization files..."));
-            foreach (var entry in ui_messages)
-            {
-                string locale = entry.Key;
-                UI_Message ui_message = entry.Value;
-                ui_message.set(mapDescriptors);
-                Directory.CreateDirectory(Path.GetDirectoryName(riivFileSet.ui_message_csv[locale]));
-                ui_message.writeToFile(riivFileSet.ui_message_csv[locale]);
-            }
+            progress?.Report("Writing map icons...");
+            await injectMapIcons(ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
 
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
@@ -55,6 +48,69 @@ namespace CustomStreetManager
 
             progress.Report(new ProgressInfo(100, "Done."));
             return true;
+        }
+
+        private void writeLocalizationFiles()
+        {
+            // free up the used MSG IDs
+            foreach (MapDescriptor mapDescriptor in mapDescriptors)
+            {
+                foreach (string locale in Locale.ALL)
+                {
+                    if (mapDescriptor.Name_MSG_ID > 0)
+                        ui_messages[locale].removeKey(mapDescriptor.Name_MSG_ID);
+                    if (mapDescriptor.Desc_MSG_ID > 0)
+                        ui_messages[locale].removeKey(mapDescriptor.Desc_MSG_ID);
+                }
+            }
+            // make new msg ids
+            foreach (var mapDescriptor in mapDescriptors)
+            {
+                mapDescriptor.Name_MSG_ID = ui_messages.Values.First().freeKey();
+                foreach (var entry in ui_messages)
+                {
+                    var locale = entry.Key;
+                    var ui_message = entry.Value;
+                    // write EN messages to the UK file as well (we are not differentiating here)
+                    if (locale == Locale.UK)
+                        locale = Locale.EN;
+                    // if there is no localization for this locale, use the english variant as default
+                    if (string.IsNullOrWhiteSpace(mapDescriptor.Name[locale]))
+                    {
+                        ui_message.set(mapDescriptor.Name_MSG_ID, mapDescriptor.Name[Locale.EN]);
+                    }
+                    else
+                    {
+                        ui_message.set(mapDescriptor.Name_MSG_ID, mapDescriptor.Name[locale]);
+                    }
+                }
+                mapDescriptor.Desc_MSG_ID = ui_messages.Values.First().freeKey();
+                foreach (var entry in ui_messages)
+                {
+                    var locale = entry.Key;
+                    var ui_message = entry.Value;
+                    // write EN messages to the UK file as well (we are not differentiating here)
+                    if (locale == Locale.UK)
+                        locale = Locale.EN;
+                    // if there is no localization for this locale, use the english variant as default
+                    if (string.IsNullOrWhiteSpace(mapDescriptor.Desc[locale]))
+                    {
+                        ui_message.set(mapDescriptor.Desc_MSG_ID, mapDescriptor.Desc[Locale.EN]);
+                    }
+                    else
+                    {
+                        ui_message.set(mapDescriptor.Desc_MSG_ID, mapDescriptor.Desc[locale]);
+                    }
+                }
+            }
+            // write to files
+            foreach (var entry in ui_messages)
+            {
+                string locale = entry.Key;
+                UI_Message ui_message = entry.Value;
+                Directory.CreateDirectory(Path.GetDirectoryName(riivFileSet.ui_message_csv[locale]));
+                ui_message.writeToFile(riivFileSet.ui_message_csv[locale]);
+            }
         }
 
         private void patchMainDol(IProgress<ProgressInfo> progress, CancellationToken ct)

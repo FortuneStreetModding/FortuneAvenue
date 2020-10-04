@@ -10,100 +10,69 @@ namespace FSEditor.MapDescriptor
 {
     class ST7P01 : ST7_Interface
     {
-        public uint VANILLA_FIRST_MAP_DESC_MESSAGE_ID() { return 4416; }
-        public uint VANILLA_FIRST_MAP_NAME_MESSAGE_ID() { return 5433; }
-        public uint MAP_BGSEQUENCE_ADDR_MARIOSTADIUM() { return 0x80428968; }
-        public uint MAP_SWITCH_PARAM_ADDR_COLLOSUS() { return 0x8047d598; }
-        public uint MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON() { return 0x806b8df0; }
-        public uint MAP_SWITCH_PARAM_ADDR_OBSERVATORY() { return 0x8047d5b4; }
-        public uint START_MAP_DATA_TABLE_VIRTUAL() { return 0x80428e50; }
-        public uint START_MAP_DEFAULTS_TABLE_VIRTUAL() { return 0x804363c8; }
-        public uint START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL() { return 0x80436bc0; }
+        uint ST7_Interface.VANILLA_FIRST_MAP_DESC_MESSAGE_ID() { return 4416; }
+        uint ST7_Interface.VANILLA_FIRST_MAP_NAME_MESSAGE_ID() { return 5433; }
+        uint ST7_Interface.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM() { return 0x80428968; }
+        uint ST7_Interface.MAP_SWITCH_PARAM_ADDR_COLLOSUS() { return 0x8047d598; }
+        uint ST7_Interface.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON() { return 0x806b8df0; }
+        uint ST7_Interface.MAP_SWITCH_PARAM_ADDR_OBSERVATORY() { return 0x8047d5b4; }
+        uint ST7_Interface.START_MAP_DATA_TABLE_VIRTUAL() { return 0x80428e50; }
+        uint ST7_Interface.START_MAP_DEFAULTS_TABLE_VIRTUAL() { return 0x804363c8; }
+        uint ST7_Interface.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL() { return 0x80436bc0; }
         // TODO: could be repurpused as unused space, since the venture card table hack is being applied
-        public uint START_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80410648; }
+        uint ST7_Interface.START_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80410648; }
         public uint END_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80411b9b; }
         // map data string table repurposed as free space
-        public uint UNUSED_SPACE_1_START_VIRTUAL() { return 0x80428978; }
-        public uint UNUSED_SPACE_1_END_VIRTUAL() { return 0x80428e4F; }
+        uint ST7_Interface.UNUSED_SPACE_1_START_VIRTUAL() { return 0x80428978; }
+        uint ST7_Interface.UNUSED_SPACE_1_END_VIRTUAL() { return 0x80428e4F; }
         // unused costume string table 1
-        public uint UNUSED_SPACE_2_START_VIRTUAL() { return 0x8042bc78; }
-        public uint UNUSED_SPACE_2_END_VIRTUAL() { return 0x8042c23f; }
+        uint ST7_Interface.UNUSED_SPACE_2_START_VIRTUAL() { return 0x8042bc78; }
+        uint ST7_Interface.UNUSED_SPACE_2_END_VIRTUAL() { return 0x8042c23f; }
         // unused costume string table 2
-        public uint UNUSED_SPACE_3_END_VIRTUAL() { return 0x8042e22f; }
-        public uint UNUSED_SPACE_3_START_VIRTUAL() { return 0x8042dfc0; }
+        uint ST7_Interface.UNUSED_SPACE_3_END_VIRTUAL() { return 0x8042e22f; }
+        uint ST7_Interface.UNUSED_SPACE_3_START_VIRTUAL() { return 0x8042dfc0; }
         // unused costume string table 3
-        public uint UNUSED_SPACE_4_START_VIRTUAL() { return 0x8042ef30; }
-        public uint UNUSED_SPACE_4_END_VIRTUAL() { return 0x8042f7ef; }
+        uint ST7_Interface.UNUSED_SPACE_4_START_VIRTUAL() { return 0x8042ef30; }
+        uint ST7_Interface.UNUSED_SPACE_4_END_VIRTUAL() { return 0x8042f7ef; }
 
-        public void writeHackExtendedMapDescriptions(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
+        void ST7_Interface.writeHackExtendedMapDescriptions(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapDescriptionTableSize, UInt32 mapDescriptionTableAddr)
         {
             // HACK: Expand the description message ID table
-            // subi r3,r3,0x15                                      ->   subi r3,r3,0x03
-            stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin); stream.Write(0x3863fffd);
-            // cmpwi r3,0x12                                        ->   cmpwi r3,0x24
-            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin); stream.Write(0x2c030024);
+            // subi r3,r3,0x15                                     -> nop
+            stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop);
+            // cmpwi r3,0x12                                       -> cmpwi r3,mapDescriptionTableSize
+            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpwi_r3(mapDescriptionTableSize));
+            // r4 <- 0x80436bc0                                    -> r4 <- mapDescriptionTableAddr
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(mapDescriptionTableAddr);
+            stream.Seek(toFileAddress(0x80212164), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r4(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r4(v.lower16Bit));
+            
+            // -- instead of having a map lock info text per map, make it generic -- 
             // lwzx r3=>DWORD_80436c08,r3,r0                        ->   li r3,0x1153
-            stream.Seek(toFileAddress(0x80212238), SeekOrigin.Begin); stream.Write(0x38601153);
+            // we relocate the map description table somewhere else, as such this hack is not needed anymore
+            // that is the reason why it is commented out here
+            // stream.Seek(toFileAddress(0x80212238), SeekOrigin.Begin); stream.Write(0x38601153);
         }
-        public bool isHackExtendedMapDescriptions(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        bool ST7_Interface.isHackExtendedMapDescriptions(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
-            // has the hack for expanded Description message table already been applied?
             stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
-            return opcode == 0x3863fffd;
+            return opcode == PowerPcAsm.nop;
         }
-
-        public void writeHackExtendedVentureCardTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 ventureCardTableEntryCount, UInt32 ventureCardTableAddr)
+        Int16 ST7_Interface.readMapDescriptionTableSize(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
-            // cmplwi r24,0x29                                     -> cmplwi r24,ventureCardTableCount-1
-            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r24((Int16)(ventureCardTableEntryCount - 1)));
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(ventureCardTableAddr);
-            // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
-            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r4(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r4(v.lower16Bit));
+            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin);
+            var opcode = stream.ReadUInt32();
+            return PowerPcAsm.getOpcodeParameter(opcode);
         }
-        public UInt32 readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        UInt32 ST7_Interface.readMapDescriptionTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
-            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(0x80212164), SeekOrigin.Begin);
             var opcode1 = stream.ReadUInt32();
             stream.Seek(4, SeekOrigin.Current);
             var opcode2 = stream.ReadUInt32();
             return PowerPcAsm.make32bitValueFromPair(opcode1, opcode2);
         }
-        public Int16 readVentureCardTableCount(EndianBinaryReader stream, Func<uint, int> toFileAddress)
-        {
-            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin);
-            var opcode = stream.ReadUInt32();
-            return (Int16) (PowerPcAsm.getOpcodeParameter(opcode) + 1);
-        }
-
-        public bool isHackExtendedVentureCardTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
-        {
-            return false;
-        }
-        public void writeHackExtendedMapDescriptionTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
-        {
-        }
-        public bool isHackExtendedMapDescriptionTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress) {
-            return false;
-        }
-        public void writeHackExtendedMapDefaultsTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
-        {
-
-        }
-        public bool isHackExtendedMapDefaultsTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
-        {
-            return false;
-        }
-        public void writeHackExtendedMapSettingsTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
-        {
-
-        }
-        public bool isHackExtendedMapSettingsTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
-        {
-            return false;
-        }
-
-        public void writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable)
+        void ST7_Interface.writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable)
         {
             // note: To add custom icons, the following files need to be editted as well:
             // - ui_menu_19_00a.brlyt with game_sequence.arc and within game_sequence_wifi.arc
@@ -134,12 +103,54 @@ namespace FSEditor.MapDescriptor
             stream.Seek(toFileAddress(0x8021e830), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r30(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r30(v.lower16Bit));
 
         }
-        public bool isHackCustomMapIcons(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        bool ST7_Interface.isHackCustomMapIcons(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
             // has the hack for expanded Description message table already been applied?
             stream.Seek(toFileAddress(0x8021e790), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
             return opcode == PowerPcAsm.cmpw_r29_r30;
+        }
+        void ST7_Interface.writeHackExtendedVentureCardTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 ventureCardTableEntryCount, UInt32 ventureCardTableAddr)
+        {
+            // cmplwi r24,0x29                                     -> cmplwi r24,ventureCardTableCount-1
+            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r24((Int16)(ventureCardTableEntryCount - 1)));
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(ventureCardTableAddr);
+            // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
+            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r4(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r4(v.lower16Bit));
+        }
+        UInt32 ST7_Interface.readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin);
+            var opcode1 = stream.ReadUInt32();
+            stream.Seek(4, SeekOrigin.Current);
+            var opcode2 = stream.ReadUInt32();
+            return PowerPcAsm.make32bitValueFromPair(opcode1, opcode2);
+        }
+        Int16 ST7_Interface.readVentureCardTableEntryCount(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin);
+            var opcode = stream.ReadUInt32();
+            return (Int16)(PowerPcAsm.getOpcodeParameter(opcode) + 1);
+        }
+
+        void ST7_Interface.writeHackExtendedMapDefaultsTable(EndianBinaryWriter stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ST7_Interface.isHackExtendedMapDefaultsTable(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ST7_Interface.writeHackExtendedMapSettingsTable(EndianBinaryWriter stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ST7_Interface.isHackExtendedMapSettingsTable(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
         }
     }
 }

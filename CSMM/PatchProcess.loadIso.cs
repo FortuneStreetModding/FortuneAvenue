@@ -43,7 +43,7 @@ namespace CustomStreetManager
 
                 progress?.Report(97);
                 progress?.Report("Read localization files...");
-                loadUIMessages(mapDescriptors, mainDol.data, cacheFileSet);
+                progress?.Report(loadUIMessages(mapDescriptors, mainDol.data, cacheFileSet));
             }
 
             progress?.Report(100);
@@ -54,55 +54,37 @@ namespace CustomStreetManager
         private string loadUIMessages(List<MapDescriptor> mapDescriptors, ST7_Interface data, DataFileSet fileSet)
         {
             string warnings = "";
-            foreach (string locale in Locale.ALL_WITHOUT_UK)
+            foreach (string locale in Locale.ALL)
             {
                 ui_messages[locale] = new UI_Message(fileSet.ui_message_csv[locale], locale);
             }
-            // reuse the EN locale for the UK locale
-            ui_messages[Locale.UK] = ui_messages[Locale.EN];
 
             // using the MSG ID in each map descriptor, load its actual string from the ui_message_XX.csv file
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
-                foreach (string locale in Locale.ALL_WITHOUT_UK)
+                foreach (string locale in Locale.ALL)
                 {
-                    mapDescriptor.Name[locale] = ui_messages[locale].get(mapDescriptor.Name_MSG_ID);
-                    mapDescriptor.Desc[locale] = ui_messages[locale].get(mapDescriptor.Desc_MSG_ID);
+                    var msgId = mapDescriptor.Name_MSG_ID;
+                    if (msgId > 0)
+                    {
+                        mapDescriptor.Name[locale] = ui_messages[locale].get(mapDescriptor.Name_MSG_ID);
+                    }
+                    else
+                    {
+                        mapDescriptor.Name[locale] = "";
+                    }
+                    msgId = mapDescriptor.Desc_MSG_ID;
+                    if (msgId > 0)
+                    {
+                        mapDescriptor.Desc[locale] = ui_messages[locale].get(mapDescriptor.Desc_MSG_ID);
+                    }
+                    else
+                    {
+                        mapDescriptor.Desc[locale] = "";
+                    }
                 }
+                // add warnings
                 warnings += mapDescriptor.readFrbFileInfo(fileSet.param_folder);
-            }
-            // -- vanilla special case handling --
-            /* 
-             * the normal game shares the name msg id and the description msg id over the easy and standard ruleset. 
-             * As such we have only 18 msg ids but 36 maps (15 normal maps + 3 debug maps)
-             * We go through the first 18 maps and assign them a new msg id so that each map can have its own name and description
-             * even between different rulesets, easy or standard.
-             */
-            for (var i = 0; i <= 17; i++)
-            {
-                var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Name_MSG_ID == data.VANILLA_FIRST_MAP_NAME_MESSAGE_ID() + i)
-                {
-                    var freeKey = ui_messages.Values.First().freeKey();
-                    foreach (UI_Message ui_message in ui_messages.Values)
-                    {
-                        ui_message.set(freeKey, "");
-                    }
-                    mapDescriptor.Name_MSG_ID = freeKey;
-                }
-            }
-            for (var i = 0; i <= 17; i++)
-            {
-                var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Desc_MSG_ID == data.VANILLA_FIRST_MAP_DESC_MESSAGE_ID() + i)
-                {
-                    var freeKey = ui_messages.Values.First().freeKey();
-                    foreach (UI_Message ui_message in ui_messages.Values)
-                    {
-                        ui_message.set(freeKey, "");
-                    }
-                    mapDescriptor.Desc_MSG_ID = freeKey;
-                }
             }
             return warnings;
         }

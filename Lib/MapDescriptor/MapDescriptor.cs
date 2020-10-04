@@ -610,7 +610,7 @@ namespace FSEditor.MapDescriptor
             FrbFile4 = mapDescriptor.FrbFile4;
             Background = mapDescriptor.Background;
             BGMID = mapDescriptor.BGMID;
-            foreach (string locale in Locale.ALL_WITHOUT_UK)
+            foreach (string locale in Locale.ALL)
             {
                 if (mapDescriptor.Name.ContainsKey(locale))
                 {

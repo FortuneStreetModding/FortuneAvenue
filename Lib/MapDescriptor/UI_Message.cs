@@ -42,6 +42,10 @@ namespace FSEditor.MapDescriptor
             }
             return i;
         }
+        public void removeKey(uint key)
+        {
+            map.Remove(key);
+        }
         public void add(uint freeKey, string v)
         {
             map.Add(freeKey, v);
@@ -50,15 +54,6 @@ namespace FSEditor.MapDescriptor
         public void set(uint freeKey, string v)
         {
             map[freeKey] = v;
-        }
-
-        public void set(List<MapDescriptor> mapDescriptors)
-        {
-            foreach(MapDescriptor mapDescriptor in mapDescriptors)
-            {
-                map[mapDescriptor.Name_MSG_ID] = mapDescriptor.Name[locale];
-                map[mapDescriptor.Desc_MSG_ID] = mapDescriptor.Desc[locale];
-            }
         }
 
         public void writeToFile(string filename)

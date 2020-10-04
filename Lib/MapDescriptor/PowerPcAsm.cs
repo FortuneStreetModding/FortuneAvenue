@@ -21,6 +21,7 @@ namespace FSEditor.MapDescriptor
         private static readonly UInt32 addi_r30_zero = 0x3bde0000;
         public static readonly UInt32 cmpw_r29_r30 = 0x7c1df000;
         public static readonly UInt32 cmpw_r30_r28 = 0x7c1ee000;
+        public static readonly UInt32 cmpwi_r3_zero = 0x2c030000;
         public static readonly UInt32 cmplwi_r24_zero = 0x28180000;
         public static readonly UInt32 cmplwi_r28_zero = 0x281c0000;
         public static readonly UInt32 cmplwi_r29_zero = 0x281d0000;
@@ -84,6 +85,10 @@ namespace FSEditor.MapDescriptor
         public static UInt32 cmplwi_r24(Int16 addr)
         {
             return cmplwi_r24_zero + ((UInt32)addr & 0x0000FFFF);
+        }
+        public static UInt32 cmpwi_r3(Int16 addr)
+        {
+            return cmpwi_r3_zero + ((UInt32)addr & 0x0000FFFF);
         }
         public static UInt32 cmplwi_r28(Int16 addr)
         {
