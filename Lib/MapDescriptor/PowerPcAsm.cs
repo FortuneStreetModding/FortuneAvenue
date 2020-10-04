@@ -30,8 +30,19 @@ namespace FSEditor.MapDescriptor
             public UInt16 upper16Bit;
             public Int16 lower16Bit;
         }
+        public static UInt32 make32bitValueFromPair(UInt32 opcode1, UInt32 opcode2)
+        {
+            // e.g. 0x3c808041 and 0x38840648
 
-        public static Pair16Bit make32bitValue(UInt32 addr)
+            var upper16Bit = opcode1 & 0x0000FFFF;
+            var lower16Bit = (Int16)(opcode2 & 0x0000FFFF);
+            if (lower16Bit < 0)
+            {
+                upper16Bit -= 1;
+            }
+            return (upper16Bit << 0x10) + ((UInt32) lower16Bit & 0x0000FFFF);
+        }
+        public static Pair16Bit make16bitValuePair(UInt32 addr)
         {
             Pair16Bit addrPair = new Pair16Bit();
             addrPair.upper16Bit = (UInt16)((addr & 0xFFFF0000) >> 0x10);
@@ -41,6 +52,10 @@ namespace FSEditor.MapDescriptor
                 addrPair.upper16Bit += 1;
             }
             return addrPair;
+        }
+        public static Int16 getOpcodeParameter(UInt32 opcode)
+        {
+            return (Int16)(opcode & 0x0000FFFF);
         }
         public static UInt32 lis_r4(ushort addr)
         {

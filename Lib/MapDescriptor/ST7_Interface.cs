@@ -44,5 +44,7 @@ namespace FSEditor.MapDescriptor
         bool isHackExtendedMapSettingsTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress);
         void writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable);
         bool isHackCustomMapIcons(EndianBinaryReader stream, Func<uint, int> toFileAddress);
+        short readVentureCardTableCount(EndianBinaryReader stream, Func<uint, int> toFileAddress);
+        uint readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress);
     }
 }

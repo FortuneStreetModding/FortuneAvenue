@@ -19,7 +19,9 @@ namespace FSEditor.MapDescriptor
         public uint START_MAP_DATA_TABLE_VIRTUAL() { return 0x80428e50; }
         public uint START_MAP_DEFAULTS_TABLE_VIRTUAL() { return 0x804363c8; }
         public uint START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL() { return 0x80436bc0; }
+        // TODO: could be repurpused as unused space, since the venture card table hack is being applied
         public uint START_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80410648; }
+        public uint END_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80411b9b; }
         // map data string table repurposed as free space
         public uint UNUSED_SPACE_1_START_VIRTUAL() { return 0x80428978; }
         public uint UNUSED_SPACE_1_END_VIRTUAL() { return 0x80428e4F; }
@@ -55,18 +57,23 @@ namespace FSEditor.MapDescriptor
         {
             // cmplwi r24,0x29                                     -> cmplwi r24,ventureCardTableCount-1
             stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r24((Int16)(ventureCardTableEntryCount - 1)));
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make32bitValue(ventureCardTableAddr);
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(ventureCardTableAddr);
             // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
             stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r4(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r4(v.lower16Bit));
         }
-        public bool isHackVentureCardTable(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        public UInt32 readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make32bitValue(START_VENTURE_CARD_TABLE_VIRTUAL());
             stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin);
             var opcode1 = stream.ReadUInt32();
             stream.Seek(4, SeekOrigin.Current);
             var opcode2 = stream.ReadUInt32();
-            return opcode1 == PowerPcAsm.lis_r4(v.upper16Bit) && opcode2 == PowerPcAsm.addi_r4(v.lower16Bit);
+            return PowerPcAsm.make32bitValueFromPair(opcode1, opcode2);
+        }
+        public Int16 readVentureCardTableCount(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin);
+            var opcode = stream.ReadUInt32();
+            return (Int16) (PowerPcAsm.getOpcodeParameter(opcode) + 1);
         }
 
         public bool isHackExtendedVentureCardTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress)
@@ -118,7 +125,7 @@ namespace FSEditor.MapDescriptor
             stream.Seek(toFileAddress(0x8021e8b8), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpw_r30_r28);
             // cmplwi r28,0x12                                     -> cmplwi r28,mapIconAddrTableItemCount
             stream.Seek(toFileAddress(0x8021e84c), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi_r28(mapIconAddrTableItemCount));
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make32bitValue(mapIconAddrTable);
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(mapIconAddrTable);
             // r29 <- 0x8047f5c0                                   -> r29 <- mapIconAddrTable
             stream.Seek(toFileAddress(0x8021e780), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis_r29(v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi_r29(v.lower16Bit));
             // r30 <- 0x8047f5c0                                   -> r30 <- mapIconAddrTable

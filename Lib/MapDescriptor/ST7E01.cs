@@ -89,5 +89,15 @@ namespace FSEditor.MapDescriptor
         {
             throw new NotImplementedException();
         }
+
+        public short readVentureCardTableCount(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
