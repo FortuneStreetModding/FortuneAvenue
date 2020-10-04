@@ -210,55 +210,21 @@ namespace CustomStreetManager
             var psi = preparePsi("benzin.exe", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
-        internal static void copyRelevantFilesForPacking(FileSet fileSet, string inputFile)
+        public static async Task<string> extractFiles(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
-            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile), "DATA");
-            var sourcePath = tmpDirectory;
-            var destinationPath = tmpExtract;
-
-            //Now Create all of the directories
-            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*",
-                SearchOption.AllDirectories))
-                Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
-
-            //Copy all the files & Replaces any files with the same name
-            foreach (string newPath in Directory.GetFiles(sourcePath, "*.*",
-                SearchOption.AllDirectories))
-                File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
-        }
-        public static async Task<FileSet> extractFiles(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
-        {
-            string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
-            if (Directory.Exists(tmpDirectory))
-            {
-                Directory.Delete(tmpDirectory, true);
-            }
-
-            string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" tmp";
+            string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" \"" + outputDirectory + "\"";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
-
-            FileSet fileSet = new FileSet();
-            fileSet.main_dol = Path.Combine(tmpDirectory, "sys", "main.dol");
-            fileSet.ui_message_csv[Locale.DE] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.de.csv");
-            fileSet.ui_message_csv[Locale.EN] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.en.csv");
-            fileSet.ui_message_csv[Locale.FR] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.fr.csv");
-            fileSet.ui_message_csv[Locale.IT] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.it.csv");
-            fileSet.ui_message_csv[Locale.JP] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.jp.csv");
-            fileSet.ui_message_csv[Locale.ES] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.su.csv");
-            fileSet.ui_message_csv[Locale.UK] = Path.Combine(tmpDirectory, "files", "localize", "ui_message.uk.csv");
-            fileSet.param_folder = Path.Combine(tmpDirectory, "files", "param");
-            return fileSet;
+            return result;
         }
-        public static async Task<string> extractFullIsoAsync(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<string> extractFullIsoAsync(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string cacheExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
-            if (!Directory.Exists(cacheExtract))
+            
+            if (!Directory.Exists(outputDirectory))
             {
-                string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + cacheExtract + "\"";
-                await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+                string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + outputDirectory + "\"";
+                return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             }
-            return cacheExtract;
+            return "";
         }
         public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
@@ -266,19 +232,7 @@ namespace CustomStreetManager
             string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
-        public static void cleanup(string inputFile)
-        {
-            string tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
-            if (Directory.Exists(tmpDirectory))
-            {
-                Directory.Delete(tmpDirectory, true);
-            }
-            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
-            if (Directory.Exists(tmpExtract))
-            {
-                Directory.Delete(tmpExtract, true);
-            }
-        }
+
         public static async Task<List<MainDolSection>> readSections(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "DUMP -l \"" + inputFile + "\"";
@@ -331,14 +285,14 @@ namespace CustomStreetManager
             string arguments = "DOLPATCH \"" + mainDolFile + "\" xml=\"" + xmlPatchFile + "\"";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
-        public static async Task<string> extractArcFile(string arcFile, string destFolder, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<string> extractArcFile(string arcFile, string dFolder, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "EXTRACT --verbose \"" + arcFile + "\" --dest \"" + destFolder + "\"";
+            string arguments = "EXTRACT --verbose \"" + arcFile + "\" --dest \"" + dFolder + "\"";
             return await callWszst(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
-        public static async Task<string> packDfolderToArc(string destFolder, string arcFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<string> packDfolderToArc(string dFolder, string arcFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "CREATE --overwrite --verbose \"" + destFolder + "\" --dest \"" + arcFile + "\"";
+            string arguments = "CREATE --overwrite --verbose \"" + dFolder + "\" --dest \"" + arcFile + "\"";
             return await callWszst(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         public static async Task<string> convertBryltToXmlyt(string bryltFile, string xmlytFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)

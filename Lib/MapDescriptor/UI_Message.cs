@@ -30,7 +30,9 @@ namespace FSEditor.MapDescriptor
         {
             return map[key];
         }
-
+        /**
+         * Get a free key in this maps by iterating until we find a free key
+         */
         public uint freeKey()
         {
             uint i = 0;

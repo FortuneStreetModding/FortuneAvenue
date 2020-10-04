@@ -46,6 +46,7 @@ namespace CustomStreetManager
 
         private void reset()
         {
+            patchProcess.cleanUp(false, true);
             patchProcess = null;
             setInputISOLocation.Text = "None";
             Go.Enabled = false;
@@ -78,9 +79,10 @@ namespace CustomStreetManager
                 {
                     await patchProcess.saveWbfsIso(inputFile, outputFile, false, progress, ct);
 
+                    // TODO, better cleanup
                     Invoke((MethodInvoker)delegate {
                         progressBar.ShowCheckbox("Cleanup temporary files.", false);
-                        progressBar.callback = (c) => { if (c) ExeWrapper.cleanup(inputFile); };
+                        progressBar.callback = (c) => { if (c) patchProcess.cleanUp(true, true); };
                     });
                 }
                 catch (Exception e2)
@@ -121,7 +123,7 @@ namespace CustomStreetManager
             }
         }
 
-        private async void ReloadWbfsIsoFile()
+        private async void reloadWbfsIsoFile()
         {
             using (var cancelTokenSource = new CancellationTokenSource())
             using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
@@ -139,7 +141,7 @@ namespace CustomStreetManager
                 patchProcess = new PatchProcess();
                 try
                 {
-                    var mapDescriptors = await patchProcess.ReloadWbfsIsoFile(inputWbfsIso, progress, ct);
+                    var mapDescriptors = await patchProcess.loadWbfsIsoFile(inputWbfsIso, progress, ct);
 
                     Go.Enabled = false;
                     BindingSource bs = new BindingSource();
@@ -170,7 +172,7 @@ namespace CustomStreetManager
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
                 setInputISOLocation.Text = openFileDialog1.FileName;
-                ReloadWbfsIsoFile();
+                reloadWbfsIsoFile();
             }
         }
 
@@ -186,7 +188,7 @@ namespace CustomStreetManager
 
         private void clearListButton_Click(object sender, EventArgs e)
         {
-            ReloadWbfsIsoFile();
+            reloadWbfsIsoFile();
         }
 
         private void updateDataGridData(object sender, EventArgs e)

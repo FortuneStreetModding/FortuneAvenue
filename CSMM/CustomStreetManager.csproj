@@ -68,10 +68,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataFileSet.cs" />
+    <Compile Include="PatchProcess.exportMd.cs" />
+    <Compile Include="PatchProcess.importMd.cs" />
+    <Compile Include="PatchProcess.saveIso.cs" />
+    <Compile Include="PatchProcess.loadIso.cs" />
     <Compile Include="PatchProcess.cs" />
     <Compile Include="ProgressInfo.cs" />
-    <Compile Include="FileSet.cs" />
-    <Compile Include="MapEntry.cs" />
     <Compile Include="ExeWrapper.cs" />
     <Compile Include="CSMM.cs">
       <SubType>Form</SubType>

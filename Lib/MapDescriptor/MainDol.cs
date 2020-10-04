@@ -17,7 +17,7 @@ namespace FSEditor.MapDescriptor
         private UInt32 unusedSpacePositionVirtual;
         public int totalBytesWritten;
         public int totalBytesLeft;
-        public AddressConstants data = new ST7P01();
+        public ST7_Interface data = new ST7P01();
 
         public MainDol(List<MainDolSection> sections)
         {
@@ -163,8 +163,9 @@ namespace FSEditor.MapDescriptor
                 }
             }
 
-            binReader.Seek(toFileAddress(data.START_VENTURE_CARD_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            for (int i = 0; i < 42; i++)
+            int ventureCardTableCount = data.readVentureCardTableCount(binReader, toFileAddress);
+            binReader.Seek(toFileAddress(data.readVentureCardTableAddr(binReader, toFileAddress)), SeekOrigin.Begin);
+            for (int i = 0; i < ventureCardTableCount; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
                 mapDescriptor.readVentureCardTableFromStream(binReader);
@@ -365,23 +366,30 @@ namespace FSEditor.MapDescriptor
             stream.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
-                if(string.IsNullOrEmpty(mapDescriptors[i].MapIcon))
+                if (string.IsNullOrEmpty(mapDescriptors[i].MapIcon))
                 {
                     mapDescriptors[i].writeMapDefaults(stream, 0);
-                } else
+                }
+                else
                 {
                     mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
                 }
-                
+
             }
 
             data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
 
-            stream.Seek(toFileAddress(data.START_VENTURE_CARD_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            for (int i = 0; i < 42; i++)
+            UInt32 ventureCardTableAddr;
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                mapDescriptors[i].writeVentureCardTable(stream);
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                for (int i = 0; i < mapDescriptors.Count; i++)
+                {
+                    mapDescriptors[i].writeVentureCardTable(s);
+                }
+                ventureCardTableAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
             }
+            data.writeHackExtendedVentureCardTable(stream, toFileAddress, (Int16)mapDescriptors.Count, ventureCardTableAddr);
 
             nullTheFreeSpace(stream);
 
