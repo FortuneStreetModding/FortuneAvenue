@@ -19,21 +19,6 @@ namespace FSEditor.MapDescriptor
         uint ST7_Interface.START_MAP_DATA_TABLE_VIRTUAL() { return 0x80428e50; }
         uint ST7_Interface.START_MAP_DEFAULTS_TABLE_VIRTUAL() { return 0x804363c8; }
         uint ST7_Interface.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL() { return 0x80436bc0; }
-        // TODO: could be repurpused as unused space, since the venture card table hack is being applied
-        uint ST7_Interface.START_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80410648; }
-        public uint END_VENTURE_CARD_TABLE_VIRTUAL() { return 0x80411b9b; }
-        // map data string table repurposed as free space
-        uint ST7_Interface.UNUSED_SPACE_1_START_VIRTUAL() { return 0x80428978; }
-        uint ST7_Interface.UNUSED_SPACE_1_END_VIRTUAL() { return 0x80428e4F; }
-        // unused costume string table 1
-        uint ST7_Interface.UNUSED_SPACE_2_START_VIRTUAL() { return 0x8042bc78; }
-        uint ST7_Interface.UNUSED_SPACE_2_END_VIRTUAL() { return 0x8042c23f; }
-        // unused costume string table 2
-        uint ST7_Interface.UNUSED_SPACE_3_END_VIRTUAL() { return 0x8042e22f; }
-        uint ST7_Interface.UNUSED_SPACE_3_START_VIRTUAL() { return 0x8042dfc0; }
-        // unused costume string table 3
-        uint ST7_Interface.UNUSED_SPACE_4_START_VIRTUAL() { return 0x8042ef30; }
-        uint ST7_Interface.UNUSED_SPACE_4_END_VIRTUAL() { return 0x8042f7ef; }
 
         void ST7_Interface.writeHackExtendedMapDescriptions(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapDescriptionTableSize, UInt32 mapDescriptionTableAddr)
         {
@@ -151,6 +136,24 @@ namespace FSEditor.MapDescriptor
         bool ST7_Interface.isHackExtendedMapSettingsTable(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
             throw new NotImplementedException();
+        }
+
+        FreeSpaceManager ST7_Interface.getFreeSpaceManager()
+        {
+            var freeSpaceManager = new FreeSpaceManager();
+            // Venture Card Table
+            freeSpaceManager.addFreeSpace(0x80410648, 0x80411b9b);
+            // Map Data String Table
+            freeSpaceManager.addFreeSpace(0x80428978, 0x80428e4F);
+            // Unused costume string table 1
+            freeSpaceManager.addFreeSpace(0x8042bc78, 0x8042c23f);
+            // Unused costume string table 2
+            freeSpaceManager.addFreeSpace(0x8042e22f, 0x8042dfc0);
+            // Unused costume string table 3
+            freeSpaceManager.addFreeSpace(0x8042ef30, 0x8042f7ef);
+            // Expanded Rom
+            freeSpaceManager.addFreeSpace(0x80001800, 0x80001800 + 0x1800);
+            return freeSpaceManager;
         }
     }
 }

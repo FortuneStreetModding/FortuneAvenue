@@ -42,47 +42,6 @@ namespace FSEditor.MapDescriptor
         {
             throw new NotImplementedException();
         }
-
-        uint ST7_Interface.UNUSED_SPACE_1_START_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_1_END_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_2_START_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_2_END_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_3_START_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_3_END_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_4_START_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.UNUSED_SPACE_4_END_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
         uint ST7_Interface.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON()
         {
             throw new NotImplementedException();
@@ -109,11 +68,6 @@ namespace FSEditor.MapDescriptor
         }
 
         uint ST7_Interface.START_MAP_DATA_TABLE_VIRTUAL()
-        {
-            throw new NotImplementedException();
-        }
-
-        uint ST7_Interface.START_VENTURE_CARD_TABLE_VIRTUAL()
         {
             throw new NotImplementedException();
         }
@@ -184,6 +138,11 @@ namespace FSEditor.MapDescriptor
         }
 
         uint ST7_Interface.readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            throw new NotImplementedException();
+        }
+
+        FreeSpaceManager ST7_Interface.getFreeSpaceManager()
         {
             throw new NotImplementedException();
         }

@@ -275,7 +275,7 @@ namespace CustomStreetManager
             }
             return sections;
         }
-        public static async Task<string> createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size, CancellationToken cancelToken, IProgress<ProgressInfo> progress, int progressMin, int progressMax)
+        public static async Task<string> createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "DOLPATCH \"" + mainDolFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);

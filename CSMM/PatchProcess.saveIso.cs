@@ -23,7 +23,7 @@ namespace CustomStreetManager
             writeLocalizationFiles();
 
             progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
-            patchMainDol(ProgressInfo.makeSubProgress(progress, 0, 6), ct);
+            await patchMainDolAsync(ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
             progress?.Report("Writing map icons...");
@@ -113,25 +113,36 @@ namespace CustomStreetManager
             }
         }
 
-        private void patchMainDol(IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task patchMainDolAsync(IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(riivFileSet.main_dol));
             File.Copy(cacheFileSet.main_dol, riivFileSet.main_dol, true);
 
             // expand dol if not already expanded
-            /*if (mainDol.toFileAddress(0x80001800) == -1)
+            if (mainDol.toFileAddress(0x80001800) == -1)
             {
-                WitWrapper.createNewTextSection(tempMainDol, 0x80001800, 0x1800);
-                mainDol.setSections(WitWrapper.readSections(tempMainDol));
-            }*/
+                await ExeWrapper.createNewTextSection(riivFileSet.main_dol, 0x80001800, 0x1800, ct, progress);
+                mainDol.setSections(await ExeWrapper.readSections(riivFileSet.main_dol, ct, progress));
+            }
 
             using (Stream baseStream = File.Open(riivFileSet.main_dol, FileMode.Open))
             {
-                EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
-                mainDol.writeMainDol(stream, mapDescriptors);
-
-                progress.Report("Amount of free space used in main.dol: " + mainDol.totalBytesWritten + " bytes");
-                progress.Report("Amount of free space left in main.dol: " + mainDol.totalBytesLeft + " bytes");
+                try
+                {
+                    EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
+                    mainDol.writeMainDol(stream, mapDescriptors);
+                }
+                finally
+                {
+                    progress.Report("Before Patch:");
+                    progress.Report("Amount of free space available in main.dol: " + mainDol.freeSpaceManager.calculateTotalFreeSpace() + " bytes");
+                    progress.Report("Amount of free space in the largest block in main.dol: " + mainDol.freeSpaceManager.calculateLargestFreeSpaceBlockSize() + " bytes");
+                    progress.Report("After Patch:");
+                    progress.Report("Amount of free space available in main.dol: " + mainDol.freeSpaceManager.calculateTotalRemainingFreeSpace() + " bytes");
+                    progress.Report("Amount of free space in the largest block in main.dol: " + mainDol.freeSpaceManager.calculateLargestRemainingFreeSpaceBlockSize() + " bytes");
+                    int bytesWritten = mainDol.freeSpaceManager.calculateTotalFreeSpace() - mainDol.freeSpaceManager.calculateTotalRemainingFreeSpace();
+                    progress.Report("Total free space used: " + bytesWritten + " bytes");
+                }
             }
         }
 
