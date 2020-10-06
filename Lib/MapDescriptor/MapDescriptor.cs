@@ -1,4 +1,4 @@
-﻿using FSEditor.FSData;
+using FSEditor.FSData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -382,7 +382,7 @@ namespace FSEditor.MapDescriptor
                         string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
                         if (flaggedValueOrNull != null)
                         {
-                            var index = uint.Parse(flaggedValueOrNull);
+                            var index = uint.Parse(flaggedValueOrNull) - 1;
                             VentureCard[index] = 1;
                         }
                     }
