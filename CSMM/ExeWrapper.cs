@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -212,7 +212,7 @@ namespace CustomStreetManager
         }
         public static async Task<string> extractFiles(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" \"" + outputDirectory + "\"";
+            string arguments = "COPY --progress --fst --preserve --overwrite --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" \"" + Path.Combine(outputDirectory, "DATA") + "\"";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             return result;
         }
@@ -223,6 +223,10 @@ namespace CustomStreetManager
             {
                 string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + outputDirectory + "\"";
                 return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+            }
+            else
+            {
+                return await extractFiles(inputFile, outputDirectory, cancelToken, progress);
             }
             return "";
         }
