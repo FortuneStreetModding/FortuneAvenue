@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -218,7 +218,7 @@ namespace CustomStreetManager
         }
         public static async Task<string> extractFullIsoAsync(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            
+
             if (!Directory.Exists(outputDirectory))
             {
                 string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + outputDirectory + "\"";

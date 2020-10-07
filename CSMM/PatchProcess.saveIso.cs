@@ -1,4 +1,4 @@
-﻿using FSEditor.Exceptions;
+using FSEditor.Exceptions;
 using FSEditor.FSData;
 using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
@@ -19,6 +19,8 @@ namespace CustomStreetManager
 
         public async Task<bool> saveWbfsIso(string inputFile, string outputFile, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
+            this.cleanUp(false, false);
+
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
             writeLocalizationFiles();
 
@@ -36,7 +38,6 @@ namespace CustomStreetManager
                 var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, 60), source.Token);
 
                 DirectoryCopy(riivFileSet.rootDir, cacheFileSet.rootDir, true, true, ProgressInfo.makeNoProgress(progress), ct);
-                // riivFileSet.copy(frbFilesToBeCopied, cacheFileSet, true);
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }
@@ -288,6 +289,8 @@ namespace CustomStreetManager
                             stream.Seek(0, SeekOrigin.Begin);
                             stream.WriteByte((byte)'R');
                         }
+                        // wait till the handle has been disposed properly
+                        await Task.Delay(500);
                     });
                     injectMapIconsInBrlytTasks.Add(task4);
                 }
