@@ -165,7 +165,7 @@ namespace FSEditor.MapDescriptor
             for (int i = 0; i < ventureCardTableCount; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.readVentureCardTableFromStream(binReader);
+                mapDescriptor.readUncompressedVentureCardTableFromStream(binReader);
             }
 
             return mapDescriptors;
@@ -319,7 +319,7 @@ namespace FSEditor.MapDescriptor
             }
             // write the map icon lookup table and remember the location of each pointer in the mapIconLookupTable dictionary
             UInt32 mapIconAddrTable = 0;
-            Int16 mapIconAddrTableItemCount = (Int16)mapIcons.Count;
+            UInt16 mapIconAddrTableItemCount = (UInt16)mapIcons.Count;
             Dictionary<string, UInt32> mapIconLookupTable = new Dictionary<string, UInt32>();
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -353,34 +353,40 @@ namespace FSEditor.MapDescriptor
             }
             data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
 
-            UInt32 ventureCardTableAddr;
+            // allocate working memory space for a single uncompressed venture card table which is passed on for the game to use. We will use it to store the result of decompressing a compressed venture card table
+            UInt32 ventureCardDecompressedTableAddr;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                s.Write(new byte[128]);
+                ventureCardDecompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+            }
+            // write the decompressVentureCardTable routine which takes a compressed venture card table as input and writes it into ventureCardDecompressedTableAddr
+            UInt32 ventureCardDecompressTableRoutine;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                data.writeDecompressVentureCardTableRoutine(s, ventureCardDecompressedTableAddr);
+                ventureCardDecompressTableRoutine = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+            }
+            // write the compressed venture card table
+            UInt32 ventureCardCompressedTableAddr;
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 for (int i = 0; i < mapDescriptors.Count; i++)
                 {
-                    mapDescriptors[i].writeVentureCardTable(s);
+                    mapDescriptors[i].writeCompressedVentureCardTable(s);
                 }
-                ventureCardTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                ventureCardCompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
             }
-            data.writeHackExtendedVentureCardTable(stream, toFileAddress, (Int16)mapDescriptors.Count, ventureCardTableAddr);
+            // hijack the LoadBoard() routine. Intercept the moment when the (now compressed) ventureCardTable is passed on to the InitChanceBoard() routine. Call the 
+            //  decompressVentureCardTable routine and pass the resulting decompressed ventureCardTable (located at ventureCardDecompressedTableAddr) to the InitChanceBoard() routine instead.
+            data.writeHackExtendedVentureCardTable(stream, toFileAddress, (Int16)mapDescriptors.Count, ventureCardCompressedTableAddr, ventureCardDecompressTableRoutine);
 
             freeSpaceManager.nullTheFreeSpace(stream, toFileAddress);
 
             return mapDescriptors;
-        }
-
-        private int search(byte[] src, byte[] pattern)
-        {
-            int c = src.Length - pattern.Length + 1;
-            int j;
-            for (int i = 0; i < c; i++)
-            {
-                if (src[i] != pattern[0]) continue;
-                for (j = pattern.Length - 1; j >= 1 && src[i + j] == pattern[j]; j--) ;
-                if (j == 0) return i;
-            }
-            return -1;
         }
     }
 }

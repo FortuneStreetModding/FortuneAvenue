@@ -112,7 +112,7 @@ namespace FSEditor.MapDescriptor
         public UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
         {
             startedAllocating = true;
-            string str = HexUtil.byteArrayToString(bytes);
+            string str = HexUtil.byteArrayToStringOrHex(bytes);
             if (reuseValues.ContainsKey(bytes))
             {
                 Console.WriteLine("Allocate Reuse " + str + " at " + reuseValues[bytes].ToString("X"));
@@ -127,6 +127,8 @@ namespace FSEditor.MapDescriptor
                 UInt32 newStartPos = start + (UInt32)bytes.Length;
                 while (newStartPos % 4 != 0)
                     newStartPos++;
+                if (newStartPos > end)
+                    newStartPos = end;
                 remainingFreeSpaceBlocks[end] = newStartPos;
 
                 stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
