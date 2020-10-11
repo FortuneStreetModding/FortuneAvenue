@@ -7,7 +7,6 @@ using System.Text;
 using System.Net;
 using System.IO.Compression;
 using System.Windows.Forms;
-using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
@@ -228,7 +227,6 @@ namespace CustomStreetManager
             {
                 return await extractFiles(inputFile, outputDirectory, cancelToken, progress);
             }
-            return "";
         }
         public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {

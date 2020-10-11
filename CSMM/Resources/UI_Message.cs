@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     public class UI_Message
     {

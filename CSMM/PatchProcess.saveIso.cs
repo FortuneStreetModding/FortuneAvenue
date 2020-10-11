@@ -1,6 +1,5 @@
 using FSEditor.Exceptions;
 using FSEditor.FSData;
-using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;

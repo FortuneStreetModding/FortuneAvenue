@@ -68,7 +68,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataFileSet.cs" />
+    <Compile Include="MapDescriptor\Character.cs" />
+    <Compile Include="MapDescriptor\OriginPoint.cs" />
+    <Compile Include="Resources\DataFileSet.cs" />
+    <Compile Include="ASM\ByteArrayComparer.cs" />
+    <Compile Include="ASM\FreeSpaceManager.cs" />
+    <Compile Include="Resources\Locale.cs" />
+    <Compile Include="ASM\MainDol.cs" />
+    <Compile Include="ASM\MainDolSection.cs" />
+    <Compile Include="MapDescriptor\MapDescriptor.cs" />
+    <Compile Include="MapDescriptor\MapDescriptorTemplate.cs">
+      <DependentUpon>MapDescriptorTemplate.md</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
+    <Compile Include="ASM\PowerPcAsm.cs" />
+    <Compile Include="ASM\ST7P01.cs" />
+    <Compile Include="ASM\ST7_Interface.cs" />
+    <Compile Include="MapDescriptor\RuleSet.cs" />
+    <Compile Include="Resources\Ui_menu_19_00a.cs" />
+    <Compile Include="Resources\UI_Message.cs" />
+    <Compile Include="Resources\VanillaDatabase.cs" />
     <Compile Include="PatchProcess.exportMd.cs" />
     <Compile Include="PatchProcess.importMd.cs" />
     <Compile Include="PatchProcess.saveIso.cs" />
@@ -107,6 +128,11 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="MapDescriptor\MapDescriptorTemplate.md">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MapDescriptorTemplate.cs</LastGenOutput>
+      <CustomToolNamespace>CustomStreetManager</CustomToolNamespace>
+    </None>
     <None Include="Properties\DataSources\FSEditor.FSData.MapDescriptor.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -139,6 +165,9 @@
       <Project>{05c60070-f4cd-4485-b438-df69a2ab8555}</Project>
       <Name>Lib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

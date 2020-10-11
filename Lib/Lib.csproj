@@ -59,29 +59,8 @@
     <Compile Include="FSData\BoardFile.cs" />
     <Compile Include="FSData\BoardInfo.cs" />
     <Compile Include="FSData\BoardTheme.cs" />
-    <Compile Include="FSData\OriginPoint.cs" />
     <Compile Include="FSData\LoopingMode.cs" />
-    <Compile Include="FSData\Character.cs" />
-    <Compile Include="MapDescriptor\ByteArrayComparer.cs" />
-    <Compile Include="MapDescriptor\FreeSpaceManager.cs" />
-    <Compile Include="MapDescriptor\ST7_Interface.cs" />
-    <Compile Include="MapDescriptor\Ui_menu_19_00a.cs" />
-    <Compile Include="MapDescriptor\VanillaDatabase.cs" />
-    <Compile Include="MapDescriptor\ST7P01.cs" />
-    <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
-    <Compile Include="MapDescriptor\MapDescriptorTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MapDescriptorTemplate.md</DependentUpon>
-    </Compile>
-    <Compile Include="MapDescriptor\PowerPcAsm.cs" />
-    <Compile Include="MapDescriptor\UI_Message.cs" />
-    <Compile Include="MapDescriptor\MainDolSection.cs" />
-    <Compile Include="MapDescriptor\MainDol.cs" />
-    <Compile Include="FSData\Locale.cs" />
-    <Compile Include="FSData\RuleSet.cs" />
     <Compile Include="FSData\Header.cs" />
-    <Compile Include="MapDescriptor\MapDescriptor.cs" />
     <Compile Include="FSData\Position.cs" />
     <Compile Include="FSData\SquareData.cs" />
     <Compile Include="FSData\SquareType.cs" />
@@ -97,13 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MapDescriptor\MapDescriptorTemplate.md">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>MapDescriptorTemplate.cs</LastGenOutput>
-      <CustomToolNamespace>FSEditor.MapDescriptor</CustomToolNamespace>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

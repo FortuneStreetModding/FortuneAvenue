@@ -436,7 +436,7 @@ namespace CustomStreetManager
             // 
             // mapDescriptorBindingSource
             // 
-            this.mapDescriptorBindingSource.DataSource = typeof(FSEditor.MapDescriptor.MapDescriptor);
+            this.mapDescriptorBindingSource.DataSource = typeof(MapDescriptor);
             // 
             // Go
             // 

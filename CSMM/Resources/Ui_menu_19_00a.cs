@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     public class Ui_menu_19_00a
     {

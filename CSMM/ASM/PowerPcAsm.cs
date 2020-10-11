@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     /**
      * Some info taken from:

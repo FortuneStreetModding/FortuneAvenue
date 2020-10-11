@@ -1,5 +1,4 @@
 ﻿using FSEditor.FSData;
-using FSEditor.MapDescriptor;
 using System;
 using System.Collections.Generic;
 using System.IO;

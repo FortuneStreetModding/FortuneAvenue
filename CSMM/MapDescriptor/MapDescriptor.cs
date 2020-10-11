@@ -9,7 +9,7 @@ using System.ComponentModel;
 using MiscUtil.Conversion;
 using System.Text.RegularExpressions;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     public class MapDescriptor
     {
