@@ -270,7 +270,7 @@ namespace CustomStreetManager
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 for (int i = 0; i < mapDescriptors.Count; i++)
                 {
-                    stream.Write(mapDescriptors[i].Desc_MSG_ID);
+                    s.Write(mapDescriptors[i].Desc_MSG_ID);
                 }
                 mapDescriptionTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Description Table");
             }
