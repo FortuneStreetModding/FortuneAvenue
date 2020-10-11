@@ -9,7 +9,7 @@ using System.IO;
 
 namespace FSEditor.MapDescriptor
 {
-    public class Ui_menu_19_00a_XMLYT
+    public class Ui_menu_19_00a
     {
 
         public static string constructMapIconTplName(string mapIcon)
@@ -21,16 +21,10 @@ namespace FSEditor.MapDescriptor
             return "ui_menu007_" + Path.GetFileNameWithoutExtension(mapIcon) + ".tpl";
         }
 
-        public static bool injectMapIcons(string xmlytFile, Dictionary<string, string> mapIconToTplName)
+        public static bool injectMapIconsLayout(string xmlytFile, Dictionary<string, string> mapIconToTplName)
         {
-            // check map icon tpl names for validity
-            foreach (String tpl in mapIconToTplName.Values)
-            {
-                if (!tpl.StartsWith("ui_menu007_") || !tpl.EndsWith(".tpl") || tpl == "ui_menu007_bghatena.tpl")
-                {
-                    throw new ArgumentException("The list of map icon tpls must follow the format ui_menu007_<XYZ>.tpl");
-                }
-            }
+            checkMapIconsForValidity(mapIconToTplName);
+
             XmlDocument doc = new XmlDocument();
             doc.Load(xmlytFile);
             // --- write the txl1 section for all the references to .tpl files ---
@@ -102,7 +96,7 @@ namespace FSEditor.MapDescriptor
                 // if the mat name is not any of those which is not a map icon then it must be a map icon... confusing double negative
                 if (!nonMapIconMatNames.Contains(matName))
                 {
-                    if(insertionPoint == null)
+                    if (insertionPoint == null)
                     {
                         insertionPoint = picNode.PreviousSibling;
                     }
@@ -125,6 +119,56 @@ namespace FSEditor.MapDescriptor
             }
             doc.Save(xmlytFile);
             return true;
+        }
+        public static bool injectMapIconsAnimation(string xmlanFile, Dictionary<string, string> mapIconToTplName)
+        {
+            checkMapIconsForValidity(mapIconToTplName);
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlanFile);
+
+            var ignorePanes = new string[] { "p_rank_1", "n_bg_b_00_anime", "p_rank_2", "n_bg_anime", "n_hatena_anime", "n_new_anime", "p_bg_flash", "w_bg_button_00", "p_rank_1_leaf", "p_rank_2_leaf", "n_rank_leaf", "p_new", "p_rank_1", "p_rank_2", "p_rank_1_leaf", "p_rank_2_leaf" };
+
+            XmlNodeList paneNodes = doc.SelectNodes("/xmlan/pai1/pane");
+            // get the first material entry which is a map icon material to serve as a template
+            XmlNode animationPaneTemplate = null;
+            foreach (XmlNode paneNode in paneNodes)
+            {
+                var paneName = paneNode.Attributes.GetNamedItem("name").InnerText;
+                // delete this pane animation entry if it belongs to one of the map icons
+                if (!ignorePanes.Contains(paneName))
+                {
+                    if (animationPaneTemplate == null)
+                        animationPaneTemplate = paneNode.Clone();
+                    paneNode.ParentNode.RemoveChild(paneNode);
+                }
+            }
+            // now build the animation entries again
+            XmlNode animationEntriesRefNode = doc.SelectSingleNode("/xmlan/pai1/pane[@name='n_rank_leaf']");
+            XmlNode animationEntriesNodeParent = doc.SelectSingleNode("/xmlan/pai1");
+            foreach (var entry in mapIconToTplName)
+            {
+                string mapIcon = entry.Key;
+                string tpl = entry.Value;
+                XmlNode newElem = animationPaneTemplate.Clone();
+                newElem.Attributes.GetNamedItem("name").InnerText = mapIcon;
+                animationEntriesNodeParent.InsertAfter(newElem, animationEntriesRefNode);
+            }
+
+            doc.Save(xmlanFile);
+            return true;
+        }
+
+        private static void checkMapIconsForValidity(Dictionary<string, string> mapIconToTplName)
+        {
+            // check map icon tpl names for validity
+            foreach (String tpl in mapIconToTplName.Values)
+            {
+                if (!tpl.StartsWith("ui_menu007_") || !tpl.EndsWith(".tpl") || tpl == "ui_menu007_bghatena.tpl")
+                {
+                    throw new ArgumentException("The list of map icon tpls must follow the format ui_menu007_<XYZ>.tpl");
+                }
+            }
         }
     }
 }

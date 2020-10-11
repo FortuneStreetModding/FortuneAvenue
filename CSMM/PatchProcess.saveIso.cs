@@ -160,8 +160,8 @@ namespace CustomStreetManager
 
             /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their respective extraction path in the tmp directory */
             var gameSequenceExtractPaths = new Dictionary<string, string>();
-            /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their respective temporary path for the converted ui_menu_19_00a.xmlyt path */
-            var gameSequenceToXmlytPaths = new Dictionary<string, string>();
+            /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their respective temporary path for the converted xmlyt base path */
+            var gameSequenceToXmlytBasePaths = new Dictionary<string, string>();
             /** maps the path of the various variants of the game_sequenceXXXXXXXX.arc files to their target path where they will be packed again */
             var gameSequencePackPaths = new Dictionary<string, string>();
             foreach (var entry in cacheFileSet.game_sequence_arc)
@@ -173,9 +173,9 @@ namespace CustomStreetManager
                 Directory.CreateDirectory(Path.GetDirectoryName(extractPath));
                 gameSequenceExtractPaths.Add(gameSequencePath, extractPath);
 
-                var xmlytPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath) + ".ui_menu_19_00a.xmlyt");
+                var xmlytPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath) + ".");
                 Directory.CreateDirectory(Path.GetDirectoryName(xmlytPath));
-                gameSequenceToXmlytPaths.Add(gameSequencePath, xmlytPath);
+                gameSequenceToXmlytBasePaths.Add(gameSequencePath, xmlytPath);
 
                 var packPath = riivFileSet.game_sequence_arc[locale];
                 Directory.CreateDirectory(Path.GetDirectoryName(packPath));
@@ -190,9 +190,9 @@ namespace CustomStreetManager
                 Directory.CreateDirectory(Path.GetDirectoryName(extractPath));
                 gameSequenceExtractPaths.Add(gameSequencePath, extractPath);
 
-                var xmlytPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath) + ".ui_menu_19_00a.xmlyt");
+                var xmlytPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension(gameSequencePath) + ".");
                 Directory.CreateDirectory(Path.GetDirectoryName(xmlytPath));
-                gameSequenceToXmlytPaths.Add(gameSequencePath, xmlytPath);
+                gameSequenceToXmlytBasePaths.Add(gameSequencePath, xmlytPath);
 
                 var packPath = riivFileSet.game_sequence_wifi_arc[locale];
                 Directory.CreateDirectory(Path.GetDirectoryName(packPath));
@@ -237,14 +237,14 @@ namespace CustomStreetManager
                         // its a vanilla map icon -> dont convert and inject it
                         if (!mapIconToTplName.ContainsKey(mapIcon))
                         {
-                            mapIconToTplName.Add(mapIcon, tplName + ".tpl");
+                            mapIconToTplName.Add(mapIcon, tplName);
                         }
                     }
                     else
                     {
                         var mapIconPng = Path.Combine(tmpFileSet.param_folder, mapIcon + ".png");
                         var mapIconTpl = Path.ChangeExtension(mapIconPng, ".tpl");
-                        tplName = Ui_menu_19_00a_XMLYT.constructMapIconTplName(mapIcon);
+                        tplName = Ui_menu_19_00a.constructMapIconTplName(mapIcon);
                         if (!mapIconToTplName.ContainsKey(mapIcon))
                         {
                             mapIconToTplName.Add(mapIcon, tplName);
@@ -267,17 +267,16 @@ namespace CustomStreetManager
                         }
                     }
                 }
-
                 // convert the brlyt files to xmlyt, inject the map icons and convert it back
                 List<Task> injectMapIconsInBrlytTasks = new List<Task>();
                 foreach (var entry in gameSequenceExtractPaths)
                 {
                     string gameSequencePath = entry.Key;
                     string gameSequenceExtractPath = entry.Value;
-                    string xmlytFile = gameSequenceToXmlytPaths[gameSequencePath];
                     var brlytFile = Path.Combine(gameSequenceExtractPath, "arc", "blyt", "ui_menu_19_00a.brlyt");
+                    string xmlytFile = gameSequenceToXmlytBasePaths[gameSequencePath] + Path.GetFileNameWithoutExtension(brlytFile) + ".xmlyt";
                     Task task1 = ExeWrapper.convertBryltToXmlyt(brlytFile, xmlytFile, ct, ProgressInfo.makeNoProgress(progress));
-                    Task task2 = task1.ContinueWith(async (t1) => { await t1.ConfigureAwait(false); Ui_menu_19_00a_XMLYT.injectMapIcons(xmlytFile, mapIconToTplName); });
+                    Task task2 = task1.ContinueWith(async (t1) => { await t1.ConfigureAwait(false); Ui_menu_19_00a.injectMapIconsLayout(xmlytFile, mapIconToTplName); });
                     Task task3 = task2.ContinueWith(async (t2) => { await t2.ConfigureAwait(false); await ExeWrapper.convertXmlytToBrylt(xmlytFile, brlytFile, ct, ProgressInfo.makeNoProgress(progress)); });
                     Task task4 = task3.ContinueWith(async (t3) =>
                     {
@@ -294,7 +293,36 @@ namespace CustomStreetManager
                     });
                     injectMapIconsInBrlytTasks.Add(task4);
                 }
+                // convert the brlan files to xmlan, inject the map icons and convert it back
+                List<Task> injectMapIconsInBrlanTasks = new List<Task>();
+                foreach (var entry in gameSequenceExtractPaths)
+                {
+                    string gameSequencePath = entry.Key;
+                    string gameSequenceExtractPath = entry.Value;
+                    foreach(var brlanFile in Directory.GetFiles(Path.Combine(gameSequenceExtractPath, "arc", "anim"), "ui_menu_19_00a_Tag_*.brlan"))
+                    {
+                        string xmlanFile = gameSequenceToXmlytBasePaths[gameSequencePath] + Path.GetFileNameWithoutExtension(brlanFile) + ".xmlan";
+                        Task task1 = ExeWrapper.convertBryltToXmlyt(brlanFile, xmlanFile, ct, ProgressInfo.makeNoProgress(progress));
+                        Task task2 = task1.ContinueWith(async (t1) => { await t1.ConfigureAwait(false); Ui_menu_19_00a.injectMapIconsAnimation(xmlanFile, mapIconToTplName); });
+                        Task task3 = task2.ContinueWith(async (t2) => { await t2.ConfigureAwait(false); await ExeWrapper.convertXmlytToBrylt(xmlanFile, brlanFile, ct, ProgressInfo.makeNoProgress(progress)); });
+                        Task task4 = task3.ContinueWith(async (t3) =>
+                        {
+                            await t3;
+                            // strange phenomenon: when converting the xmlyt files back to brlyt using benzin, sometimes the first byte is not correctly written. This fixes it as the first byte must be an 'R'.
+                            await Task.Delay(500);
+                            using (var stream = File.OpenWrite(brlanFile))
+                            {
+                                stream.Seek(0, SeekOrigin.Begin);
+                                stream.WriteByte((byte)'R');
+                            }
+                            // wait till the handle has been disposed properly
+                            await Task.Delay(500);
+                        });
+                        injectMapIconsInBrlanTasks.Add(task4);
+                    }
+                }
                 await Task.WhenAll(injectMapIconsInBrlytTasks).ConfigureAwait(false);
+                await Task.WhenAll(injectMapIconsInBrlanTasks).ConfigureAwait(false);
                 await Task.WhenAll(convertPngFileTasks).ConfigureAwait(false);
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
