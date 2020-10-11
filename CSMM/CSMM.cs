@@ -72,6 +72,7 @@ namespace CustomStreetManager
                 var progress = new Progress<ProgressInfo>(progressInfo =>
                 {
                     progressBar.update(progressInfo);
+                    Console.WriteLine(progressInfo.line);
                 });
 
                 try
@@ -134,6 +135,7 @@ namespace CustomStreetManager
                 var progress = new Progress<ProgressInfo>(progressInfo =>
                 {
                     progressBar.update(progressInfo);
+                    Console.WriteLine(progressInfo.line);
                 });
 
                 var inputWbfsIso = setInputISOLocation.Text;
@@ -258,6 +260,7 @@ namespace CustomStreetManager
                     var progress = new Progress<ProgressInfo>(progressInfo =>
                     {
                         progressBar.update(progressInfo);
+                        Console.WriteLine(progressInfo.line);
                     });
 
                     bool overwrite = false;
@@ -306,6 +309,7 @@ namespace CustomStreetManager
                     var progress = new Progress<ProgressInfo>(progressInfo =>
                     {
                         progressBar.update(progressInfo);
+                        Console.WriteLine(progressInfo.line);
                     });
 
                     try

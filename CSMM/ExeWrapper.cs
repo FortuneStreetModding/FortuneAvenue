@@ -149,13 +149,11 @@ namespace CustomStreetManager
                     while ((line = await stdOut.ReadLineAsync()) != null)
                     {
                         parsePercentageValue(line, progress);
-                        Console.Out.WriteLine(line);
                         output += line + Environment.NewLine;
                     }
                     while ((line = await stdErr.ReadLineAsync()) != null)
                     {
                         parsePercentageValue(line, progress);
-                        Console.Error.WriteLine(line);
                         output += line + Environment.NewLine;
                     }
                     await Task.Delay(100);

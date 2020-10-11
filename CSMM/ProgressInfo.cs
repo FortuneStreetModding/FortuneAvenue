@@ -26,6 +26,13 @@ namespace CustomStreetManager
             this.verbose = true;
         }
 
+        public ProgressInfo(string text, bool verbose)
+        {
+            this.progress = -1;
+            this.line = text;
+            this.verbose = true;
+        }
+
         public static implicit operator ProgressInfo(int value)
         {
             return new ProgressInfo() { progress = value, line = null, verbose = false };

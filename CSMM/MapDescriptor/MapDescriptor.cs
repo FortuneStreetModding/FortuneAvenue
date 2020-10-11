@@ -118,7 +118,6 @@ namespace CustomStreetManager
         public void writeSwitchRotationOriginPoints(EndianBinaryWriter stream)
         {
             stream.Write((UInt32)SwitchRotationOriginPoints.Count);
-            Console.WriteLine("SwitchRotationOriginPoints.Count=" + SwitchRotationOriginPoints.Count);
             for (int i = 0; i < SwitchRotationOriginPoints.Count; i++)
             {
                 stream.Write(SwitchRotationOriginPoints[i].X);

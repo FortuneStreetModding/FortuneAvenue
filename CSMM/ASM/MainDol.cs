@@ -183,7 +183,6 @@ namespace CustomStreetManager
             for (int i = 0; i < 48; i++)
             {
                 int seek = (int)stream.BaseStream.Position;
-                Console.WriteLine("WritePos=" + seek);
                 MapDescriptor mapDescriptor = mapDescriptors[i];
                 UInt32 internalNameAddr = 0;
                 UInt32 backgroundAddr = 0;
