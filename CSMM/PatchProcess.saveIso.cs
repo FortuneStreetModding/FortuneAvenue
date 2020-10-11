@@ -76,7 +76,7 @@ namespace CustomStreetManager
                     if (locale == Locale.UK)
                         locale = Locale.EN;
                     // if there is no localization for this locale, use the english variant as default
-                    if (string.IsNullOrWhiteSpace(mapDescriptor.Name[locale]))
+                    if (!mapDescriptor.Name.ContainsKey(locale) || string.IsNullOrWhiteSpace(mapDescriptor.Name[locale]))
                     {
                         ui_message.set(mapDescriptor.Name_MSG_ID, mapDescriptor.Name[Locale.EN]);
                     }
@@ -94,7 +94,7 @@ namespace CustomStreetManager
                     if (locale == Locale.UK)
                         locale = Locale.EN;
                     // if there is no localization for this locale, use the english variant as default
-                    if (string.IsNullOrWhiteSpace(mapDescriptor.Desc[locale]))
+                    if (!mapDescriptor.Desc.ContainsKey(locale) || string.IsNullOrWhiteSpace(mapDescriptor.Desc[locale]))
                     {
                         ui_message.set(mapDescriptor.Desc_MSG_ID, mapDescriptor.Desc[Locale.EN]);
                     }
@@ -149,8 +149,6 @@ namespace CustomStreetManager
 
         private async Task<bool> injectMapIcons(IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            progress.Report("Checking needed installations...");
-
             await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
             await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(false);
 
