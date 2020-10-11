@@ -45,6 +45,8 @@ namespace CustomStreetManager
                 progress?.Report(loadUIMessages(mapDescriptors, mainDol.data, cacheFileSet));
             }
 
+            this.cleanUp(false, false);
+
             progress?.Report(100);
             progress?.Report("Loaded successfully.");
 

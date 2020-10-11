@@ -18,8 +18,6 @@ namespace CustomStreetManager
 
         public async Task<bool> saveWbfsIso(string inputFile, string outputFile, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            this.cleanUp(false, false);
-
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
             writeLocalizationFiles();
 
