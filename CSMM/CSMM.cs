@@ -332,7 +332,7 @@ namespace CustomStreetManager
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/FortuneStreetModding/FortuneAvenue/tree/master/Doc/CSMM");
+            Process.Start("https://github.com/FortuneStreetModding/FortuneAvenue/wiki/CSMM-User-Guide");
         }
     }
 }
