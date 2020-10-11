@@ -65,7 +65,7 @@
     <Compile Include="MapDescriptor\ByteArrayComparer.cs" />
     <Compile Include="MapDescriptor\FreeSpaceManager.cs" />
     <Compile Include="MapDescriptor\ST7_Interface.cs" />
-    <Compile Include="MapDescriptor\Ui_menu_19_00a_XMLYT.cs" />
+    <Compile Include="MapDescriptor\Ui_menu_19_00a.cs" />
     <Compile Include="MapDescriptor\VanillaDatabase.cs" />
     <Compile Include="MapDescriptor\ST7P01.cs" />
     <Compile Include="MapDescriptor\MapDescriptorTemplateCode.cs" />
