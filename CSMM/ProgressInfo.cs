@@ -42,6 +42,8 @@ namespace CustomStreetManager
         }
         public static int lerp(int min, int max, int value)
         {
+            if (value < 0)
+                return value;
             return lerp(min, max, value / 100f);
         }
         public static IProgress<ProgressInfo> makeSubProgress(IProgress<ProgressInfo> progress, int minProgress, int maxProgress)
