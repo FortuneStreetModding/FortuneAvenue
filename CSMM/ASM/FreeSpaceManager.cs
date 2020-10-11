@@ -124,7 +124,7 @@ namespace CustomStreetManager
             string str = HexUtil.byteArrayToStringOrHex(bytes);
             if (reuseValues.ContainsKey(bytes))
             {
-                progress?.Report("Reuse " + str + " at " + reuseValues[bytes].ToString("X") + purpose);
+                progress?.Report(new ProgressInfo("Reuse " + str + " at " + reuseValues[bytes].ToString("X") + purpose, true));
                 return reuseValues[bytes];
             }
             else
@@ -146,7 +146,7 @@ namespace CustomStreetManager
                 stream.Write(fillUpToAlign);
 
                 reuseValues.Add(bytes, virtualAddr);
-                progress?.Report("Allocate " + str + " (" + bytes.Length + " bytes) at " + virtualAddr.ToString("X") + purpose);
+                progress?.Report(new ProgressInfo("Allocate " + str + " (" + bytes.Length + " bytes) at " + virtualAddr.ToString("X") + purpose, true));
                 return virtualAddr;
             }
         }
