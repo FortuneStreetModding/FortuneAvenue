@@ -130,7 +130,7 @@ namespace CustomStreetManager
                 try
                 {
                     EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
-                    mainDol.writeMainDol(stream, mapDescriptors);
+                    mainDol.writeMainDol(stream, mapDescriptors, progress);
                 }
                 finally
                 {

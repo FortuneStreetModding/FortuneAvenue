@@ -109,13 +109,22 @@ namespace CustomStreetManager
             return (int)(end - start);
         }
 
-        public UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
+        public UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, IProgress<ProgressInfo> progress)
         {
+            return allocateUnusedSpace(bytes, stream, toFileAddress, progress, "");
+        }
+
+        public UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, IProgress<ProgressInfo> progress, string purpose)
+        {
+            if (!string.IsNullOrEmpty(purpose))
+            {
+                purpose = " for " + purpose;
+            }
             startedAllocating = true;
             string str = HexUtil.byteArrayToStringOrHex(bytes);
             if (reuseValues.ContainsKey(bytes))
             {
-                Console.WriteLine("Allocate Reuse " + str + " at " + reuseValues[bytes].ToString("X"));
+                progress?.Report("Reuse " + str + " at " + reuseValues[bytes].ToString("X") + purpose);
                 return reuseValues[bytes];
             }
             else
@@ -137,7 +146,7 @@ namespace CustomStreetManager
                 stream.Write(fillUpToAlign);
 
                 reuseValues.Add(bytes, virtualAddr);
-                Console.WriteLine("Allocate Fresh " + str + " at " + virtualAddr.ToString("X"));
+                progress?.Report("Allocate " + str + " (" + bytes.Length + " bytes) at " + virtualAddr.ToString("X") + purpose);
                 return virtualAddr;
             }
         }

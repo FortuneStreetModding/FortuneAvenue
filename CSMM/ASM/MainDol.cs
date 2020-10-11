@@ -170,7 +170,7 @@ namespace CustomStreetManager
 
             return mapDescriptors;
         }
-        public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors)
+        public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
             if (mapDescriptors.Count != 48)
             {
@@ -198,21 +198,21 @@ namespace CustomStreetManager
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapDescriptor.InternalName);
                     s.Write((byte)0);
-                    internalNameAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                    internalNameAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                 }
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapDescriptor.Background);
                     s.Write((byte)0);
-                    backgroundAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                    backgroundAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                 }
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapDescriptor.FrbFile1);
                     s.Write((byte)0);
-                    frbFile1Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                    frbFile1Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                 }
                 if (!string.IsNullOrEmpty(mapDescriptor.FrbFile2))
                 {
@@ -221,7 +221,7 @@ namespace CustomStreetManager
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         s.Write(mapDescriptor.FrbFile2);
                         s.Write((byte)0);
-                        frbFile2Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                        frbFile2Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     }
                 }
                 if (!string.IsNullOrEmpty(mapDescriptor.FrbFile3))
@@ -231,7 +231,7 @@ namespace CustomStreetManager
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         s.Write(mapDescriptor.FrbFile3);
                         s.Write((byte)0);
-                        frbFile3Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                        frbFile3Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     }
                 }
                 if (!string.IsNullOrEmpty(mapDescriptor.FrbFile4))
@@ -241,7 +241,7 @@ namespace CustomStreetManager
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         s.Write(mapDescriptor.FrbFile4);
                         s.Write((byte)0);
-                        frbFile4Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                        frbFile4Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     }
                 }
                 if (mapDescriptor.LoopingMode != LoopingMode.None)
@@ -250,7 +250,7 @@ namespace CustomStreetManager
                     {
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         mapDescriptor.writeLoopingModeParams(s);
-                        loopingModeParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                        loopingModeParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Looping Mode Config");
                     }
                 }
                 if (mapDescriptor.SwitchRotationOriginPoints.Count != 0)
@@ -259,7 +259,7 @@ namespace CustomStreetManager
                     {
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         mapDescriptor.writeSwitchRotationOriginPoints(s);
-                        mapSwitchParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                        mapSwitchParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Switch Rotation Origin Points");
                     }
                 }
                 stream.Seek(seek, SeekOrigin.Begin);
@@ -273,7 +273,7 @@ namespace CustomStreetManager
                 {
                     stream.Write(mapDescriptors[i].Desc_MSG_ID);
                 }
-                mapDescriptionTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                mapDescriptionTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Description Table");
             }
             data.writeHackExtendedMapDescriptions(stream, toFileAddress, (Int16)mapDescriptors.Count, mapDescriptionTableAddr);
 
@@ -313,7 +313,7 @@ namespace CustomStreetManager
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapIcon);
                     s.Write((byte)0);
-                    var mapIconAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                    var mapIconAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     mapIcons.Add(mapIcon, mapIconAddr);
                 }
             }
@@ -332,7 +332,7 @@ namespace CustomStreetManager
                     mapIconLookupTable.Add(entry.Key, i);
                     i += 4;
                 }
-                mapIconAddrTable = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                mapIconAddrTable = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Icon String Lookup Table");
                 foreach (var key in mapIconLookupTable.Keys.ToList())
                 {
                     mapIconLookupTable[key] = mapIconLookupTable[key] + mapIconAddrTable;
@@ -359,7 +359,7 @@ namespace CustomStreetManager
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 s.Write(new byte[130]);
-                ventureCardDecompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                ventureCardDecompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Venture Card Decompressed Table Reserved Space");
             }
             // write the decompressVentureCardTable routine which takes a compressed venture card table as input and writes it into ventureCardDecompressedTableAddr
             UInt32 ventureCardDecompressTableRoutine;
@@ -367,7 +367,7 @@ namespace CustomStreetManager
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 data.writeDecompressVentureCardTableRoutine(s, ventureCardDecompressedTableAddr);
-                ventureCardDecompressTableRoutine = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                ventureCardDecompressTableRoutine = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Decompress Venture Card Code");
             }
             // write the compressed venture card table
             UInt32 ventureCardCompressedTableAddr;
@@ -378,7 +378,7 @@ namespace CustomStreetManager
                 {
                     mapDescriptors[i].writeCompressedVentureCardTable(s);
                 }
-                ventureCardCompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress);
+                ventureCardCompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Compressed Venture Card Table");
             }
             // hijack the LoadBoard() routine. Intercept the moment when the (now compressed) ventureCardTable is passed on to the InitChanceBoard() routine. Call the 
             //  decompressVentureCardTable routine and pass the resulting decompressed ventureCardTable (located at ventureCardDecompressedTableAddr) to the InitChanceBoard() routine instead.
