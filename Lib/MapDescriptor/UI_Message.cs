@@ -18,7 +18,7 @@ namespace FSEditor.MapDescriptor
             for (int i = 0; i < lines.Length; i += 1)
             {
                 string line = lines[i];
-                string[] columns = line.Split(',');
+                string[] columns = line.Split(new[] { ',' }, 2);
                 uint key = uint.Parse(columns[0].Trim());
                 string value = columns[1].Trim().Replace("\"", "");
                 map.Add(key, value);
@@ -36,7 +36,7 @@ namespace FSEditor.MapDescriptor
         public uint freeKey()
         {
             uint i = 0;
-            while(map.ContainsKey(i))
+            while (map.ContainsKey(i))
             {
                 i++;
             }
@@ -46,6 +46,7 @@ namespace FSEditor.MapDescriptor
         {
             map.Remove(key);
         }
+
         public void add(uint freeKey, string v)
         {
             map.Add(freeKey, v);
