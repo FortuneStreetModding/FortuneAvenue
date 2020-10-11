@@ -7,7 +7,6 @@ using System.Text;
 using System.Net;
 using System.IO.Compression;
 using System.Windows.Forms;
-using FSEditor.MapDescriptor;
 using MiscUtil.Conversion;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
@@ -150,13 +149,11 @@ namespace CustomStreetManager
                     while ((line = await stdOut.ReadLineAsync()) != null)
                     {
                         parsePercentageValue(line, progress);
-                        Console.Out.WriteLine(line);
                         output += line + Environment.NewLine;
                     }
                     while ((line = await stdErr.ReadLineAsync()) != null)
                     {
                         parsePercentageValue(line, progress);
-                        Console.Error.WriteLine(line);
                         output += line + Environment.NewLine;
                     }
                     await Task.Delay(100);
@@ -212,19 +209,22 @@ namespace CustomStreetManager
         }
         public static async Task<string> extractFiles(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "COPY --progress --fst --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" \"" + outputDirectory + "\"";
+            string arguments = "COPY --progress --fst --preserve --overwrite --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb; \"" + inputFile + "\" \"" + Path.Combine(outputDirectory, "DATA") + "\"";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             return result;
         }
         public static async Task<string> extractFullIsoAsync(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            
+
             if (!Directory.Exists(outputDirectory))
             {
                 string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + outputDirectory + "\"";
                 return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             }
-            return "";
+            else
+            {
+                return await extractFiles(inputFile, outputDirectory, cancelToken, progress);
+            }
         }
         public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
@@ -275,7 +275,7 @@ namespace CustomStreetManager
             }
             return sections;
         }
-        public static async Task<string> createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size, CancellationToken cancelToken, IProgress<ProgressInfo> progress, int progressMin, int progressMax)
+        public static async Task<string> createNewTextSection(string mainDolFile, UInt32 virtualAddress, UInt32 size, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "DOLPATCH \"" + mainDolFile + "\" new=TEXT," + virtualAddress.ToString("X8") + "," + size.ToString("X8") + " " + virtualAddress.ToString("X8") + "=00000001";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);

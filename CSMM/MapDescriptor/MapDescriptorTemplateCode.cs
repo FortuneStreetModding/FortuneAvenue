@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     partial class MapDescriptorTemplate
     {

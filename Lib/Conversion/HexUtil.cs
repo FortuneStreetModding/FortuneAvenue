@@ -32,5 +32,20 @@ namespace MiscUtil.Conversion
             return BitConverter.ToString(bytes).Replace("-", string.Empty);
         }
 
+        public static string byteArrayToStringOrHex(byte[] bytes)
+        {
+            var str = Encoding.UTF8.GetString(bytes);
+            bool constainsAnsiCharsOnlyOrZero = str.All(c => (c >= 32 && c <= 255) || c == 0 );
+            bool containsAtLeastOneAnsiChar = str.Any(c => (c >= 32 && c <= 255));
+            if (constainsAnsiCharsOnlyOrZero && containsAtLeastOneAnsiChar)
+            {
+                return byteArrayToString(bytes);
+            }
+            else
+            {
+                return byteArrayToHex(bytes);
+            }
+        }
+
     }
 }

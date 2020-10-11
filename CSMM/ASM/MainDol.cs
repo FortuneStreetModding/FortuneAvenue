@@ -8,16 +8,13 @@ using MiscUtil.Conversion;
 using FSEditor.FSData;
 using System.Text.RegularExpressions;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     public class MainDol
     {
         private List<MainDolSection> sections;
-        private Dictionary<byte[], UInt32> reuseValues;
-        private UInt32 unusedSpacePositionVirtual;
-        public int totalBytesWritten;
-        public int totalBytesLeft;
         public ST7_Interface data = new ST7P01();
+        public FreeSpaceManager freeSpaceManager;
 
         public MainDol(List<MainDolSection> sections)
         {
@@ -163,47 +160,29 @@ namespace FSEditor.MapDescriptor
                 }
             }
 
-            int ventureCardTableCount = data.readVentureCardTableCount(binReader, toFileAddress);
+            int ventureCardTableCount = data.readVentureCardTableEntryCount(binReader, toFileAddress);
             binReader.Seek(toFileAddress(data.readVentureCardTableAddr(binReader, toFileAddress)), SeekOrigin.Begin);
             for (int i = 0; i < ventureCardTableCount; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.readVentureCardTableFromStream(binReader);
+                mapDescriptor.readUncompressedVentureCardTableFromStream(binReader);
             }
 
             return mapDescriptors;
         }
-        public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors)
+        public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
             if (mapDescriptors.Count != 48)
             {
                 throw new ArgumentException("length of map descriptor list is not 48.");
             }
 
-            // reset writing state
-            reuseValues = new Dictionary<byte[], UInt32>(new ByteArrayComparer());
-            unusedSpacePositionVirtual = data.UNUSED_SPACE_1_START_VIRTUAL();
-            totalBytesWritten = 0;
-            totalBytesLeft = 0;
-
-            data.writeHackExtendedMapDescriptions(stream, toFileAddress);
-
-            // HACK: remove the use of Map Difficulty and Map General Play Time to free up some space
-            /* stream.Seek(toFileAddress(0x801fd9b8), SeekOrigin.Begin);
-            stream.Write(NOP);
-            stream.Seek(toFileAddress(0x80187168), SeekOrigin.Begin);
-            stream.Write(NOP);
-            stream.Seek(toFileAddress(0x801fd8b0), SeekOrigin.Begin);
-            stream.Write(NOP);
-            stream.Seek(toFileAddress(0x801fd954), SeekOrigin.Begin);
-            stream.Write(NOP);
-            */
+            this.freeSpaceManager = data.getFreeSpaceManager();
 
             stream.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 int seek = (int)stream.BaseStream.Position;
-                Console.WriteLine("WritePos=" + seek);
                 MapDescriptor mapDescriptor = mapDescriptors[i];
                 UInt32 internalNameAddr = 0;
                 UInt32 backgroundAddr = 0;
@@ -218,21 +197,21 @@ namespace FSEditor.MapDescriptor
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapDescriptor.InternalName);
                     s.Write((byte)0);
-                    internalNameAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                    internalNameAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                 }
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapDescriptor.Background);
                     s.Write((byte)0);
-                    backgroundAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                    backgroundAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                 }
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapDescriptor.FrbFile1);
                     s.Write((byte)0);
-                    frbFile1Addr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                    frbFile1Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                 }
                 if (!string.IsNullOrEmpty(mapDescriptor.FrbFile2))
                 {
@@ -241,7 +220,7 @@ namespace FSEditor.MapDescriptor
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         s.Write(mapDescriptor.FrbFile2);
                         s.Write((byte)0);
-                        frbFile2Addr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                        frbFile2Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     }
                 }
                 if (!string.IsNullOrEmpty(mapDescriptor.FrbFile3))
@@ -251,7 +230,7 @@ namespace FSEditor.MapDescriptor
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         s.Write(mapDescriptor.FrbFile3);
                         s.Write((byte)0);
-                        frbFile3Addr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                        frbFile3Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     }
                 }
                 if (!string.IsNullOrEmpty(mapDescriptor.FrbFile4))
@@ -261,7 +240,7 @@ namespace FSEditor.MapDescriptor
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         s.Write(mapDescriptor.FrbFile4);
                         s.Write((byte)0);
-                        frbFile4Addr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                        frbFile4Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     }
                 }
                 if (mapDescriptor.LoopingMode != LoopingMode.None)
@@ -270,7 +249,7 @@ namespace FSEditor.MapDescriptor
                     {
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         mapDescriptor.writeLoopingModeParams(s);
-                        loopingModeParamAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                        loopingModeParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Looping Mode Config");
                     }
                 }
                 if (mapDescriptor.SwitchRotationOriginPoints.Count != 0)
@@ -279,27 +258,23 @@ namespace FSEditor.MapDescriptor
                     {
                         EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                         mapDescriptor.writeSwitchRotationOriginPoints(s);
-                        mapSwitchParamAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                        mapSwitchParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Switch Rotation Origin Points");
                     }
                 }
                 stream.Seek(seek, SeekOrigin.Begin);
                 mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, data.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM());
             }
-
-            stream.Seek(toFileAddress(data.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            int j = 0;
-            for (int i = 0; i < 48; i++)
+            UInt32 mapDescriptionTableAddr;
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                if (mapDescriptors[i].ID < 18)
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                for (int i = 0; i < mapDescriptors.Count; i++)
                 {
-                    stream.Write(mapDescriptors[i].Desc_MSG_ID);
-                    j++;
+                    s.Write(mapDescriptors[i].Desc_MSG_ID);
                 }
+                mapDescriptionTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Description Table");
             }
-            if (j != 18 * 2)
-            {
-                throw new DataMisalignedException("Expected to write " + 18 * 2 + " Description Message Ids, but wrote " + j + ".");
-            }
+            data.writeHackExtendedMapDescriptions(stream, toFileAddress, (Int16)mapDescriptors.Count, mapDescriptionTableAddr);
 
             // Find out which map icons exist
             HashSet<string> allUniqueMapIcons = new HashSet<string>();
@@ -337,13 +312,13 @@ namespace FSEditor.MapDescriptor
                     EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                     s.Write(mapIcon);
                     s.Write((byte)0);
-                    var mapIconAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                    var mapIconAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
                     mapIcons.Add(mapIcon, mapIconAddr);
                 }
             }
             // write the map icon lookup table and remember the location of each pointer in the mapIconLookupTable dictionary
             UInt32 mapIconAddrTable = 0;
-            Int16 mapIconAddrTableItemCount = (Int16)mapIcons.Count;
+            UInt16 mapIconAddrTableItemCount = (UInt16)mapIcons.Count;
             Dictionary<string, UInt32> mapIconLookupTable = new Dictionary<string, UInt32>();
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -356,7 +331,7 @@ namespace FSEditor.MapDescriptor
                     mapIconLookupTable.Add(entry.Key, i);
                     i += 4;
                 }
-                mapIconAddrTable = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                mapIconAddrTable = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Icon String Lookup Table");
                 foreach (var key in mapIconLookupTable.Keys.ToList())
                 {
                     mapIconLookupTable[key] = mapIconLookupTable[key] + mapIconAddrTable;
@@ -374,133 +349,43 @@ namespace FSEditor.MapDescriptor
                 {
                     mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
                 }
-
             }
-
             data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
 
-            UInt32 ventureCardTableAddr;
+            // allocate working memory space for a single uncompressed venture card table which is passed on for the game to use. We will use it to store the result of decompressing a compressed venture card table
+            UInt32 ventureCardDecompressedTableAddr;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                s.Write(new byte[130]);
+                ventureCardDecompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Venture Card Decompressed Table Reserved Space");
+            }
+            // write the decompressVentureCardTable routine which takes a compressed venture card table as input and writes it into ventureCardDecompressedTableAddr
+            UInt32 ventureCardDecompressTableRoutine;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                data.writeDecompressVentureCardTableRoutine(s, ventureCardDecompressedTableAddr);
+                ventureCardDecompressTableRoutine = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Decompress Venture Card Code");
+            }
+            // write the compressed venture card table
+            UInt32 ventureCardCompressedTableAddr;
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 for (int i = 0; i < mapDescriptors.Count; i++)
                 {
-                    mapDescriptors[i].writeVentureCardTable(s);
+                    mapDescriptors[i].writeCompressedVentureCardTable(s);
                 }
-                ventureCardTableAddr = allocateUnusedSpace(memoryStream.ToArray(), stream);
+                ventureCardCompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Compressed Venture Card Table");
             }
-            data.writeHackExtendedVentureCardTable(stream, toFileAddress, (Int16)mapDescriptors.Count, ventureCardTableAddr);
+            // hijack the LoadBoard() routine. Intercept the moment when the (now compressed) ventureCardTable is passed on to the InitChanceBoard() routine. Call the 
+            //  decompressVentureCardTable routine and pass the resulting decompressed ventureCardTable (located at ventureCardDecompressedTableAddr) to the InitChanceBoard() routine instead.
+            data.writeHackExtendedVentureCardTable(stream, toFileAddress, (Int16)mapDescriptors.Count, ventureCardCompressedTableAddr, ventureCardDecompressTableRoutine);
 
-            nullTheFreeSpace(stream);
+            freeSpaceManager.nullTheFreeSpace(stream, toFileAddress);
 
             return mapDescriptors;
-        }
-
-        private UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream)
-        {
-            string str = HexUtil.byteArrayToString(bytes);
-            if (reuseValues.ContainsKey(bytes))
-            {
-                Console.WriteLine("Allocate Reuse " + str + " at " + reuseValues[bytes].ToString("X"));
-                return reuseValues[bytes];
-            }
-            else
-            {
-                UInt32 virtualAddr = unusedSpacePositionVirtual;
-                unusedSpacePositionVirtual += (UInt32)bytes.Length;
-                // align to 4
-                while (unusedSpacePositionVirtual % 4 != 0)
-                    unusedSpacePositionVirtual++;
-
-                if (unusedSpacePositionVirtual > data.UNUSED_SPACE_4_END_VIRTUAL())
-                {
-                    throw new InsufficientMemoryException("There is not enough free space in the main.dol available.");
-                }
-                else if (unusedSpacePositionVirtual > data.UNUSED_SPACE_3_END_VIRTUAL() && unusedSpacePositionVirtual < data.UNUSED_SPACE_4_START_VIRTUAL())
-                {
-                    unusedSpacePositionVirtual = data.UNUSED_SPACE_4_START_VIRTUAL();
-                    virtualAddr = unusedSpacePositionVirtual;
-                    // align to 4
-                    unusedSpacePositionVirtual += (UInt32)bytes.Length;
-                    while (unusedSpacePositionVirtual % 4 != 0)
-                        unusedSpacePositionVirtual++;
-                }
-                else if (unusedSpacePositionVirtual > data.UNUSED_SPACE_2_END_VIRTUAL() && unusedSpacePositionVirtual < data.UNUSED_SPACE_3_START_VIRTUAL())
-                {
-                    unusedSpacePositionVirtual = data.UNUSED_SPACE_3_START_VIRTUAL();
-                    virtualAddr = unusedSpacePositionVirtual;
-                    // align to 4
-                    unusedSpacePositionVirtual += (UInt32)bytes.Length;
-                    while (unusedSpacePositionVirtual % 4 != 0)
-                        unusedSpacePositionVirtual++;
-                }
-                else if (unusedSpacePositionVirtual > data.UNUSED_SPACE_1_END_VIRTUAL() && unusedSpacePositionVirtual < data.UNUSED_SPACE_2_START_VIRTUAL())
-                {
-                    unusedSpacePositionVirtual = data.UNUSED_SPACE_2_START_VIRTUAL();
-                    virtualAddr = unusedSpacePositionVirtual;
-                    // align to 4
-                    unusedSpacePositionVirtual += (UInt32)bytes.Length;
-                    while (unusedSpacePositionVirtual % 4 != 0)
-                        unusedSpacePositionVirtual++;
-                }
-                stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
-                stream.Write(bytes);
-                totalBytesWritten += bytes.Length;
-                byte[] fillUpToAlign = new byte[unusedSpacePositionVirtual - virtualAddr - bytes.Length];
-                stream.Write(fillUpToAlign);
-                totalBytesWritten += bytes.Length;
-
-                reuseValues.Add(bytes, virtualAddr);
-                Console.WriteLine("Allocate Fresh " + str + " at " + virtualAddr.ToString("X"));
-                return virtualAddr;
-            }
-        }
-
-        private void nullTheFreeSpace(EndianBinaryWriter stream)
-        {
-            UInt32 virtualAddr = unusedSpacePositionVirtual;
-            stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
-            byte[] nullBytes;
-            if (virtualAddr < data.UNUSED_SPACE_1_END_VIRTUAL())
-            {
-                nullBytes = new byte[data.UNUSED_SPACE_1_END_VIRTUAL() - virtualAddr];
-                stream.Write(nullBytes);
-                stream.Seek(toFileAddress(data.UNUSED_SPACE_2_START_VIRTUAL()), SeekOrigin.Begin);
-                totalBytesLeft += nullBytes.Length;
-            }
-            if (virtualAddr < data.UNUSED_SPACE_2_END_VIRTUAL())
-            {
-                nullBytes = new byte[data.UNUSED_SPACE_2_END_VIRTUAL() - virtualAddr];
-                stream.Write(nullBytes);
-                stream.Seek(toFileAddress(data.UNUSED_SPACE_3_START_VIRTUAL()), SeekOrigin.Begin);
-                totalBytesLeft += nullBytes.Length;
-            }
-            if (virtualAddr < data.UNUSED_SPACE_3_END_VIRTUAL())
-            {
-                nullBytes = new byte[data.UNUSED_SPACE_3_END_VIRTUAL() - virtualAddr];
-                stream.Write(nullBytes);
-                stream.Seek(toFileAddress(data.UNUSED_SPACE_4_START_VIRTUAL()), SeekOrigin.Begin);
-                totalBytesLeft += nullBytes.Length;
-            }
-            if (virtualAddr < data.UNUSED_SPACE_4_END_VIRTUAL())
-            {
-                nullBytes = new byte[data.UNUSED_SPACE_4_END_VIRTUAL() - virtualAddr];
-                stream.Write(nullBytes);
-                totalBytesLeft += nullBytes.Length;
-            }
-        }
-
-        private int search(byte[] src, byte[] pattern)
-        {
-            int c = src.Length - pattern.Length + 1;
-            int j;
-            for (int i = 0; i < c; i++)
-            {
-                if (src[i] != pattern[0]) continue;
-                for (j = pattern.Length - 1; j >= 1 && src[i + j] == pattern[j]; j--) ;
-                if (j == 0) return i;
-            }
-            return -1;
         }
     }
 }

@@ -9,7 +9,7 @@ using System.ComponentModel;
 using MiscUtil.Conversion;
 using System.Text.RegularExpressions;
 
-namespace FSEditor.MapDescriptor
+namespace CustomStreetManager
 {
     public class MapDescriptor
     {
@@ -81,7 +81,7 @@ namespace FSEditor.MapDescriptor
         {
             Name = new Dictionary<string, string>();
             Desc = new Dictionary<string, string>();
-            VentureCard = new byte[130];
+            VentureCard = new byte[128];
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
         public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress, ST7_Interface data)
@@ -118,7 +118,6 @@ namespace FSEditor.MapDescriptor
         public void writeSwitchRotationOriginPoints(EndianBinaryWriter stream)
         {
             stream.Write((UInt32)SwitchRotationOriginPoints.Count);
-            Console.WriteLine("SwitchRotationOriginPoints.Count=" + SwitchRotationOriginPoints.Count);
             for (int i = 0; i < SwitchRotationOriginPoints.Count; i++)
             {
                 stream.Write(SwitchRotationOriginPoints[i].X);
@@ -203,19 +202,51 @@ namespace FSEditor.MapDescriptor
             stream.Write(0); // stream.Write(TourGeneralPlayTime);
         }
 
-        public void readVentureCardTableFromStream(EndianBinaryReader stream)
+        public void readUncompressedVentureCardTableFromStream(EndianBinaryReader stream)
         {
-            for (int i = 0; i < VentureCard.Length; i++)
+            for (int i = 0; i < 128; i++)
             {
                 VentureCard[i] = stream.ReadByte();
             }
+            // discard the last two bytes
+            stream.ReadByte();
+            stream.ReadByte();
         }
 
-        public void writeVentureCardTable(EndianBinaryWriter stream)
+        public void readCompressedVentureCardTableFromStream(EndianBinaryReader stream)
         {
-            for (int i = 0; i < VentureCard.Length; i++)
+            int i = 0;
+            while (i < VentureCard.Count())
             {
-                stream.Write(VentureCard[i]);
+                byte bitPackedVentureCardValue = stream.ReadByte();
+                for (int j = 0; j < 8; j++, i++)
+                {
+                    if (i < VentureCard.Count())
+                    {
+                        VentureCard[i] = (byte)((bitPackedVentureCardValue >> j) & 1);
+                    }
+                }
+            }
+        }
+
+        public void writeCompressedVentureCardTable(EndianBinaryWriter stream)
+        {
+            // in vanilla the venture card table uses a wasteful format of having an array of 130 bytes for each map: 
+            // 1 byte for each venture card id, the last two bytes are unused. 
+            // here we bitpack the venture card table so that each byte stores 8 venture cards. This results
+            // in an array of just 16 bytes for each map.
+            int i = 0;
+            while (i < VentureCard.Count())
+            {
+                byte bitPackedVentureCardValue = 0;
+                for (int j = 0; j < 8; j++, i++)
+                {
+                    if (i < VentureCard.Count())
+                    {
+                        bitPackedVentureCardValue |= (byte)(VentureCard[i] << j);
+                    }
+                }
+                stream.Write(bitPackedVentureCardValue);
             }
         }
 
@@ -382,7 +413,7 @@ namespace FSEditor.MapDescriptor
                         string flaggedValueOrNull = parseFlaggedValueOrReturnNull(columns);
                         if (flaggedValueOrNull != null)
                         {
-                            var index = uint.Parse(flaggedValueOrNull);
+                            var index = uint.Parse(flaggedValueOrNull) - 1;
                             VentureCard[index] = 1;
                         }
                     }
@@ -610,7 +641,7 @@ namespace FSEditor.MapDescriptor
             FrbFile4 = mapDescriptor.FrbFile4;
             Background = mapDescriptor.Background;
             BGMID = mapDescriptor.BGMID;
-            foreach (string locale in Locale.ALL_WITHOUT_UK)
+            foreach (string locale in Locale.ALL)
             {
                 if (mapDescriptor.Name.ContainsKey(locale))
                 {

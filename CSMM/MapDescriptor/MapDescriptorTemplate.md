@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ output encoding="utf-8"#>
+<#@ import namespace="CustomStreetManager" #>
 <#@ import namespace="FSEditor.FSData" #>
 
 # <#= md.Name[Locale.EN] #>

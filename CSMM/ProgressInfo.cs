@@ -26,6 +26,13 @@ namespace CustomStreetManager
             this.verbose = true;
         }
 
+        public ProgressInfo(string text, bool verbose)
+        {
+            this.progress = -1;
+            this.line = text;
+            this.verbose = true;
+        }
+
         public static implicit operator ProgressInfo(int value)
         {
             return new ProgressInfo() { progress = value, line = null, verbose = false };
@@ -42,6 +49,8 @@ namespace CustomStreetManager
         }
         public static int lerp(int min, int max, int value)
         {
+            if (value < 0)
+                return value;
             return lerp(min, max, value / 100f);
         }
         public static IProgress<ProgressInfo> makeSubProgress(IProgress<ProgressInfo> progress, int minProgress, int maxProgress)

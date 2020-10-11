@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FSEditor.FSData
+namespace CustomStreetManager
 {
     public class Locale
     {
@@ -15,7 +15,6 @@ namespace FSEditor.FSData
         public static readonly string ES = "su";
         public static readonly string UK = "uk";
 
-        public static readonly string[] ALL_WITHOUT_UK = new string[] { EN, DE, FR, IT, JP, ES };
-        public static readonly string[] ALL_WITHOUT_JP = new string[] { EN, DE, FR, IT, ES, UK };
+        public static readonly string[] ALL = new string[] { EN, DE, ES, FR, IT, JP, UK };
     }
 }
