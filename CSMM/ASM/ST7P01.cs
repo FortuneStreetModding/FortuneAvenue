@@ -195,7 +195,7 @@ namespace CustomStreetManager
             // Venture Card Table
             freeSpaceManager.addFreeSpace(0x80410648, 0x80411b9b);
             // Map Data String Table
-            // freeSpaceManager.addFreeSpace(0x80428978, 0x80428e4f);
+            freeSpaceManager.addFreeSpace(0x80428978, 0x80428e4f);
             // Unused costume string table 1
             freeSpaceManager.addFreeSpace(0x8042bc78, 0x8042c23f);
             // Unused costume string table 2
@@ -203,7 +203,7 @@ namespace CustomStreetManager
             // Unused costume string table 3
             freeSpaceManager.addFreeSpace(0x8042ef30, 0x8042f7ef);
             // Expanded Rom
-            freeSpaceManager.addFreeSpace(0x80001800, 0x80001800 + 0x1800);
+            // freeSpaceManager.addFreeSpace(0x80001800, 0x80001800 + 0x1800);
             return freeSpaceManager;
         }
     }

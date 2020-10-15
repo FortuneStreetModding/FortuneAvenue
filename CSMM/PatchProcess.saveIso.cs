@@ -117,11 +117,12 @@ namespace CustomStreetManager
             File.Copy(cacheFileSet.main_dol, riivFileSet.main_dol, true);
 
             // expand dol if not already expanded
-            if (mainDol.toFileAddress(0x80001800) == -1)
-            {
-                await ExeWrapper.createNewTextSection(riivFileSet.main_dol, 0x80001800, 0x1800, ct, progress);
-                mainDol.setSections(await ExeWrapper.readSections(riivFileSet.main_dol, ct, progress));
-            }
+            // ehmm.. actually lets not do this -> range 0x80001800 till 0x80003000 is already used by gecko codes
+            //if (mainDol.toFileAddress(0x80001800) == -1)
+            //{
+            //    await ExeWrapper.createNewTextSection(riivFileSet.main_dol, 0x80001800, 0x1800, ct, progress);
+            //    mainDol.setSections(await ExeWrapper.readSections(riivFileSet.main_dol, ct, progress));
+            //}
 
             using (Stream baseStream = File.Open(riivFileSet.main_dol, FileMode.Open))
             {
