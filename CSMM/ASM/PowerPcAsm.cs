@@ -40,12 +40,12 @@ namespace CustomStreetManager
             public Int16 upper16Bit;
             public Int16 lower16Bit;
         }
-        public static UInt32 make32bitValueFromPair(UInt32 opcode1, UInt32 opcode2)
+        public static UInt32 make32bitValueFromPair(UInt32 lis_opcode, UInt32 addi_opcode)
         {
             // e.g. 0x3c808041 and 0x38840648
 
-            var upper16Bit = opcode1 & 0x0000FFFF;
-            var lower16Bit = (Int16)(opcode2 & 0x0000FFFF);
+            var upper16Bit = lis_opcode & 0x0000FFFF;
+            var lower16Bit = (Int16)(addi_opcode & 0x0000FFFF);
             if (lower16Bit < 0)
             {
                 upper16Bit -= 1;

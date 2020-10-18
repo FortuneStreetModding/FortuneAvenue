@@ -1,4 +1,4 @@
-﻿using MiscUtil.IO;
+using MiscUtil.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,10 +53,10 @@ namespace CustomStreetManager
         UInt32 ST7_Interface.readMapDescriptionTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
             stream.Seek(toFileAddress(0x80212164), SeekOrigin.Begin);
-            var opcode1 = stream.ReadUInt32();
+            var lis_opcode = stream.ReadUInt32();
             stream.Seek(4, SeekOrigin.Current);
-            var opcode2 = stream.ReadUInt32();
-            return PowerPcAsm.make32bitValueFromPair(opcode1, opcode2);
+            var addi_opcode = stream.ReadUInt32();
+            return PowerPcAsm.make32bitValueFromPair(lis_opcode, addi_opcode);
         }
         void ST7_Interface.writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, UInt16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable)
         {
@@ -157,10 +157,10 @@ namespace CustomStreetManager
         UInt32 ST7_Interface.readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
             stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin);
-            var opcode1 = stream.ReadUInt32();
+            var lis_opcode = stream.ReadUInt32();
             stream.Seek(4, SeekOrigin.Current);
-            var opcode2 = stream.ReadUInt32();
-            return PowerPcAsm.make32bitValueFromPair(opcode1, opcode2);
+            var addi_opcode = stream.ReadUInt32();
+            return PowerPcAsm.make32bitValueFromPair(lis_opcode, addi_opcode);
         }
         Int16 ST7_Interface.readVentureCardTableEntryCount(EndianBinaryReader stream, Func<uint, int> toFileAddress)
         {
