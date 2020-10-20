@@ -78,5 +78,11 @@ namespace CustomStreetManager
             stream.Seek(toFileAddress(0x8020d0e8), SeekOrigin.Begin); opcode = stream.ReadUInt32();
             return (Int16)(PowerPcAsm.getOpcodeParameter(opcode));
         }
+        protected override bool readIsVanilla(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            stream.Seek(toFileAddress(0x8020d0dc), SeekOrigin.Begin);
+            var opcode = stream.ReadUInt32();
+            return opcode != PowerPcAsm.nop();
+        }
     }
 }

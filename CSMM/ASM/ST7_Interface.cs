@@ -20,10 +20,6 @@ namespace CustomStreetManager
         UInt32 START_MAP_DATA_TABLE_VIRTUAL();
         UInt32 START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL();
         UInt32 ROUTINE_GET_MAP_DIFFICULTY_VIRTUAL();
-        void writeHackExtendedMapDescriptions(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 mapDescriptionTableSize, uint mapDescriptionTableAddr);
-        bool isHackExtendedMapDescriptions(EndianBinaryReader stream, Func<uint, int> toFileAddress);
-        Int16 readMapDescriptionTableSize(EndianBinaryReader stream, Func<uint, int> toFileAddress);
-        UInt32 readMapDescriptionTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress);
         void writeHackMapDefaultGoalMoneyTable(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableSize, UInt32 tableAddr);
         void writeHackExtendedMapDefaultsTable(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 mapDefaultsTableSize, UInt32 mapDefaultsTableAddr);
         UInt32 readMapDefaultsTableAddr(EndianBinaryReader stream, Func<UInt32, int> toFileAddress);

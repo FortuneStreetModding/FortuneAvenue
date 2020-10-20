@@ -21,37 +21,6 @@ namespace CustomStreetManager
         uint ST7_Interface.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL() { return 0x80436bc0; }
         uint ST7_Interface.ROUTINE_GET_MAP_DIFFICULTY_VIRTUAL() { return 0x80211da4; }
 
-        void ST7_Interface.writeHackExtendedMapDescriptions(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 mapDescriptionTableSize, UInt32 mapDescriptionTableAddr)
-        {
-            // HACK: Expand the description message ID table
-            // subi r3,r3,0x15                                     -> nop
-            stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
-            // cmpwi r3,0x12                                       -> cmpwi r3,mapDescriptionTableSize
-            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpwi(3, mapDescriptionTableSize));
-            // r4 <- 0x80436bc0                                    -> r4 <- mapDescriptionTableAddr
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(mapDescriptionTableAddr);
-            stream.Seek(toFileAddress(0x80212164), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
-        }
-        bool ST7_Interface.isHackExtendedMapDescriptions(EndianBinaryReader stream, Func<uint, int> toFileAddress)
-        {
-            stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin);
-            var opcode = stream.ReadUInt32();
-            return opcode == PowerPcAsm.nop();
-        }
-        Int16 ST7_Interface.readMapDescriptionTableSize(EndianBinaryReader stream, Func<uint, int> toFileAddress)
-        {
-            stream.Seek(toFileAddress(0x80212158), SeekOrigin.Begin);
-            var opcode = stream.ReadUInt32();
-            return PowerPcAsm.getOpcodeParameter(opcode);
-        }
-        UInt32 ST7_Interface.readMapDescriptionTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress)
-        {
-            stream.Seek(toFileAddress(0x80212164), SeekOrigin.Begin);
-            var lis_opcode = stream.ReadUInt32();
-            stream.Seek(4, SeekOrigin.Current);
-            var addi_opcode = stream.ReadUInt32();
-            return PowerPcAsm.make32bitValueFromPair(lis_opcode, addi_opcode);
-        }
         void ST7_Interface.writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, UInt16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable)
         {
             // note: To add custom icons, the following files need to be editted as well:

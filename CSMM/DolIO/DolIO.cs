@@ -50,8 +50,9 @@ namespace CustomStreetManager
         protected virtual string writeData(EndianBinaryWriter s) { return null; }
         protected virtual string writeSubroutine(EndianBinaryWriter s, UInt32 dataAddr) { return null; }
         protected abstract void writeTableRefs(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 tableAddr, UInt32 dataAddr, UInt32 subroutineAddr);
-        public void read(EndianBinaryReader stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors, bool isVanilla, IProgress<ProgressInfo> progress)
+        public void read(EndianBinaryReader stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
+            var isVanilla = readIsVanilla(stream, toFileAddress);
             var rowCount = readTableRowCount(stream, toFileAddress, isVanilla);
             if (rowCount != mapDescriptors.Count)
             {
@@ -75,5 +76,6 @@ namespace CustomStreetManager
         protected abstract UInt32 readTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla);
         protected abstract Int16 readTableRowCount(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla);
         protected abstract void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, bool isVanilla);
+        protected abstract bool readIsVanilla(EndianBinaryReader stream, Func<uint, int> toFileAddress);
     }
 }

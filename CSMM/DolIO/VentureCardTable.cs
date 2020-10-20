@@ -115,7 +115,7 @@ namespace CustomStreetManager
         protected override string writeData(EndianBinaryWriter s)
         {
             s.Write(new byte[130]);
-            return "VentureCardDecompressedTableReservedMemory";
+            return "VentureCardReservedMemoryForDecompressedTable";
         }
         private void readVanillaVentureCardTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors)
         {
@@ -181,6 +181,12 @@ namespace CustomStreetManager
             stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
             return (Int16)(PowerPcAsm.getOpcodeParameter(opcode) + 1);
+        }
+        protected override bool readIsVanilla(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        {
+            stream.Seek(toFileAddress(0x8007e130), SeekOrigin.Begin);
+            var opcode = stream.ReadUInt32();
+            return opcode == PowerPcAsm.li(5, 0);
         }
     }
 }
