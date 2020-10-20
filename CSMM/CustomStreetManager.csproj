@@ -68,6 +68,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DolIO\VentureCardTable.cs" />
+    <Compile Include="DolIO\DolIO.cs" />
+    <Compile Include="DolIO\DefaultGoalMoneyTable.cs" />
     <Compile Include="MapDescriptor\Character.cs" />
     <Compile Include="MapDescriptor\OriginPoint.cs" />
     <Compile Include="Resources\DataFileSet.cs" />

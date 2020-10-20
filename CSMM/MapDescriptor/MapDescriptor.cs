@@ -202,54 +202,6 @@ namespace CustomStreetManager
             stream.Write(0); // stream.Write(TourGeneralPlayTime);
         }
 
-        public void readUncompressedVentureCardTableFromStream(EndianBinaryReader stream)
-        {
-            for (int i = 0; i < 128; i++)
-            {
-                VentureCard[i] = stream.ReadByte();
-            }
-            // discard the last two bytes
-            stream.ReadByte();
-            stream.ReadByte();
-        }
-
-        public void readCompressedVentureCardTableFromStream(EndianBinaryReader stream)
-        {
-            int i = 0;
-            while (i < VentureCard.Count())
-            {
-                byte bitPackedVentureCardValue = stream.ReadByte();
-                for (int j = 0; j < 8; j++, i++)
-                {
-                    if (i < VentureCard.Count())
-                    {
-                        VentureCard[i] = (byte)((bitPackedVentureCardValue >> j) & 1);
-                    }
-                }
-            }
-        }
-
-        public void writeCompressedVentureCardTable(EndianBinaryWriter stream)
-        {
-            // in vanilla the venture card table uses a wasteful format of having an array of 130 bytes for each map: 
-            // 1 byte for each venture card id, the last two bytes are unused. 
-            // here we bitpack the venture card table so that each byte stores 8 venture cards. This results
-            // in an array of just 16 bytes for each map.
-            int i = 0;
-            while (i < VentureCard.Count())
-            {
-                byte bitPackedVentureCardValue = 0;
-                for (int j = 0; j < 8; j++, i++)
-                {
-                    if (i < VentureCard.Count())
-                    {
-                        bitPackedVentureCardValue |= (byte)(VentureCard[i] << j);
-                    }
-                }
-                stream.Write(bitPackedVentureCardValue);
-            }
-        }
-
         public string readFrbFileInfo(string param_folder)
         {
             string warning = "";

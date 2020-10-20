@@ -94,6 +94,8 @@ namespace CustomStreetManager
 
         public List<MapDescriptor> readMainDol(EndianBinaryReader binReader)
         {
+            bool isVanilla = true;
+
             List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
             // has the hack for unique map icons been applied?
             var hackExpandedMapIconsApplied = data.isHackCustomMapIcons(binReader, toFileAddress);
@@ -113,6 +115,10 @@ namespace CustomStreetManager
                 MapDescriptor mapDescriptor = mapDescriptors[i];
                 mapDescriptor.readMapDefaultsFromStream(binReader);
             }
+            DefaultGoalMoneyTable defaultGoalMoney = new DefaultGoalMoneyTable();
+            
+            defaultGoalMoney.read(binReader, toFileAddress, mapDescriptors, isVanilla, null);
+
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
                 var internalName = resolveAddressToString(mapDescriptor.InternalNameAddr, binReader).Trim();
@@ -160,13 +166,7 @@ namespace CustomStreetManager
                 }
             }
 
-            int ventureCardTableCount = data.readVentureCardTableEntryCount(binReader, toFileAddress);
-            binReader.Seek(toFileAddress(data.readVentureCardTableAddr(binReader, toFileAddress)), SeekOrigin.Begin);
-            for (int i = 0; i < ventureCardTableCount; i++)
-            {
-                MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.readUncompressedVentureCardTableFromStream(binReader);
-            }
+            new VentureCardTable().read(binReader, toFileAddress, mapDescriptors, isVanilla, null);
 
             return mapDescriptors;
         }
@@ -352,36 +352,7 @@ namespace CustomStreetManager
             }
             data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
 
-            // allocate working memory space for a single uncompressed venture card table which is passed on for the game to use. We will use it to store the result of decompressing a compressed venture card table
-            UInt32 ventureCardDecompressedTableAddr;
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                s.Write(new byte[130]);
-                ventureCardDecompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Venture Card Decompressed Table Reserved Space");
-            }
-            // write the decompressVentureCardTable routine which takes a compressed venture card table as input and writes it into ventureCardDecompressedTableAddr
-            UInt32 ventureCardDecompressTableRoutine;
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                data.writeDecompressVentureCardTableRoutine(s, ventureCardDecompressedTableAddr);
-                ventureCardDecompressTableRoutine = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Decompress Venture Card Code");
-            }
-            // write the compressed venture card table
-            UInt32 ventureCardCompressedTableAddr;
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                for (int i = 0; i < mapDescriptors.Count; i++)
-                {
-                    mapDescriptors[i].writeCompressedVentureCardTable(s);
-                }
-                ventureCardCompressedTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Compressed Venture Card Table");
-            }
-            // hijack the LoadBoard() routine. Intercept the moment when the (now compressed) ventureCardTable is passed on to the InitChanceBoard() routine. Call the 
-            //  decompressVentureCardTable routine and pass the resulting decompressed ventureCardTable (located at ventureCardDecompressedTableAddr) to the InitChanceBoard() routine instead.
-            data.writeHackExtendedVentureCardTable(stream, toFileAddress, (Int16)mapDescriptors.Count, ventureCardCompressedTableAddr, ventureCardDecompressTableRoutine);
+            new VentureCardTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, toFileAddress);
 

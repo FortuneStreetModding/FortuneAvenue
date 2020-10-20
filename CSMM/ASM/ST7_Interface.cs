@@ -31,9 +31,5 @@ namespace CustomStreetManager
         bool isHackExtendedMapSettingsTable(EndianBinaryReader stream, Func<UInt32, int> toFileAddress);
         void writeHackCustomMapIcons(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, UInt16 mapIconAddrTableItemCount, UInt32 mapIconAddrTable);
         bool isHackCustomMapIcons(EndianBinaryReader stream, Func<uint, int> toFileAddress);
-        void writeHackExtendedVentureCardTable(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, Int16 ventureCardTableCount, UInt32 ventureCardCompressedTableAddr, UInt32 ventureCardDecompressTableRoutine);
-        short readVentureCardTableEntryCount(EndianBinaryReader stream, Func<uint, int> toFileAddress);
-        uint readVentureCardTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress);
-        void writeDecompressVentureCardTableRoutine(EndianBinaryWriter stream, uint ventureCardDecompressedTableAddr);
     }
 }
