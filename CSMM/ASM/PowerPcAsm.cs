@@ -212,6 +212,11 @@ namespace CustomStreetManager
             return blt_opcode + ((targetPos - currentPos) & 0x0000FFFF);
         }
 
+        public static uint blt(int currentPos, int targetPos)
+        {
+            return (uint)(blt_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
+        }
+
         public static UInt32 cmpwi(byte register, short value)
         {
             if (register > 31)

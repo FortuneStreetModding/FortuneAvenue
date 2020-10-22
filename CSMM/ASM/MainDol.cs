@@ -62,21 +62,6 @@ namespace CustomStreetManager
             return -1;
         }
 
-        private string resolveAddressAddressToString(uint virtualAddressAddress, EndianBinaryReader stream)
-        {
-            int fileAddress = toFileAddress(virtualAddressAddress);
-            if (fileAddress >= 0)
-            {
-                stream.Seek(fileAddress, SeekOrigin.Begin);
-                var virtualAddress = stream.ReadUInt32();
-                return resolveAddressToString(virtualAddress, stream);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         private string resolveAddressToString(uint virtualAddress, EndianBinaryReader stream)
         {
             int fileAddress = toFileAddress(virtualAddress);
@@ -95,8 +80,6 @@ namespace CustomStreetManager
         public List<MapDescriptor> readMainDol(EndianBinaryReader stream)
         {
             List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
-            // has the hack for unique map icons been applied?
-            var hackExpandedMapIconsApplied = data.isHackCustomMapIcons(stream, toFileAddress);
 
             stream.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
@@ -127,22 +110,9 @@ namespace CustomStreetManager
                 mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, stream);
                 mapDescriptor.readRotationOriginPoints(stream, toFileAddress(mapDescriptor.MapSwitchParamAddr), data);
                 mapDescriptor.readLoopingModeParams(stream, toFileAddress(mapDescriptor.LoopingModeParamAddr));
-
-                if (hackExpandedMapIconsApplied)
-                {
-                    mapDescriptor.MapIcon = resolveAddressAddressToString(mapDescriptor.MapIconAddrAddr, stream);
-                }
-                else
-                {
-                    if (mapDescriptor.ID < 18)
-                    {
-                        mapDescriptor.MapIconAddrAddr = 0;
-                        var number = Regex.Match(mapDescriptor.Background, @"\d+").Value;
-                        mapDescriptor.MapIcon = "p_bg_" + number;
-                    }
-                }
             }
 
+            new MapIconTable().read(stream, toFileAddress, mapDescriptors, null);
 
             new VentureCardTable().read(stream, toFileAddress, mapDescriptors, null);
 
@@ -319,8 +289,7 @@ namespace CustomStreetManager
                     mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
                 }
             }
-            data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
-
+            new MapIconTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, toFileAddress);

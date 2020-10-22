@@ -11,7 +11,15 @@ namespace CustomStreetManager
 {
     public class DefaultGoalMoneyTable : DolIO
     {
-        protected override void writeTableRefs(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 tableAddr, UInt32 dataAddr, UInt32 subroutineAddr)
+        protected override string writeTable(EndianBinaryWriter s, List<MapDescriptor> mapDescriptors)
+        {
+            foreach (var mapDescriptor in mapDescriptors)
+            {
+                s.Write(mapDescriptor.TargetAmount);
+            }
+            return "DefaultGoalMoneyTable";
+        }
+        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 tableAddr)
         {
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(tableAddr);
 
@@ -41,16 +49,7 @@ namespace CustomStreetManager
             // mulli r3,r31,0x24                                  ->  mulli r3,r31,0x04
             stream.Seek(toFileAddress(0x80211ca0), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(3, 31, 4));
         }
-
-        protected override string writeTable(EndianBinaryWriter s, List<MapDescriptor> mapDescriptors)
-        {
-            foreach (var mapDescriptor in mapDescriptors)
-            {
-                s.Write(mapDescriptor.TargetAmount);
-            }
-            return "DefaultGoalMoneyTable";
-        }
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, bool isVanilla)
+        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, Func<uint, int> toFileAddress, bool isVanilla)
         {
             int tableSize;
             if (isVanilla)

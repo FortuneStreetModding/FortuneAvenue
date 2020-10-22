@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DolIO\MapIconTable.cs" />
     <Compile Include="DolIO\MapDescriptionTable.cs" />
     <Compile Include="DolIO\VentureCardTable.cs" />
     <Compile Include="DolIO\DolIO.cs" />

@@ -11,7 +11,15 @@ namespace CustomStreetManager
 {
     public class MapDescriptionTable : DolIO
     {
-        protected override void writeTableRefs(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 mapDescriptionTableAddr, UInt32 dataAddr, UInt32 subroutineAddr)
+        protected override string writeTable(EndianBinaryWriter s, List<MapDescriptor> mapDescriptors)
+        {
+            foreach (var mapDescriptor in mapDescriptors)
+            {
+                s.Write(mapDescriptor.Desc_MSG_ID);
+            }
+            return "MapDescriptionTable";
+        }
+        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 mapDescriptionTableAddr)
         {
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(mapDescriptionTableAddr);
             // HACK: Expand the description message ID table
@@ -22,13 +30,15 @@ namespace CustomStreetManager
             // r4 <- 0x80436bc0                                    -> r4 <- mapDescriptionTableAddr
             stream.Seek(toFileAddress(0x80212164), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
         }
-        protected override string writeTable(EndianBinaryWriter s, List<MapDescriptor> mapDescriptors)
+        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, Func<uint, int> toFileAddress, bool isVanilla)
         {
-            foreach (var mapDescriptor in mapDescriptors)
-            {
-                s.Write(mapDescriptor.Desc_MSG_ID);
-            }
-            return "MapDescriptionTable";
+            if (isVanilla)
+                readVanillaTable(s, mapDescriptors);
+            else
+                foreach (MapDescriptor mapDescriptor in mapDescriptors)
+                {
+                    mapDescriptor.Desc_MSG_ID = s.ReadUInt32();
+                }
         }
         protected void readVanillaTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors)
         {
@@ -48,16 +58,6 @@ namespace CustomStreetManager
                         j = 0;
                 }
             }
-        }
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, bool isVanilla)
-        {
-            if (isVanilla)
-                readVanillaTable(s, mapDescriptors);
-            else
-                foreach (MapDescriptor mapDescriptor in mapDescriptors)
-                {
-                    mapDescriptor.Desc_MSG_ID = s.ReadUInt32();
-                }
         }
         protected override UInt32 readTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla)
         {
