@@ -213,82 +213,8 @@ namespace CustomStreetManager
                 mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, data.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM());
             }
 
+            new DefaultGoalMoneyTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
             new MapDescriptionTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
-
-            // Find out which map icons exist
-            HashSet<string> allUniqueMapIcons = new HashSet<string>();
-            for (int i = 0; i < 48; i++)
-            {
-                if (mapDescriptors[i].MapIcon != null)
-                    allUniqueMapIcons.Add(mapDescriptors[i].MapIcon);
-            }
-            allUniqueMapIcons.Add("p_bg_101");
-            allUniqueMapIcons.Add("p_bg_109");
-            allUniqueMapIcons.Add("p_bg_102");
-            allUniqueMapIcons.Add("p_bg_105");
-            allUniqueMapIcons.Add("p_bg_104");
-            allUniqueMapIcons.Add("p_bg_106");
-            allUniqueMapIcons.Add("p_bg_004");
-            allUniqueMapIcons.Add("p_bg_008");
-            allUniqueMapIcons.Add("p_bg_002");
-            allUniqueMapIcons.Add("p_bg_001");
-            allUniqueMapIcons.Add("p_bg_005");
-            allUniqueMapIcons.Add("p_bg_003");
-            allUniqueMapIcons.Add("p_bg_107");
-            allUniqueMapIcons.Add("p_bg_006");
-            allUniqueMapIcons.Add("p_bg_007");
-            allUniqueMapIcons.Add("p_bg_009");
-            allUniqueMapIcons.Add("p_bg_103");
-            allUniqueMapIcons.Add("p_bg_108");
-            var countUniqueMapIcons = allUniqueMapIcons.Count;
-
-            // write each map icon into the main.dol and remember the location in the mapIcons dictionary
-            Dictionary<string, UInt32> mapIcons = new Dictionary<string, UInt32>();
-            foreach (string mapIcon in allUniqueMapIcons)
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                    s.Write(mapIcon);
-                    s.Write((byte)0);
-                    var mapIconAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
-                    mapIcons.Add(mapIcon, mapIconAddr);
-                }
-            }
-            // write the map icon lookup table and remember the location of each pointer in the mapIconLookupTable dictionary
-            UInt32 mapIconAddrTable = 0;
-            UInt16 mapIconAddrTableItemCount = (UInt16)mapIcons.Count;
-            Dictionary<string, UInt32> mapIconLookupTable = new Dictionary<string, UInt32>();
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                UInt32 i = 0;
-                foreach (var entry in mapIcons)
-                {
-                    var addr = entry.Value;
-                    s.Write(addr);
-                    mapIconLookupTable.Add(entry.Key, i);
-                    i += 4;
-                }
-                mapIconAddrTable = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Icon String Lookup Table");
-                foreach (var key in mapIconLookupTable.Keys.ToList())
-                {
-                    mapIconLookupTable[key] = mapIconLookupTable[key] + mapIconAddrTable;
-                }
-            }
-            // pass the map icon addr as property for the map defaults table
-            stream.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            for (int i = 0; i < 48; i++)
-            {
-                if (string.IsNullOrEmpty(mapDescriptors[i].MapIcon))
-                {
-                    mapDescriptors[i].writeMapDefaults(stream, 0);
-                }
-                else
-                {
-                    mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
-                }
-            }
             new MapIconTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
 

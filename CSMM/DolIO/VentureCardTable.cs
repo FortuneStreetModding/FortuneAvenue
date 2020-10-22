@@ -14,8 +14,9 @@ namespace CustomStreetManager
         /// <summary>
         /// Write the compressed venture card table
         /// </summary>
-        protected override string writeTable(EndianBinaryWriter s, List<MapDescriptor> mapDescriptors)
+        protected UInt32 writeTable(List<MapDescriptor> mapDescriptors)
         {
+            var ventureCardCompressedTable = new List<byte>();
             foreach (var mapDescriptor in mapDescriptors)
             {
                 // here we bitpack the venture card table so that each byte stores 8 venture cards. This results
@@ -31,10 +32,10 @@ namespace CustomStreetManager
                             bitPackedVentureCardValue |= (byte)(mapDescriptor.VentureCard[i] << j);
                         }
                     }
-                    s.Write(bitPackedVentureCardValue);
+                    ventureCardCompressedTable.Add(bitPackedVentureCardValue);
                 }
             }
-            return "VentureCardCompressedTable";
+            return allocate(ventureCardCompressedTable, "VentureCardCompressedTable");
         }
 
         /// <summary>
@@ -43,17 +44,20 @@ namespace CustomStreetManager
         /// </summary>
         /// <param name="tableRowCount"></param>
         /// <param name="ventureCardCompressedTableAddr"></param>
-        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 ventureCardCompressedTableAddr)
+        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors)
         {
+            var tableRowCount = mapDescriptors.Count;
+            var ventureCardCompressedTableAddr = writeTable(mapDescriptors);
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(ventureCardCompressedTableAddr);
+
             // Allocate working memory space for a single uncompressed venture card table which is passed on for the game to use. We will use it to store the result of decompressing a compressed venture card table
-            var ventureCardDecompressedTableAddr = allocateData(new byte[130], "VentureCardReservedMemoryForDecompressedTable");
-            var ventureCardDecompressTableRoutine = allocateSubroutine(writeSubroutine(ventureCardDecompressedTableAddr), "DecompressVentureCardSubroutine");
+            var ventureCardDecompressedTableAddr = allocate(new byte[130], "VentureCardReservedMemoryForDecompressedTable");
+            var ventureCardDecompressTableRoutine = allocate(writeSubroutine(ventureCardDecompressedTableAddr), "DecompressVentureCardSubroutine");
 
             // cmplwi r24,0x29                                     -> cmplwi r24,ventureCardTableCount-1
             stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(24, (UInt16)(tableRowCount - 1)));
             // mulli r0,r24,0x82                                   -> mulli r0,r24,0x10
-            stream.Seek(toFileAddress(0x8007e11c), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 24, 16));
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(ventureCardCompressedTableAddr);
+            stream.Seek(toFileAddress(0x8007e11c), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 24, 0x10));
             // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
             stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
             // li r5,0x0                                           -> bl ventureCardDecompressTableRoutine

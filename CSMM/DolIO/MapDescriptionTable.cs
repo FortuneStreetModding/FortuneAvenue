@@ -11,16 +11,19 @@ namespace CustomStreetManager
 {
     public class MapDescriptionTable : DolIO
     {
-        protected override string writeTable(EndianBinaryWriter s, List<MapDescriptor> mapDescriptors)
+        protected UInt32 writeTable(List<MapDescriptor> mapDescriptors)
         {
+            var mapDescriptionTable = new List<UInt32>();
             foreach (var mapDescriptor in mapDescriptors)
             {
-                s.Write(mapDescriptor.Desc_MSG_ID);
+                mapDescriptionTable.Add(mapDescriptor.Desc_MSG_ID);
             }
-            return "MapDescriptionTable";
+            return allocate(mapDescriptionTable, "MapDescriptionTable");
         }
-        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, Int16 tableRowCount, UInt32 mapDescriptionTableAddr)
+        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors)
         {
+            short tableRowCount = (short)mapDescriptors.Count;
+            var mapDescriptionTableAddr = writeTable(mapDescriptors);
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(mapDescriptionTableAddr);
             // HACK: Expand the description message ID table
             // subi r3,r3,0x15                                     -> nop
@@ -77,7 +80,8 @@ namespace CustomStreetManager
         {
             stream.Seek(toFileAddress(0x8021214c), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
-            return opcode != PowerPcAsm.nop();
+            // subi r3,r3,0x15
+            return opcode == PowerPcAsm.subi(3, 3, 0x15);
         }
     }
 }

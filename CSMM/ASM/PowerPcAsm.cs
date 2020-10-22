@@ -17,6 +17,7 @@ namespace CustomStreetManager
         private static readonly UInt32 andi_opcode = 0x70000000;
 
         private static readonly UInt32 lwzx_opcode = 0x7c00002e;
+        private static readonly UInt32 lwz_opcode = 0x80000000;
         private static readonly UInt32 stbx_opcode = 0x7c0001ae;
 
         private static readonly UInt32 li_opcode = 0x38000000;
@@ -79,6 +80,10 @@ namespace CustomStreetManager
                 throw new ArgumentException("the register value must be 31 or below");
             return lis_opcode + ((UInt32)register << 21) + ((UInt32)value & 0x0000FFFF);
         }
+        public static UInt32 subi(byte register1, byte register2, short value)
+        {
+            return addi(register1, register2, (short)-value);
+        }
         public static UInt32 addi(byte register1, byte register2, short value)
         {
             if (register1 > 31 || register2 > 31)
@@ -126,6 +131,12 @@ namespace CustomStreetManager
             Console.WriteLine(lwzx(31, 31, 31).ToString("X"));
             Console.WriteLine(lwzx(4, 5, 6).ToString("X"));
             Console.WriteLine(lwzx(1, 1, 1).ToString("X"));
+            // 80230002     lwz       r1,0x2,r3
+            // 83ffffff     lwz       r31,-0x1,r31
+            // 8063001C     lwz       r3,0x1c,r3
+            Console.WriteLine(lwz(1, 2, 3).ToString("X"));
+            Console.WriteLine(lwz(31, -1, 31).ToString("X"));
+            Console.WriteLine(lwz(3, 0x1c, 3).ToString("X"));
             // 7c0101ae     stbx       r0,r1,r0
             // 7c2219ae     stbx       r1,r2,r3
             // 7ffff9ae     stbx       r31,r31,r31
@@ -237,7 +248,6 @@ namespace CustomStreetManager
         {
             return ori(0, 0, 0);
         }
-
         public static uint lwzx(byte register1, byte register2, byte register3)
         {
             if (register1 > 31 || register2 > 31 || register3 > 31)
@@ -246,21 +256,26 @@ namespace CustomStreetManager
                 throw new ArgumentException("the register2 cannot be r0");
             return lwzx_opcode + ((UInt32)register1 << 21) + ((UInt32)register2 << 16) + ((UInt32)register3 << 11);
         }
-
+        public static uint lwz(byte register1, short value, byte register2)
+        {
+            if (register1 > 31 || register2 > 31)
+                throw new ArgumentException("the register value must be 31 or below");
+            if (register2 == 0)
+                throw new ArgumentException("the register2 cannot be r0");
+            return lwz_opcode + ((UInt32)register1 << 21) + ((UInt32)register2 << 16) + ((UInt32)value & 0x0000FFFF);
+        }
         public static uint srw(byte register1, byte register2, byte register3)
         {
             if (register1 > 31 || register2 > 31 || register3 > 31)
                 throw new ArgumentException("the register value must be 31 or below");
             return srw_opcode + ((UInt32)register1 << 16) + ((UInt32)register2 << 21) + ((UInt32)register3 << 11);
         }
-
         public static uint andi(byte register1, byte register2, short value)
         {
             if (register1 > 31 || register2 > 31)
                 throw new ArgumentException("the register value must be 31 or below");
             return andi_opcode + ((UInt32)register1 << 16) + ((UInt32)register2 << 21) + ((UInt32)value & 0x0000FFFF);
         }
-
         public static uint stbx(byte register1, byte register2, byte register3)
         {
             if (register1 > 31 || register2 > 31 || register3 > 31)
