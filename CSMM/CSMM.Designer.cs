@@ -46,9 +46,9 @@ namespace CustomStreetManager
             this.deflaktorsASMHacksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeIntroMenuAndMapBgmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.patchToWiimmfiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verboseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.setOutputLocationButton = new System.Windows.Forms.Button();
             this.setOutputPathLabel = new System.Windows.Forms.Label();
@@ -90,7 +90,7 @@ namespace CustomStreetManager
             this.clearListButton.Location = new System.Drawing.Point(1, 1);
             this.clearListButton.Margin = new System.Windows.Forms.Padding(1);
             this.clearListButton.Name = "clearListButton";
-            this.clearListButton.Size = new System.Drawing.Size(95, 31);
+            this.clearListButton.Size = new System.Drawing.Size(111, 36);
             this.clearListButton.TabIndex = 37;
             this.clearListButton.Text = "Clear Changes";
             this.clearListButton.UseVisualStyleBackColor = true;
@@ -111,8 +111,8 @@ namespace CustomStreetManager
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
-            this.menuStrip1.Size = new System.Drawing.Size(1357, 24);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 1, 0, 1);
+            this.menuStrip1.Size = new System.Drawing.Size(1583, 24);
             this.menuStrip1.TabIndex = 42;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -167,13 +167,6 @@ namespace CustomStreetManager
             this.patchToWiimmfiToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
             this.patchToWiimmfiToolStripMenuItem.Text = "Wiimmfi";
             // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
-            this.helpToolStripMenuItem.Text = "Help";
-            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
-            // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -187,14 +180,22 @@ namespace CustomStreetManager
             this.verboseToolStripMenuItem.CheckOnClick = true;
             this.verboseToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.verboseToolStripMenuItem.Name = "verboseToolStripMenuItem";
-            this.verboseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.verboseToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.verboseToolStripMenuItem.Text = "Verbose";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
+            this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // setOutputLocationButton
             // 
-            this.setOutputLocationButton.Location = new System.Drawing.Point(3, 3);
+            this.setOutputLocationButton.Location = new System.Drawing.Point(4, 3);
+            this.setOutputLocationButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.setOutputLocationButton.Name = "setOutputLocationButton";
-            this.setOutputLocationButton.Size = new System.Drawing.Size(116, 23);
+            this.setOutputLocationButton.Size = new System.Drawing.Size(135, 27);
             this.setOutputLocationButton.TabIndex = 43;
             this.setOutputLocationButton.Text = "Set Output ISO";
             this.setOutputLocationButton.UseVisualStyleBackColor = true;
@@ -203,18 +204,20 @@ namespace CustomStreetManager
             // setOutputPathLabel
             // 
             this.setOutputPathLabel.AutoEllipsis = true;
-            this.setOutputPathLabel.Location = new System.Drawing.Point(125, 0);
+            this.setOutputPathLabel.Location = new System.Drawing.Point(147, 0);
+            this.setOutputPathLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.setOutputPathLabel.Name = "setOutputPathLabel";
-            this.setOutputPathLabel.Size = new System.Drawing.Size(282, 21);
+            this.setOutputPathLabel.Size = new System.Drawing.Size(329, 24);
             this.setOutputPathLabel.TabIndex = 44;
             this.setOutputPathLabel.Text = "None";
             this.setOutputPathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(3, 3);
+            this.button1.Location = new System.Drawing.Point(4, 3);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(116, 23);
+            this.button1.Size = new System.Drawing.Size(135, 27);
             this.button1.TabIndex = 45;
             this.button1.Text = "Set Input WBFS/ISO";
             this.button1.UseVisualStyleBackColor = true;
@@ -222,9 +225,10 @@ namespace CustomStreetManager
             // 
             // setInputISOLocation
             // 
-            this.setInputISOLocation.Location = new System.Drawing.Point(125, 0);
+            this.setInputISOLocation.Location = new System.Drawing.Point(147, 0);
+            this.setInputISOLocation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.setInputISOLocation.Name = "setInputISOLocation";
-            this.setInputISOLocation.Size = new System.Drawing.Size(282, 23);
+            this.setInputISOLocation.Size = new System.Drawing.Size(329, 27);
             this.setInputISOLocation.TabIndex = 46;
             this.setInputISOLocation.Text = "None";
             this.setInputISOLocation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -241,12 +245,13 @@ namespace CustomStreetManager
             this.tableLayoutPanel1.Controls.Add(this.Go, 1, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1357, 922);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1583, 1068);
             this.tableLayoutPanel1.TabIndex = 47;
             // 
             // flowLayoutPanel1
@@ -254,9 +259,10 @@ namespace CustomStreetManager
             this.flowLayoutPanel1.Controls.Add(this.setOutputLocationButton);
             this.flowLayoutPanel1.Controls.Add(this.setOutputPathLabel);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(681, 3);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(795, 3);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(673, 34);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(784, 40);
             this.flowLayoutPanel1.TabIndex = 42;
             // 
             // flowLayoutPanel2
@@ -264,18 +270,20 @@ namespace CustomStreetManager
             this.flowLayoutPanel2.Controls.Add(this.clearListButton);
             this.flowLayoutPanel2.Controls.Add(this.checkBox1);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 885);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(4, 1025);
+            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(672, 34);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(783, 40);
             this.flowLayoutPanel2.TabIndex = 43;
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBox1.Location = new System.Drawing.Point(100, 3);
+            this.checkBox1.Location = new System.Drawing.Point(117, 3);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(93, 27);
+            this.checkBox1.Size = new System.Drawing.Size(98, 32);
             this.checkBox1.TabIndex = 38;
             this.checkBox1.Text = "Show Unused";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -286,9 +294,10 @@ namespace CustomStreetManager
             this.flowLayoutPanel3.Controls.Add(this.button1);
             this.flowLayoutPanel3.Controls.Add(this.setInputISOLocation);
             this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel3.Location = new System.Drawing.Point(3, 3);
+            this.flowLayoutPanel3.Location = new System.Drawing.Point(4, 3);
+            this.flowLayoutPanel3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-            this.flowLayoutPanel3.Size = new System.Drawing.Size(672, 34);
+            this.flowLayoutPanel3.Size = new System.Drawing.Size(783, 40);
             this.flowLayoutPanel3.TabIndex = 44;
             // 
             // dataGridView1
@@ -316,12 +325,13 @@ namespace CustomStreetManager
             this.tableLayoutPanel1.SetColumnSpan(this.dataGridView1, 2);
             this.dataGridView1.DataSource = this.mapDescriptorBindingSource;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 43);
+            this.dataGridView1.Location = new System.Drawing.Point(4, 49);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridView1.Size = new System.Drawing.Size(1351, 836);
+            this.dataGridView1.Size = new System.Drawing.Size(1575, 970);
             this.dataGridView1.TabIndex = 45;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.dataGridView1_RowPrePaint);
@@ -436,15 +446,16 @@ namespace CustomStreetManager
             // 
             // mapDescriptorBindingSource
             // 
-            this.mapDescriptorBindingSource.DataSource = typeof(MapDescriptor);
+            this.mapDescriptorBindingSource.DataSource = typeof(CustomStreetManager.MapDescriptor);
             // 
             // Go
             // 
             this.Go.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Go.Enabled = false;
-            this.Go.Location = new System.Drawing.Point(681, 885);
+            this.Go.Location = new System.Drawing.Point(795, 1025);
+            this.Go.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Go.Name = "Go";
-            this.Go.Size = new System.Drawing.Size(673, 34);
+            this.Go.Size = new System.Drawing.Size(784, 40);
             this.Go.TabIndex = 46;
             this.Go.Text = "Go !";
             this.Go.UseVisualStyleBackColor = true;
@@ -452,14 +463,15 @@ namespace CustomStreetManager
             // 
             // CSMM
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1357, 946);
+            this.ClientSize = new System.Drawing.Size(1583, 1092);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
             this.Name = "CSMM";
             this.RightToLeftLayout = true;
