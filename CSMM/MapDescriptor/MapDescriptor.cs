@@ -31,7 +31,17 @@ namespace CustomStreetManager
         public string FrbFile4 { get; set; }
         public UInt32 BackgroundAddr { get; set; }
         public string Background { get; set; }
-        public UInt32 BGMID { get; set; }
+
+        private Optional<UInt32> bgmId = Optional<UInt32>.CreateEmpty();
+        public UInt32 BGMID
+        {
+            get { return bgmId.OrElse(0); }
+            set { bgmId = Optional<UInt32>.Create(value); }
+        }
+        private bool BgmIdInitialized()
+        {
+            return bgmId.Any();
+        }
         public UInt32 Name_MSG_ID { get; set; }
         public Dictionary<string, string> Name { get; private set; }
         public string Name_EN
@@ -333,6 +343,10 @@ namespace CustomStreetManager
                         if (flaggedValueOrNull != null)
                         {
                             Background = flaggedValueOrNull;
+                            if (string.IsNullOrEmpty(MapIcon))
+                                VanillaDatabase.getMapIconFromVanillaBackground(Background).IfPresent(value => MapIcon = value);
+                            if (!BgmIdInitialized())
+                                VanillaDatabase.getBgmIdFromVanillaBackground(Background).IfPresent(value => BGMID = value);
                         }
                     }
                     break;
@@ -641,7 +655,7 @@ namespace CustomStreetManager
         public string generateMapDescriptorFileContent()
         {
             MapDescriptorTemplate t = new MapDescriptorTemplate(this);
-            return t .TransformText().TrimStart();
+            return t.TransformText().TrimStart();
         }
     }
 }

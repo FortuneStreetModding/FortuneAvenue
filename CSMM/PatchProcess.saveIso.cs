@@ -227,20 +227,16 @@ namespace CustomStreetManager
                     if (string.IsNullOrEmpty(mapIcon))
                         continue;
 
-                    var tplName = VanillaDatabase.getVanillaTpl(mapIcon);
-                    if (tplName != null)
+                    if (VanillaDatabase.getVanillaTpl(mapIcon).Any())
                     {
                         // its a vanilla map icon -> dont convert and inject it
-                        if (!mapIconToTplName.ContainsKey(mapIcon))
-                        {
-                            mapIconToTplName.Add(mapIcon, tplName);
-                        }
+                        VanillaDatabase.getVanillaTpl(mapIcon).IfPresent(value => mapIconToTplName[mapIcon] = value);
                     }
                     else
                     {
                         var mapIconPng = Path.Combine(tmpFileSet.param_folder, mapIcon + ".png");
                         var mapIconTpl = Path.ChangeExtension(mapIconPng, ".tpl");
-                        tplName = Ui_menu_19_00a.constructMapIconTplName(mapIcon);
+                        var tplName = Ui_menu_19_00a.constructMapIconTplName(mapIcon);
                         if (!mapIconToTplName.ContainsKey(mapIcon))
                         {
                             mapIconToTplName.Add(mapIcon, tplName);
@@ -295,7 +291,7 @@ namespace CustomStreetManager
                 {
                     string gameSequencePath = entry.Key;
                     string gameSequenceExtractPath = entry.Value;
-                    foreach(var brlanFile in Directory.GetFiles(Path.Combine(gameSequenceExtractPath, "arc", "anim"), "ui_menu_19_00a_Tag_*.brlan"))
+                    foreach (var brlanFile in Directory.GetFiles(Path.Combine(gameSequenceExtractPath, "arc", "anim"), "ui_menu_19_00a_Tag_*.brlan"))
                     {
                         string xmlanFile = gameSequenceToXmlytBasePaths[gameSequencePath] + Path.GetFileNameWithoutExtension(brlanFile) + ".xmlan";
                         Task task1 = ExeWrapper.convertBryltToXmlyt(brlanFile, xmlanFile, ct, ProgressInfo.makeNoProgress(progress));
