@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -17,4 +17,23 @@
     <Resource Include="cube.ico" />
   </ItemGroup>
   
+  <ItemGroup>
+    <None Update="MapDescriptor\MapDescriptorTemplate.md">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MapDescriptorTemplate.cs</LastGenOutput>
+      <CustomToolNamespace>CustomStreetManager</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="MapDescriptor\MapDescriptorTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MapDescriptorTemplate.md</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
