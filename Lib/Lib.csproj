@@ -1,88 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{05C60070-F4CD-4485-B438-DF69A2AB8555}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	<RuntimeIdentifiers>win10-x64;osx.10.12-x64</RuntimeIdentifiers>
+    <UseWPF>true</UseWPF>
     <RootNamespace>Lib</RootNamespace>
     <AssemblyName>Lib</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <DefineConstants>NETCORE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Conversion\BigEndianBitConverter.cs" />
-    <Compile Include="Conversion\DoubleConverter.cs" />
-    <Compile Include="Conversion\EndianBitConverter.cs" />
-    <Compile Include="Conversion\Endianness.cs" />
-    <Compile Include="Conversion\HexUtil.cs" />
-    <Compile Include="Conversion\IBuffer.cs" />
-    <Compile Include="Conversion\IBufferManager.cs" />
-    <Compile Include="Conversion\LittleEndianBitConverter.cs" />
-    <Compile Include="Exceptions\FileAlreadyExistException.cs" />
-    <Compile Include="Exceptions\InvalidFileException.cs" />
-    <Compile Include="FSData\BoardData.cs" />
-    <Compile Include="FSData\BoardFile.cs" />
-    <Compile Include="FSData\BoardInfo.cs" />
-    <Compile Include="FSData\BoardTheme.cs" />
-    <Compile Include="FSData\LoopingMode.cs" />
-    <Compile Include="FSData\Header.cs" />
-    <Compile Include="FSData\Position.cs" />
-    <Compile Include="FSData\SquareData.cs" />
-    <Compile Include="FSData\SquareType.cs" />
-    <Compile Include="FSData\WaypointData.cs" />
-    <Compile Include="IO\EndianBinaryReader.cs" />
-    <Compile Include="IO\EndianBinaryWriter.cs" />
-    <Compile Include="IO\LineReader.cs" />
-    <Compile Include="IO\NonClosingStreamWrapper.cs" />
-    <Compile Include="IO\ReverseLineReader.cs" />
-    <Compile Include="IO\StreamUtil.cs" />
-    <Compile Include="IO\StringWriterWithEncoding.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

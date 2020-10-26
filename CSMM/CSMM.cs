@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using FSEditor.FSData;
 using System.Xml;
 using FSEditor.Exceptions;
+using System.Runtime.InteropServices;
 
 namespace CustomStreetManager
 {
@@ -332,7 +333,27 @@ namespace CustomStreetManager
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/FortuneStreetModding/FortuneAvenue/wiki/CSMM-User-Guide");
+            OpenBrowser("https://github.com/FortuneStreetModding/FortuneAvenue/wiki/CSMM-User-Guide");
+        }
+
+        public static void OpenBrowser(string url)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", url);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", url);
+            }
+            else
+            {
+                MessageBox.Show("Visit " + url + " for help");
+            }
         }
     }
 }

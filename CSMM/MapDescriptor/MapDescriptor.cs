@@ -641,9 +641,7 @@ namespace CustomStreetManager
         public string generateMapDescriptorFileContent()
         {
             MapDescriptorTemplate t = new MapDescriptorTemplate(this);
-            return t.TransformText().TrimStart();
+            return t .TransformText().TrimStart();
         }
-
-
     }
 }
