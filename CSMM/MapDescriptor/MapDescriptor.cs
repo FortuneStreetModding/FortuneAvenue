@@ -38,7 +38,7 @@ namespace CustomStreetManager
             get { return bgmId.OrElse(0); }
             set { bgmId = Optional<UInt32>.Create(value); }
         }
-        private bool BgmIdInitialized()
+        private bool IsBgmIdInitialized()
         {
             return bgmId.Any();
         }
@@ -78,12 +78,12 @@ namespace CustomStreetManager
         public UInt32 BaseSalary { get; set; }
         public UInt32 SalaryIncrement { get; set; }
         public UInt32 MaxDiceRoll { get; set; }
-        public UInt32 TourBankruptcyLimit { get; set; }
+        public UInt32 TourBankruptcyLimit { get; set; } = 1;
         public UInt32 TourInitialCash { get; set; }
-        public Character TourOpponent1 { get; set; }
-        public Character TourOpponent2 { get; set; }
-        public Character TourOpponent3 { get; set; }
-        public UInt32 TourClearRank { get; set; }
+        public Character TourOpponent1 { get; set; } = Character.Mario;
+        public Character TourOpponent2 { get; set; } = Character.Luigi;
+        public Character TourOpponent3 { get; set; } = Character.Peach;
+        public UInt32 TourClearRank { get; set; } = 2;
         public UInt32 MapIconAddrAddr { get; set; }
         public string MapIcon { get; internal set; }
 
@@ -224,6 +224,8 @@ namespace CustomStreetManager
                 BaseSalary = board.BoardInfo.BaseSalary;
                 SalaryIncrement = board.BoardInfo.SalaryIncrement;
                 InitialCash = board.BoardInfo.InitialCash;
+                if (TourInitialCash == 0)
+                    TourInitialCash = InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
                     warning += "[" + ID + "] " + Name[Locale.EN] + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect." + Environment.NewLine;
@@ -345,7 +347,7 @@ namespace CustomStreetManager
                             Background = flaggedValueOrNull;
                             if (string.IsNullOrEmpty(MapIcon))
                                 VanillaDatabase.getMapIconFromVanillaBackground(Background).IfPresent(value => MapIcon = value);
-                            if (!BgmIdInitialized())
+                            if (!IsBgmIdInitialized())
                                 VanillaDatabase.getBgmIdFromVanillaBackground(Background).IfPresent(value => BGMID = value);
                         }
                     }
