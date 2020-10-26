@@ -62,28 +62,13 @@ namespace CustomStreetManager
             return -1;
         }
 
-        private string resolveAddressAddressToString(uint virtualAddressAddress, EndianBinaryReader binReader)
-        {
-            int fileAddress = toFileAddress(virtualAddressAddress);
-            if (fileAddress >= 0)
-            {
-                binReader.Seek(fileAddress, SeekOrigin.Begin);
-                var virtualAddress = binReader.ReadUInt32();
-                return resolveAddressToString(virtualAddress, binReader);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private string resolveAddressToString(uint virtualAddress, EndianBinaryReader binReader)
+        private string resolveAddressToString(uint virtualAddress, EndianBinaryReader stream)
         {
             int fileAddress = toFileAddress(virtualAddress);
             if (fileAddress >= 0)
             {
-                binReader.Seek(fileAddress, SeekOrigin.Begin);
-                byte[] buff = binReader.ReadBytes(64);
+                stream.Seek(fileAddress, SeekOrigin.Begin);
+                byte[] buff = stream.ReadBytes(64);
                 return HexUtil.byteArrayToString(buff);
             }
             else
@@ -92,81 +77,44 @@ namespace CustomStreetManager
             }
         }
 
-        public List<MapDescriptor> readMainDol(EndianBinaryReader binReader)
+        public List<MapDescriptor> readMainDol(EndianBinaryReader stream)
         {
-            bool isVanilla = true;
-
             List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
-            // has the hack for unique map icons been applied?
-            var hackExpandedMapIconsApplied = data.isHackCustomMapIcons(binReader, toFileAddress);
-            // has the hack for expanded Description message table already been applied?
-            var hackExpandedDescriptionMessageTableApplied = data.isHackExtendedMapDescriptions(binReader, toFileAddress);
 
-            binReader.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(data.START_MAP_DATA_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 MapDescriptor mapDescriptor = new MapDescriptor();
-                mapDescriptor.readMapDataFromStream(binReader);
+                mapDescriptor.readMapDataFromStream(stream);
                 mapDescriptors.Add(mapDescriptor);
             }
-            binReader.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
+            stream.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
             for (int i = 0; i < 48; i++)
             {
                 MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.readMapDefaultsFromStream(binReader);
+                mapDescriptor.readMapDefaultsFromStream(stream);
             }
-            DefaultGoalMoneyTable defaultGoalMoney = new DefaultGoalMoneyTable();
-            
-            defaultGoalMoney.read(binReader, toFileAddress, mapDescriptors, isVanilla, null);
+            new DefaultGoalMoneyTable().read(stream, toFileAddress, mapDescriptors, null);
+
+            new MapDescriptionTable().read(stream, toFileAddress, mapDescriptors, null);
 
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
-                var internalName = resolveAddressToString(mapDescriptor.InternalNameAddr, binReader).Trim();
+                var internalName = resolveAddressToString(mapDescriptor.InternalNameAddr, stream).Trim();
                 mapDescriptor.InternalName = Regex.Replace(internalName, @"[<>:/\|?*""]+", "");
 
-                mapDescriptor.Background = resolveAddressToString(mapDescriptor.BackgroundAddr, binReader);
-                mapDescriptor.FrbFile1 = resolveAddressToString(mapDescriptor.FrbFile1Addr, binReader);
-                mapDescriptor.FrbFile2 = resolveAddressToString(mapDescriptor.FrbFile2Addr, binReader);
-                mapDescriptor.FrbFile3 = resolveAddressToString(mapDescriptor.FrbFile3Addr, binReader);
-                mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, binReader);
-                mapDescriptor.readRotationOriginPoints(binReader, toFileAddress(mapDescriptor.MapSwitchParamAddr), data);
-                mapDescriptor.readLoopingModeParams(binReader, toFileAddress(mapDescriptor.LoopingModeParamAddr));
-
-                if (hackExpandedMapIconsApplied)
-                {
-                    mapDescriptor.MapIcon = resolveAddressAddressToString(mapDescriptor.MapIconAddrAddr, binReader);
-                }
-                else
-                {
-                    if (mapDescriptor.ID < 18)
-                    {
-                        mapDescriptor.MapIconAddrAddr = 0;
-                        var number = Regex.Match(mapDescriptor.Background, @"\d+").Value;
-                        mapDescriptor.MapIcon = "p_bg_" + number;
-                    }
-                }
-            }
-            UInt32[] descMsgIdTable = new UInt32[18 * 2];
-            binReader.Seek(toFileAddress(data.START_MAP_DESCRIPTION_MSG_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            for (int i = 0; i < descMsgIdTable.Length; i++)
-            {
-                descMsgIdTable[i] = binReader.ReadUInt32();
-            }
-            var j = 0;
-            foreach (MapDescriptor mapDescriptor in mapDescriptors)
-            {
-                if (mapDescriptor.ID < 18)
-                {
-                    mapDescriptor.Desc_MSG_ID = descMsgIdTable[j];
-                    j++;
-                    if (j == 18 && !hackExpandedDescriptionMessageTableApplied) // vanilla
-                    {
-                        j = 0;
-                    }
-                }
+                mapDescriptor.Background = resolveAddressToString(mapDescriptor.BackgroundAddr, stream);
+                mapDescriptor.FrbFile1 = resolveAddressToString(mapDescriptor.FrbFile1Addr, stream);
+                mapDescriptor.FrbFile2 = resolveAddressToString(mapDescriptor.FrbFile2Addr, stream);
+                mapDescriptor.FrbFile3 = resolveAddressToString(mapDescriptor.FrbFile3Addr, stream);
+                mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, stream);
+                mapDescriptor.readRotationOriginPoints(stream, toFileAddress(mapDescriptor.MapSwitchParamAddr), data);
+                mapDescriptor.readLoopingModeParams(stream, toFileAddress(mapDescriptor.LoopingModeParamAddr));
             }
 
-            new VentureCardTable().read(binReader, toFileAddress, mapDescriptors, isVanilla, null);
+            new MapIconTable().read(stream, toFileAddress, mapDescriptors, null);
+
+            new VentureCardTable().read(stream, toFileAddress, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -264,94 +212,10 @@ namespace CustomStreetManager
                 stream.Seek(seek, SeekOrigin.Begin);
                 mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, data.MAP_BGSEQUENCE_ADDR_MARIOSTADIUM());
             }
-            UInt32 mapDescriptionTableAddr;
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                for (int i = 0; i < mapDescriptors.Count; i++)
-                {
-                    s.Write(mapDescriptors[i].Desc_MSG_ID);
-                }
-                mapDescriptionTableAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Description Table");
-            }
-            data.writeHackExtendedMapDescriptions(stream, toFileAddress, (Int16)mapDescriptors.Count, mapDescriptionTableAddr);
 
-            // Find out which map icons exist
-            HashSet<string> allUniqueMapIcons = new HashSet<string>();
-            for (int i = 0; i < 48; i++)
-            {
-                if (mapDescriptors[i].MapIcon != null)
-                    allUniqueMapIcons.Add(mapDescriptors[i].MapIcon);
-            }
-            allUniqueMapIcons.Add("p_bg_101");
-            allUniqueMapIcons.Add("p_bg_109");
-            allUniqueMapIcons.Add("p_bg_102");
-            allUniqueMapIcons.Add("p_bg_105");
-            allUniqueMapIcons.Add("p_bg_104");
-            allUniqueMapIcons.Add("p_bg_106");
-            allUniqueMapIcons.Add("p_bg_004");
-            allUniqueMapIcons.Add("p_bg_008");
-            allUniqueMapIcons.Add("p_bg_002");
-            allUniqueMapIcons.Add("p_bg_001");
-            allUniqueMapIcons.Add("p_bg_005");
-            allUniqueMapIcons.Add("p_bg_003");
-            allUniqueMapIcons.Add("p_bg_107");
-            allUniqueMapIcons.Add("p_bg_006");
-            allUniqueMapIcons.Add("p_bg_007");
-            allUniqueMapIcons.Add("p_bg_009");
-            allUniqueMapIcons.Add("p_bg_103");
-            allUniqueMapIcons.Add("p_bg_108");
-            var countUniqueMapIcons = allUniqueMapIcons.Count;
-
-            // write each map icon into the main.dol and remember the location in the mapIcons dictionary
-            Dictionary<string, UInt32> mapIcons = new Dictionary<string, UInt32>();
-            foreach (string mapIcon in allUniqueMapIcons)
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                    s.Write(mapIcon);
-                    s.Write((byte)0);
-                    var mapIconAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress);
-                    mapIcons.Add(mapIcon, mapIconAddr);
-                }
-            }
-            // write the map icon lookup table and remember the location of each pointer in the mapIconLookupTable dictionary
-            UInt32 mapIconAddrTable = 0;
-            UInt16 mapIconAddrTableItemCount = (UInt16)mapIcons.Count;
-            Dictionary<string, UInt32> mapIconLookupTable = new Dictionary<string, UInt32>();
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                UInt32 i = 0;
-                foreach (var entry in mapIcons)
-                {
-                    var addr = entry.Value;
-                    s.Write(addr);
-                    mapIconLookupTable.Add(entry.Key, i);
-                    i += 4;
-                }
-                mapIconAddrTable = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, "Map Icon String Lookup Table");
-                foreach (var key in mapIconLookupTable.Keys.ToList())
-                {
-                    mapIconLookupTable[key] = mapIconLookupTable[key] + mapIconAddrTable;
-                }
-            }
-            // pass the map icon addr as property for the map defaults table
-            stream.Seek(toFileAddress(data.START_MAP_DEFAULTS_TABLE_VIRTUAL()), SeekOrigin.Begin);
-            for (int i = 0; i < 48; i++)
-            {
-                if (string.IsNullOrEmpty(mapDescriptors[i].MapIcon))
-                {
-                    mapDescriptors[i].writeMapDefaults(stream, 0);
-                }
-                else
-                {
-                    mapDescriptors[i].writeMapDefaults(stream, mapIconLookupTable[mapDescriptors[i].MapIcon]);
-                }
-            }
-            data.writeHackCustomMapIcons(stream, toFileAddress, mapIconAddrTableItemCount, mapIconAddrTable);
-
+            new DefaultGoalMoneyTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
+            new MapDescriptionTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
+            new MapIconTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, toFileAddress, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, toFileAddress);
