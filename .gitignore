@@ -5,3 +5,4 @@ obj
 MapDescriptorTemplate.cs
 packages
 .vs
+*.pubxml
