@@ -94,31 +94,43 @@ namespace CustomStreetManager
 
         public static Optional<string> getMapIconFromVanillaBackground(string background)
         {
-            var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
-                         where row.Field<string>("Background") == background
-                         select row;
-            if (result.Any())
-                try { return Optional<string>.Create(result.Single().Field<string>("Map Icon")); } catch (IndexOutOfRangeException e) { }
+            try
+            {
+                var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
+                             where row.Field<string>("Background") == background
+                             select row.Field<string>("Map Icon");
+                if (result.Any())
+                    return Optional<string>.Create(result.Distinct().Single());
+            }
+            catch (IndexOutOfRangeException e) { }
             return Optional<string>.CreateEmpty();
         }
 
         public static Optional<UInt32> getBgmIdFromVanillaBackground(string background)
         {
-            var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
-                         where row.Field<string>("Background") == background
-                         select row;
-            if (result.Any())
-                try { return Optional<UInt32>.Create(result.Single().Field<UInt32>("Bgm Id")); } catch (IndexOutOfRangeException e) { }
+            try
+            {
+                var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
+                             where row.Field<string>("Background") == background
+                             select row.Field<UInt32>("Bgm Id");
+                if (result.Any())
+                    return Optional<UInt32>.Create(result.Distinct().Single());
+            }
+            catch (IndexOutOfRangeException e) { }
             return Optional<UInt32>.CreateEmpty();
         }
 
         public static Optional<string> getVanillaTpl(string mapIcon)
         {
-            var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
-                         where row.Field<string>("Map Icon") == mapIcon
-                         select row;
-            if (result.Any())
-                try { return Optional<string>.Create(result.Single().Field<string>("Map Tpl")); } catch (IndexOutOfRangeException e) { }
+            try
+            {
+                var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
+                             where row.Field<string>("Map Icon") == mapIcon
+                             select row.Field<string>("Map Tpl");
+                if (result.Any())
+                    return Optional<string>.Create(result.Distinct().Single());
+            }
+            catch (IndexOutOfRangeException e) { }
             return Optional<string>.CreateEmpty();
         }
 

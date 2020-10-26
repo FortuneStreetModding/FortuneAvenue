@@ -78,7 +78,7 @@ namespace CustomStreetManager
             }
             var mapIcon = mapDescriptorImport.MapIcon;
             // only import the png if it is not a vanilla map icon
-            if (mapIcon != null && VanillaDatabase.getVanillaTpl(mapIcon) == null)
+            if (mapIcon != null && !VanillaDatabase.getVanillaTpl(mapIcon).Any())
             {
                 importFile = Path.Combine(dir, mapIcon + ".png");
                 destFile = Path.Combine(tmpFileSet.param_folder, mapIcon + ".png");
