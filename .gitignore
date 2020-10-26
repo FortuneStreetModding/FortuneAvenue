@@ -1,9 +1,10 @@
-bin
-obj
+bin/
+obj/
 *.suo
 *.user
 MapDescriptorTemplate.cs
-packages
+packages/
 .vs
 *.pubxml
 Directory.Build.Props
+Properties/
