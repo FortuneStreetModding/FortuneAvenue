@@ -14,7 +14,7 @@ namespace CustomStreetManager
         /// <summary>
         /// Write the compressed venture card table
         /// </summary>
-        protected UInt32 writeTable(List<MapDescriptor> mapDescriptors)
+        protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
             var ventureCardCompressedTable = new List<byte>();
             foreach (var mapDescriptor in mapDescriptors)
@@ -44,34 +44,34 @@ namespace CustomStreetManager
         /// </summary>
         /// <param name="tableRowCount"></param>
         /// <param name="ventureCardCompressedTableAddr"></param>
-        protected override void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors)
+        protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {
             var tableRowCount = mapDescriptors.Count;
             var ventureCardCompressedTableAddr = writeTable(mapDescriptors);
-            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair(ventureCardCompressedTableAddr);
+            PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair((UInt32)ventureCardCompressedTableAddr);
 
             // Allocate working memory space for a single uncompressed venture card table which is passed on for the game to use. We will use it to store the result of decompressing a compressed venture card table
             var ventureCardDecompressedTableAddr = allocate(new byte[130], "VentureCardReservedMemoryForDecompressedTable");
             var ventureCardDecompressTableRoutine = allocate(writeSubroutine(ventureCardDecompressedTableAddr), "DecompressVentureCardSubroutine");
 
             // cmplwi r24,0x29                                     -> cmplwi r24,ventureCardTableCount-1
-            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(24, (UInt16)(tableRowCount - 1)));
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(24, (UInt16)(tableRowCount - 1)));
             // mulli r0,r24,0x82                                   -> mulli r0,r24,0x10
-            stream.Seek(toFileAddress(0x8007e11c), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 24, 0x10));
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e11c), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 24, 0x10));
             // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
-            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
             // li r5,0x0                                           -> bl ventureCardDecompressTableRoutine
-            stream.Seek(toFileAddress(0x8007e130), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(0x8007e130, ventureCardDecompressTableRoutine));
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e130), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl((UInt32)addressMapper.toVersionAgnosticAddress((BSVAddr)0x8007e130), (UInt32)ventureCardDecompressTableRoutine));
         }
 
         /// <summary>
         /// Write the subroutine which takes a compressed venture card table as input and writes it into ventureCardDecompressedTableAddr
         /// </summary>
         /// <param name="ventureCardDecompressedTableAddr">The address for the reserved memory space to store the decompressed venture card table in</param>
-        private List<UInt32> writeSubroutine(UInt32 ventureCardDecompressedTableAddr)
+        private List<UInt32> writeSubroutine(VAVAddr ventureCardDecompressedTableAddr)
         {
             var asm = new List<UInt32>();
-            PowerPcAsm.Pair16Bit ventureCardTableAddrPair = PowerPcAsm.make16bitValuePair(ventureCardDecompressedTableAddr);
+            PowerPcAsm.Pair16Bit ventureCardTableAddrPair = PowerPcAsm.make16bitValuePair((UInt32)ventureCardDecompressedTableAddr);
             ///
             /// assume: 
             /// r6 = ventureCardCompressedTableAddr
@@ -125,7 +125,7 @@ namespace CustomStreetManager
         /// <param name="s"></param>
         /// <param name="mapDescriptors"></param>
         /// <param name="isVanilla"></param>
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, Func<uint, int> toFileAddress, bool isVanilla)
+        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
             if (isVanilla)
             {
@@ -168,23 +168,23 @@ namespace CustomStreetManager
                 }
             }
         }
-        protected override UInt32 readTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla)
+        protected override VAVAddr readTableAddr(EndianBinaryReader stream, AddressMapper addressMapper, bool isVanilla)
         {
-            stream.Seek(toFileAddress(0x8007e120), SeekOrigin.Begin);
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e120), SeekOrigin.Begin);
             var lis_opcode = stream.ReadUInt32();
             stream.Seek(4, SeekOrigin.Current);
             var addi_opcode = stream.ReadUInt32();
-            return PowerPcAsm.make32bitValueFromPair(lis_opcode, addi_opcode);
+            return (VAVAddr)PowerPcAsm.make32bitValueFromPair(lis_opcode, addi_opcode);
         }
-        protected override Int16 readTableRowCount(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla)
+        protected override Int16 readTableRowCount(EndianBinaryReader stream, AddressMapper addressMapper, bool isVanilla)
         {
-            stream.Seek(toFileAddress(0x8007e104), SeekOrigin.Begin);
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e104), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
             return (Int16)(PowerPcAsm.getOpcodeParameter(opcode) + 1);
         }
-        protected override bool readIsVanilla(EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        protected override bool readIsVanilla(EndianBinaryReader stream, AddressMapper addressMapper)
         {
-            stream.Seek(toFileAddress(0x8007e130), SeekOrigin.Begin);
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e130), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
             return opcode == PowerPcAsm.li(5, 0);
         }

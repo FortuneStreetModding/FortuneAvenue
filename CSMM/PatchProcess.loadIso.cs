@@ -31,18 +31,18 @@ namespace CustomStreetManager
 
             cacheFileSet = new DataFileSet(Path.Combine(extractDir, "DATA"));
             progress?.Report("Detect the sections in main.dol file...");
-            List<MainDolSection> sections = await ExeWrapper.readSections(cacheFileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 90, 95)).ConfigureAwait(false);
-            mainDol = new MainDol(sections);
+            List<AddressSection> sections = await ExeWrapper.readSections(cacheFileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 90, 95)).ConfigureAwait(false);
 
             progress?.Report("Read data from main.dol file...");
             using (var stream = File.OpenRead(cacheFileSet.main_dol))
             {
                 EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
-                mapDescriptors = mainDol.readMainDol(binReader);
+                mainDol = new MainDol();
+                mapDescriptors = mainDol.readMainDol(binReader, sections);
 
                 progress?.Report(97);
                 progress?.Report("Read localization files...");
-                progress?.Report(loadUIMessages(mapDescriptors, mainDol.data, cacheFileSet));
+                progress?.Report(loadUIMessages(mapDescriptors, cacheFileSet));
             }
 
             this.cleanUp(false, false);
@@ -52,7 +52,7 @@ namespace CustomStreetManager
 
             return mapDescriptors;
         }
-        private string loadUIMessages(List<MapDescriptor> mapDescriptors, ST7_Interface data, DataFileSet fileSet)
+        private string loadUIMessages(List<MapDescriptor> mapDescriptors, DataFileSet fileSet)
         {
             string warnings = "";
             foreach (string locale in Locale.ALL)

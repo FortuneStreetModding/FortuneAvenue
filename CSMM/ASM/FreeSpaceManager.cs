@@ -14,12 +14,12 @@ namespace CustomStreetManager
         /// <summary>
         /// Maps the end of a free space region to its start.
         /// </summary>
-        private Dictionary<UInt32, UInt32> remainingFreeSpaceBlocks = new Dictionary<UInt32, UInt32>();
-        private readonly Dictionary<UInt32, UInt32> totalFreeSpaceBlocks = new Dictionary<UInt32, UInt32>();
-        private readonly Dictionary<byte[], UInt32> reuseValues = new Dictionary<byte[], UInt32>();
+        private Dictionary<VAVAddr, VAVAddr> remainingFreeSpaceBlocks = new Dictionary<VAVAddr, VAVAddr>();
+        private readonly Dictionary<VAVAddr, VAVAddr> totalFreeSpaceBlocks = new Dictionary<VAVAddr, VAVAddr>();
+        private readonly Dictionary<byte[], VAVAddr> reuseValues = new Dictionary<byte[], VAVAddr>();
         private bool startedAllocating = false;
 
-        public void addFreeSpace(UInt32 start, UInt32 end)
+        public void addFreeSpace(VAVAddr start, VAVAddr end)
         {
             if (startedAllocating)
                 throw new InvalidOperationException("Can't add more free space after calling allocateUnusedSpace()");
@@ -27,11 +27,11 @@ namespace CustomStreetManager
             remainingFreeSpaceBlocks.Add(end, start);
         }
 
-        private UInt32 findSuitableFreeSpaceBlock(int requiredSize)
+        private VAVAddr findSuitableFreeSpaceBlock(int requiredSize)
         {
             // search for a suitable free space where it fits best (fill smallest free space blocks first which still hold the space)
             int smallestFreeSpaceBlockSize = int.MaxValue;
-            var smallestFreeSpaceBlockEnd = uint.MaxValue;
+            VAVAddr smallestFreeSpaceBlockEnd = VAVAddr.MaxValue;
             foreach (var entry in remainingFreeSpaceBlocks)
             {
                 var start = entry.Value;
@@ -43,14 +43,14 @@ namespace CustomStreetManager
                     smallestFreeSpaceBlockEnd = end;
                 }
             }
-            if (smallestFreeSpaceBlockEnd == uint.MaxValue)
+            if (smallestFreeSpaceBlockEnd == VAVAddr.MaxValue)
             {
                 throw new InsufficientMemoryException("Could not find a suitable free space block in the main.dol to allocate " + requiredSize + " bytes.");
             }
             return smallestFreeSpaceBlockEnd;
         }
 
-        private int calculateFreeSpace(Dictionary<UInt32, UInt32> freeSpaceBlocks)
+        private int calculateFreeSpace(Dictionary<VAVAddr, VAVAddr> freeSpaceBlocks)
         {
             int freeSpaceLeft = 0;
             foreach (var entry in freeSpaceBlocks)
@@ -73,10 +73,10 @@ namespace CustomStreetManager
             return calculateFreeSpace(totalFreeSpaceBlocks);
         }
 
-        private UInt32 findLargestFreeSpaceBlock(Dictionary<UInt32, UInt32> freeSpaceBlocks)
+        private VAVAddr findLargestFreeSpaceBlock(Dictionary<VAVAddr, VAVAddr> freeSpaceBlocks)
         {
             int largestFreeSpaceBlockSize = -1;
-            UInt32 largestFreeSpaceBlockEnd = uint.MaxValue;
+            VAVAddr largestFreeSpaceBlockEnd = (VAVAddr)uint.MaxValue;
             foreach (var entry in remainingFreeSpaceBlocks)
             {
                 var start = entry.Value;
@@ -88,7 +88,7 @@ namespace CustomStreetManager
                     largestFreeSpaceBlockEnd = end;
                 }
             }
-            if (largestFreeSpaceBlockEnd == uint.MaxValue)
+            if (largestFreeSpaceBlockEnd == (VAVAddr)uint.MaxValue)
             {
                 throw new InsufficientMemoryException("Could not determine the largest free space block.");
             }
@@ -109,12 +109,12 @@ namespace CustomStreetManager
             return (int)(end - start);
         }
 
-        public UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, IProgress<ProgressInfo> progress)
+        public VAVAddr allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, AddressMapper fileMapper, IProgress<ProgressInfo> progress)
         {
-            return allocateUnusedSpace(bytes, stream, toFileAddress, progress, "");
+            return allocateUnusedSpace(bytes, stream, fileMapper, progress, "");
         }
 
-        public UInt32 allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, Func<UInt32, int> toFileAddress, IProgress<ProgressInfo> progress, string purpose)
+        public VAVAddr allocateUnusedSpace(byte[] bytes, EndianBinaryWriter stream, AddressMapper fileMapper, IProgress<ProgressInfo> progress, string purpose)
         {
             if (!string.IsNullOrEmpty(purpose))
             {
@@ -124,30 +124,30 @@ namespace CustomStreetManager
             string str = HexUtil.byteArrayToStringOrHex(bytes);
             if (reuseValues.ContainsKey(bytes))
             {
-                progress?.Report(new ProgressInfo("Reuse " + str + " at " + reuseValues[bytes].ToString("X") + purpose, true));
+                progress?.Report(new ProgressInfo("Reuse " + str + " at " + reuseValues[bytes].ToString() + purpose, true));
                 return reuseValues[bytes];
             }
             else
             {
-                UInt32 end = findSuitableFreeSpaceBlock(bytes.Length);
-                UInt32 start = remainingFreeSpaceBlocks[end];
-                UInt32 virtualAddr = start;
+                VAVAddr end = findSuitableFreeSpaceBlock(bytes.Length);
+                VAVAddr start = remainingFreeSpaceBlocks[end];
+                VAVAddr addr = start;
 
-                UInt32 newStartPos = start + (UInt32)bytes.Length;
+                VAVAddr newStartPos = start + bytes.Length;
                 while (newStartPos % 4 != 0)
                     newStartPos++;
                 if (newStartPos > end)
                     newStartPos = end;
                 remainingFreeSpaceBlocks[end] = newStartPos;
 
-                stream.Seek(toFileAddress(virtualAddr), SeekOrigin.Begin);
+                stream.Seek(fileMapper.toFileAddress(addr), SeekOrigin.Begin);
                 stream.Write(bytes);
-                byte[] fillUpToAlign = new byte[newStartPos - virtualAddr - bytes.Length];
+                byte[] fillUpToAlign = new byte[(int)(newStartPos - addr - bytes.Length)];
                 stream.Write(fillUpToAlign);
 
-                reuseValues.Add(bytes, virtualAddr);
-                progress?.Report(new ProgressInfo("Allocate " + str + " (" + bytes.Length + " bytes) at " + virtualAddr.ToString("X") + purpose, true));
-                return virtualAddr;
+                reuseValues.Add(bytes, addr);
+                progress?.Report(new ProgressInfo("Allocate " + str + " (" + bytes.Length + " bytes) at " + addr.ToString() + purpose, true));
+                return addr;
             }
         }
         /// <summary>
@@ -158,8 +158,8 @@ namespace CustomStreetManager
         /// bug and others do not, making it harder to find the root cause.
         /// </summary>
         /// <param name="stream"></param>
-        /// <param name="toFileAddress"></param>
-        public void nullTheFreeSpace(EndianBinaryWriter stream, Func<UInt32, int> toFileAddress)
+        /// <param name="addressMapper"></param>
+        public void nullTheFreeSpace(EndianBinaryWriter stream, AddressMapper addressMapper)
         {
             byte[] nullBytes;
             foreach (var entry in remainingFreeSpaceBlocks)
@@ -167,7 +167,7 @@ namespace CustomStreetManager
                 var start = entry.Value;
                 var end = entry.Key;
                 var freeSpaceSize = end - start;
-                stream.Seek(toFileAddress(start), SeekOrigin.Begin);
+                stream.Seek(addressMapper.toFileAddress(start), SeekOrigin.Begin);
                 nullBytes = new byte[freeSpaceSize];
                 stream.Write(nullBytes);
             }
@@ -175,7 +175,7 @@ namespace CustomStreetManager
 
         public void reset()
         {
-            this.remainingFreeSpaceBlocks = new Dictionary<UInt32, UInt32>(totalFreeSpaceBlocks);
+            this.remainingFreeSpaceBlocks = new Dictionary<VAVAddr, VAVAddr>(totalFreeSpaceBlocks);
             reuseValues.Clear();
             startedAllocating = false;
         }

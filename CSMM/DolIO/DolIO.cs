@@ -11,33 +11,27 @@ namespace CustomStreetManager
 {
     public abstract class DolIO
     {
-        private FreeSpaceManager freeSpaceManager;
-        private IProgress<ProgressInfo> progress;
-        private EndianBinaryWriter stream;
-        private Func<uint, int> toFileAddress;
-        public void write(EndianBinaryWriter stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors, FreeSpaceManager freeSpaceManager, IProgress<ProgressInfo> progress)
+        private FreeSpaceManager _fsm;
+        private IProgress<ProgressInfo> _p;
+        private EndianBinaryWriter _w;
+        private AddressMapper _am;
+        public void write(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors, FreeSpaceManager freeSpaceManager, IProgress<ProgressInfo> progress)
         {
-            try
-            {
-                this.freeSpaceManager = freeSpaceManager;
-                this.progress = progress;
-                this.stream = stream;
-                this.toFileAddress = toFileAddress;
-                writeAsm(stream, toFileAddress, mapDescriptors);
-            }
-            finally
-            {
-                this.freeSpaceManager = null;
-                this.progress = null;
-                this.stream = null;
-                this.toFileAddress = null;
-            }
+            this._fsm = freeSpaceManager;
+            this._p = progress;
+            this._w = stream;
+            this._am = addressMapper;
+            writeAsm(stream, addressMapper, mapDescriptors);
+            this._fsm = null;
+            this._p = null;
+            this._w = null;
+            this._am = null;
         }
-        protected abstract void writeAsm(EndianBinaryWriter stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors);
-        public void read(EndianBinaryReader stream, Func<uint, int> toFileAddress, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
+        protected abstract void writeAsm(EndianBinaryWriter writer, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors);
+        public void read(EndianBinaryReader stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
-            var isVanilla = readIsVanilla(stream, toFileAddress);
-            var rowCount = readTableRowCount(stream, toFileAddress, isVanilla);
+            var isVanilla = readIsVanilla(stream, addressMapper);
+            var rowCount = readTableRowCount(stream, addressMapper, isVanilla);
             if (rowCount != mapDescriptors.Count)
             {
                 if (isVanilla)
@@ -53,61 +47,66 @@ namespace CustomStreetManager
                     throw new ApplicationException("The amount of rows of the table in the main.dol is " + rowCount + " but the mapDescriptor count is " + mapDescriptors.Count);
                 }
             }
-            var addr = readTableAddr(stream, toFileAddress, isVanilla);
-            stream.Seek(toFileAddress(addr), SeekOrigin.Begin);
-            readTable(stream, mapDescriptors, toFileAddress, isVanilla);
+            var addr = readTableAddr(stream, addressMapper, isVanilla);
+            stream.Seek(addressMapper.toFileAddress(addr), SeekOrigin.Begin);
+            readTable(stream, mapDescriptors, addressMapper, isVanilla);
         }
-        protected abstract UInt32 readTableAddr(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla);
-        protected abstract Int16 readTableRowCount(EndianBinaryReader stream, Func<uint, int> toFileAddress, bool isVanilla);
-        protected abstract void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, Func<uint, int> toFileAddress, bool isVanilla);
-        protected abstract bool readIsVanilla(EndianBinaryReader stream, Func<uint, int> toFileAddress);
+        protected abstract VAVAddr readTableAddr(EndianBinaryReader reader, AddressMapper addressMapper, bool isVanilla);
+        protected abstract Int16 readTableRowCount(EndianBinaryReader reader, AddressMapper addressMapper, bool isVanilla);
+        protected abstract void readTable(EndianBinaryReader reader, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla);
+        protected abstract bool readIsVanilla(EndianBinaryReader reader, AddressMapper addressMapper);
 
-        protected UInt32 allocate(string str, string purpose = null)
+        protected VAVAddr allocate(string str, string purpose = null)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 s.Write(str);
                 s.Write((byte)0);
-                return freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, purpose);
+                return _fsm.allocateUnusedSpace(memoryStream.ToArray(), _w, _am, _p, purpose);
             }
         }
-        protected UInt32 allocate(byte[] bytes, string purpose)
+        protected VAVAddr allocate(byte[] bytes, string purpose)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 s.Write(bytes);
-                return freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, purpose);
+                return _fsm.allocateUnusedSpace(memoryStream.ToArray(), _w, _am, _p, purpose);
             }
         }
-        protected UInt32 allocate(List<byte> bytes, string purpose)
+        protected VAVAddr allocate(List<byte> bytes, string purpose)
         {
             return allocate(bytes.ToArray(), purpose);
         }
-        protected UInt32 allocate(List<UInt32> opcodes, string purpose)
+        protected VAVAddr allocate(List<UInt32> opcodes, string purpose)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
                 foreach (UInt32 opcode in opcodes)
                     s.Write(opcode);
-                return freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, toFileAddress, progress, purpose);
+                return _fsm.allocateUnusedSpace(memoryStream.ToArray(), _w, _am, _p, purpose);
             }
         }
-        protected string resolveAddressToString(uint virtualAddress, EndianBinaryReader stream, Func<uint, int> toFileAddress)
+        protected VAVAddr allocate(List<VAVAddr> addressTable, string purpose)
         {
-            int fileAddress = toFileAddress(virtualAddress);
-            if (fileAddress >= 0)
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                stream.Seek(fileAddress, SeekOrigin.Begin);
-                byte[] buff = stream.ReadBytes(64);
-                return HexUtil.byteArrayToString(buff);
+                EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
+                foreach (VAVAddr address in addressTable)
+                    s.Write((UInt32)address);
+                return _fsm.allocateUnusedSpace(memoryStream.ToArray(), _w, _am, _p, purpose);
             }
-            else
-            {
+        }
+        protected string resolveAddressToString(VAVAddr virtualAddress, EndianBinaryReader stream, AddressMapper addressMapper)
+        {
+            if (virtualAddress == VAVAddr.NullAddress)
                 return null;
-            }
+            int fileAddress = addressMapper.toFileAddress(virtualAddress);
+            stream.Seek(fileAddress, SeekOrigin.Begin);
+            byte[] buff = stream.ReadBytes(64);
+            return HexUtil.byteArrayToString(buff);
         }
     }
 }

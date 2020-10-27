@@ -1,21 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class MainDolSection
+    public class AddressSection
     {
-        public string sectionName { get; set; }
         public long offsetBeg { get; set; }
         public long offsetEnd { get; set; }
         public long fileDelta { get; set; }
+        public string sectionName { get; set; }
+
+        public AddressSection(long offsetBeg, long offsetEnd, long fileDelta, string sectionName)
+        {
+            this.offsetBeg = offsetBeg;
+            this.offsetEnd = offsetEnd;
+            this.fileDelta = fileDelta;
+            this.sectionName = sectionName;
+        }
+
+        public static AddressSection identity()
+        {
+            return new AddressSection(long.MinValue, long.MaxValue, 0, "Identity");
+        }
 
         internal bool containsVirtualAddress(long virtualAddress)
         {
-            if(offsetBeg <= virtualAddress && virtualAddress <= offsetEnd)
+            if (offsetBeg <= virtualAddress && virtualAddress <= offsetEnd)
             {
                 return true;
             }

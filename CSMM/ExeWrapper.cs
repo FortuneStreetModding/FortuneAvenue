@@ -233,12 +233,12 @@ namespace CustomStreetManager
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
 
-        public static async Task<List<MainDolSection>> readSections(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<List<AddressSection>> readSections(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "DUMP -l \"" + inputFile + "\"";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
 
-            List<MainDolSection> sections = new List<MainDolSection>();
+            List<AddressSection> sections = new List<AddressSection>();
 
             using (StringReader reader = new StringReader(result))
             {
@@ -260,15 +260,14 @@ namespace CustomStreetManager
                     string[] columns = line.Split(':');
                     if (columns.Length == 5)
                     {
-                        MainDolSection section = new MainDolSection();
                         string unused = columns[0];
                         string[] offsets = columns[1].Split(new string[] { ".." }, StringSplitOptions.None);
-                        section.offsetBeg = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(offsets[0]), 0);
-                        section.offsetEnd = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(offsets[1]), 0);
+                        var offsetBeg = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(offsets[0]), 0);
+                        var offsetEnd = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(offsets[1]), 0);
                         string size = columns[2];
-                        section.fileDelta = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(columns[3]), 0);
-                        section.sectionName = columns[4].Trim();
-                        sections.Add(section);
+                        var fileDelta = endianBitConverter.ToUInt32(HexUtil.hexStringToByteArray(columns[3]), 0);
+                        var sectionName = columns[4].Trim();
+                        sections.Add(new AddressSection(offsetBeg, offsetEnd, fileDelta, sectionName));
                     }
                 }
 

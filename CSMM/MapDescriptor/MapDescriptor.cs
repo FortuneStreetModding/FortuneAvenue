@@ -19,17 +19,17 @@ namespace CustomStreetManager
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
         public RuleSet RuleSet { get; set; }
-        public UInt32 InternalNameAddr { get; set; }
+        public VAVAddr InternalNameAddr { get; set; }
         public string InternalName { get; set; }
-        public UInt32 FrbFile1Addr { get; set; }
+        public VAVAddr FrbFile1Addr { get; set; }
         public string FrbFile1 { get; set; }
-        public UInt32 FrbFile2Addr { get; set; }
+        public VAVAddr FrbFile2Addr { get; set; }
         public string FrbFile2 { get; set; }
-        public UInt32 FrbFile3Addr { get; set; }
+        public VAVAddr FrbFile3Addr { get; set; }
         public string FrbFile3 { get; set; }
-        public UInt32 FrbFile4Addr { get; set; }
+        public VAVAddr FrbFile4Addr { get; set; }
         public string FrbFile4 { get; set; }
-        public UInt32 BackgroundAddr { get; set; }
+        public VAVAddr BackgroundAddr { get; set; }
         public string Background { get; set; }
 
         private Optional<UInt32> bgmId = Optional<UInt32>.CreateEmpty();
@@ -68,10 +68,10 @@ namespace CustomStreetManager
             }
             set { }
         }
-        public UInt32 MapSwitchParamAddr { get; set; }
+        public VAVAddr MapSwitchParamAddr { get; set; }
         public Dictionary<int, OriginPoint> SwitchRotationOriginPoints { get; private set; }
         public LoopingMode LoopingMode { get; set; }
-        public UInt32 LoopingModeParamAddr { get; set; }
+        public VAVAddr LoopingModeParamAddr { get; set; }
         public Single LoopingModeRadius { get; set; }
         public Single LoopingModeHorizontalPadding { get; set; }
         public Single LoopingModeVerticalSquareCount { get; set; }
@@ -84,7 +84,7 @@ namespace CustomStreetManager
         public Character TourOpponent2 { get; set; } = Character.Luigi;
         public Character TourOpponent3 { get; set; } = Character.Peach;
         public UInt32 TourClearRank { get; set; } = 2;
-        public UInt32 MapIconAddrAddr { get; set; }
+        public VAVAddr MapIconAddrAddr { get; set; }
         public string MapIcon { get; internal set; }
 
         public MapDescriptor()
@@ -94,26 +94,26 @@ namespace CustomStreetManager
             VentureCard = new byte[128];
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
-        public void readRotationOriginPoints(EndianBinaryReader stream, int fileAddress, ST7_Interface data)
+        public void readRotationOriginPoints(EndianBinaryReader stream, AddressMapper addressMapper)
         {
             SwitchRotationOriginPoints.Clear();
             // Special case handling: in the original game these values are initialized at run time only. So we need to hardcode them:
-            if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_MAGMAGEDDON()) // magmageddon
+            if (MapSwitchParamAddr == addressMapper.toVersionAgnosticAddress((BSVAddr) 0x806b8df0)) // magmageddon
             {
                 // no points
             }
-            else if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_COLLOSUS()) // collosus
+            else if (MapSwitchParamAddr == addressMapper.toVersionAgnosticAddress((BSVAddr) 0x8047d598)) // collosus
             {
                 SwitchRotationOriginPoints[0] = new OriginPoint(-288, -32);
                 SwitchRotationOriginPoints[1] = new OriginPoint(288, -32);
             }
-            else if (MapSwitchParamAddr == data.MAP_SWITCH_PARAM_ADDR_OBSERVATORY()) // observatory
+            else if (MapSwitchParamAddr == addressMapper.toVersionAgnosticAddress((BSVAddr) 0x8047d5b4)) // observatory
             {
                 SwitchRotationOriginPoints[0] = new OriginPoint(0, 0);
             }
-            else if (fileAddress >= 0)
+            else if (addressMapper.canConvertToFileAddress(MapSwitchParamAddr))
             {
-                stream.Seek(fileAddress, SeekOrigin.Begin);
+                stream.Seek(addressMapper.toFileAddress(MapSwitchParamAddr), SeekOrigin.Begin);
                 var originPointCount = stream.ReadUInt32();
                 for (int i = 0; i < originPointCount; i++)
                 {
@@ -135,11 +135,11 @@ namespace CustomStreetManager
                 stream.Write(SwitchRotationOriginPoints[i].Y);
             }
         }
-        public void readLoopingModeParams(EndianBinaryReader stream, int fileAddress)
+        public void readLoopingModeParams(EndianBinaryReader stream, AddressMapper addressMapper)
         {
-            if (fileAddress >= 0)
+            if (addressMapper.canConvertToFileAddress(LoopingModeParamAddr))
             {
-                stream.Seek(fileAddress, SeekOrigin.Begin);
+                stream.Seek(addressMapper.toFileAddress(LoopingModeParamAddr), SeekOrigin.Begin);
                 LoopingModeRadius = stream.ReadSingle();
                 LoopingModeHorizontalPadding = stream.ReadSingle();
                 LoopingModeVerticalSquareCount = stream.ReadSingle();
@@ -155,37 +155,37 @@ namespace CustomStreetManager
         {
             Name_MSG_ID = stream.ReadUInt32();
             BGMID = stream.ReadUInt32();
-            InternalNameAddr = stream.ReadUInt32();
-            BackgroundAddr = stream.ReadUInt32();
+            InternalNameAddr = (VAVAddr)stream.ReadUInt32();
+            BackgroundAddr = (VAVAddr)stream.ReadUInt32();
             RuleSet = (RuleSet)stream.ReadUInt32();
             Theme = (BoardTheme)stream.ReadUInt32();
-            FrbFile1Addr = stream.ReadUInt32();
-            FrbFile2Addr = stream.ReadUInt32();
-            FrbFile3Addr = stream.ReadUInt32();
-            FrbFile4Addr = stream.ReadUInt32();
-            MapSwitchParamAddr = stream.ReadUInt32();
-            LoopingModeParamAddr = stream.ReadUInt32();
+            FrbFile1Addr = (VAVAddr)stream.ReadUInt32();
+            FrbFile2Addr = (VAVAddr)stream.ReadUInt32();
+            FrbFile3Addr = (VAVAddr)stream.ReadUInt32();
+            FrbFile4Addr = (VAVAddr)stream.ReadUInt32();
+            MapSwitchParamAddr = (VAVAddr)stream.ReadUInt32();
+            LoopingModeParamAddr = (VAVAddr)stream.ReadUInt32();
             ID = stream.ReadUInt32();
             // ignore BG Sequence
             UInt32 BGSequenceAddr = stream.ReadUInt32();
         }
-        public void writeMapData(EndianBinaryWriter stream, UInt32 internalNameAddr, UInt32 backgroundAddr, UInt32 frbFile1Addr, UInt32 frbFile2Addr, UInt32 frbFile3Addr, UInt32 frbFile4Addr, UInt32 mapSwitchParamAddr, UInt32 loopingModeParamAddr, UInt32 bgSequenceMarioStadium)
+        public void writeMapData(EndianBinaryWriter stream, VAVAddr internalNameAddr, VAVAddr backgroundAddr, VAVAddr frbFile1Addr, VAVAddr frbFile2Addr, VAVAddr frbFile3Addr, VAVAddr frbFile4Addr, VAVAddr mapSwitchParamAddr, VAVAddr loopingModeParamAddr, VAVAddr bgSequenceMarioStadium)
         {
             stream.Write(Name_MSG_ID);
             stream.Write(BGMID);
-            stream.Write(internalNameAddr);
-            stream.Write(backgroundAddr);
+            stream.Write((UInt32)internalNameAddr);
+            stream.Write((UInt32)backgroundAddr);
             stream.Write((UInt32)RuleSet);
             stream.Write((UInt32)Theme);
-            stream.Write(frbFile1Addr);
-            stream.Write(frbFile2Addr);
-            stream.Write(frbFile3Addr);
-            stream.Write(frbFile4Addr);
-            stream.Write(mapSwitchParamAddr);
-            stream.Write(loopingModeParamAddr);
+            stream.Write((UInt32)frbFile1Addr);
+            stream.Write((UInt32)frbFile2Addr);
+            stream.Write((UInt32)frbFile3Addr);
+            stream.Write((UInt32)frbFile4Addr);
+            stream.Write((UInt32)mapSwitchParamAddr);
+            stream.Write((UInt32)loopingModeParamAddr);
             stream.Seek(4, SeekOrigin.Current); // skip MapOriginID
             // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
-            stream.Write(Background == "bg004" ? bgSequenceMarioStadium : (UInt32)0);
+            stream.Write(Background == "bg004" ? (UInt32)bgSequenceMarioStadium : (UInt32)0);
         }
         public void readMapDefaultsFromStream(EndianBinaryReader stream)
         {
@@ -196,7 +196,7 @@ namespace CustomStreetManager
             TourOpponent2 = (Character)stream.ReadUInt32();
             TourOpponent3 = (Character)stream.ReadUInt32();
             TourClearRank = stream.ReadUInt32();
-            MapIconAddrAddr = stream.ReadUInt32(); // this is normally TourMapDifficulty, but since it is unused it has been repurposed so that each map can have a unique icon
+            MapIconAddrAddr = (VAVAddr)stream.ReadUInt32(); // this is normally TourMapDifficulty, but since it is unused it has been repurposed so that each map can have a unique icon
             var TourGeneralPlayTime = stream.ReadUInt32(); // ignore unused tour general play time
         }
         public void writeMapDefaults(EndianBinaryWriter stream, UInt32 mapIconAddrAddr)
