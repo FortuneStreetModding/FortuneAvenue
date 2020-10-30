@@ -51,11 +51,7 @@ namespace CustomStreetManager
                     versionMappingSections.Add(new AddressSection(0x8040d980, 0x8041027f, 0x40, ".data2, .data3 and beginning of .data4 until Boom Street / Fortune Street strings"));
                     versionMappingSections.Add(new AddressSection(0x804105f0, 0x8044ebe7, 0x188, "continuation of .data4"));
                     versionMappingSections.Add(new AddressSection(0x8044ec00, 0x804ac804, 0x1A0, ".data5"));
-                    versionMappingSections.Add(new AddressSection(0x804ac880, 0x80814c7f, 0x200, ".uninitialized0"));
-                    versionMappingSections.Add(new AddressSection(0x80814c80, 0x808173bf, 0x200, ".data6"));
-                    versionMappingSections.Add(new AddressSection(0x808173c0, 0x80818f9f, 0x200, ".uninitialized1"));
-                    versionMappingSections.Add(new AddressSection(0x80818fa0, 0x8081efdf, 0x200, ".data7"));
-                    versionMappingSections.Add(new AddressSection(0x8081efe0, 0x8081f013, 0x200, ".uninitialized2"));
+                    versionMappingSections.Add(new AddressSection(0x804ac880, 0x8081f013, 0x200, ".uninitialized0, .data6, .uninitialized1, .data7, .uninitialized2"));
 
                     addressMapper.setVersionMappingSections(versionMappingSections);
                 }
