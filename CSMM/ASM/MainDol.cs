@@ -25,9 +25,47 @@ namespace CustomStreetManager
             return HexUtil.byteArrayToString(buff);
         }
 
-        FreeSpaceManager createFreeSpaceManager(AddressMapper addressMapper)
+        public void setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections)
         {
-            var freeSpaceManager = new FreeSpaceManager();
+            addressMapper = new AddressMapper(fileMappingSections);
+            // find out the version we are dealing with
+            // Boom Street___: 8007a314: lwz r0,-0x547c(r13)
+            stream.Seek(addressMapper.toFileAddress((VAVAddr)0x8007a314), SeekOrigin.Begin);
+            if (stream.ReadUInt32() == PowerPcAsm.lwz(0, -0x547c, 13))
+            {
+                // boom street address mapper is a no-op, since the ASM hacks use the boom street virtual addresses
+                var versionMappingSections = new List<AddressSection> { AddressSection.identity() };
+                addressMapper.setVersionMappingSections(versionMappingSections);
+            }
+            else
+            {
+                // Fortune Street: 8007a2c0: lwz r0,-0x547c(r13)
+                stream.Seek(addressMapper.toFileAddress((VAVAddr)0x8007a2c0), SeekOrigin.Begin);
+                if (stream.ReadUInt32() == PowerPcAsm.lwz(0, -0x547c, 13))
+                {
+                    var versionMappingSections = new List<AddressSection>();
+                    // add mappings to translate boom street virtual addresses to fortune street virtual addresses
+                    versionMappingSections.Add(new AddressSection(0x80000100, 0x8007a283, 0x0, ".text, .data0, .data1 and beginning of .text1 until InitSoftLanguage"));
+                    versionMappingSections.Add(new AddressSection(0x8007a2f4, 0x80268717, 0x54, "continuation of .text1 until AIRegisterDMACallback"));
+                    versionMappingSections.Add(new AddressSection(0x80268720, 0x8040d97b, 0x50, "continuation of .text1"));
+                    versionMappingSections.Add(new AddressSection(0x8040d980, 0x8041027f, 0x40, ".data2, .data3 and beginning of .data4 until Boom Street / Fortune Street strings"));
+                    versionMappingSections.Add(new AddressSection(0x804105f0, 0x8044ebe7, 0x188, "continuation of .data4"));
+                    versionMappingSections.Add(new AddressSection(0x8044ec00, 0x804ac804, 0x1A0, ".data5"));
+                    versionMappingSections.Add(new AddressSection(0x804ac880, 0x80814c7f, 0x200, ".uninitialized0"));
+                    versionMappingSections.Add(new AddressSection(0x80814c80, 0x808173bf, 0x200, ".data6"));
+                    versionMappingSections.Add(new AddressSection(0x808173c0, 0x80818f9f, 0x200, ".uninitialized1"));
+                    versionMappingSections.Add(new AddressSection(0x80818fa0, 0x8081efdf, 0x200, ".data7"));
+                    versionMappingSections.Add(new AddressSection(0x8081efe0, 0x8081f013, 0x200, ".uninitialized2"));
+
+                    addressMapper.setVersionMappingSections(versionMappingSections);
+                }
+                else
+                {
+                    // unsupported version
+                    throw new ApplicationException("Only Boom Street (ST7P01) and Fortune Street (ST7E01) are supported.");
+                }
+            }
+            freeSpaceManager = new FreeSpaceManager();
             // Venture Card Table
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80410648), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80411b9b));
             // Map Data String Table
@@ -38,17 +76,9 @@ namespace CustomStreetManager
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042dfc0), addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042e22f));
             // Unused costume string table 3
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042ef30), addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042f7ef));
-            // Expanded Rom
-            // freeSpaceManager.addFreeSpace(0x80001800, 0x80001800 + 0x1800);
-            return freeSpaceManager;
         }
 
-        public void setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections)
-        {
-            var versionMappingSections = new List<AddressSection> { AddressSection.identity() };
-            addressMapper = new AddressMapper(fileMappingSections, versionMappingSections);
-            freeSpaceManager = createFreeSpaceManager(addressMapper);
-        }
+
 
         public List<MapDescriptor> readMainDol(EndianBinaryReader stream, List<AddressSection> fileMappingSections)
         {

@@ -9,10 +9,15 @@ namespace CustomStreetManager
     {
         AddressSectionMapper fileMapper;
         AddressSectionMapper versionMapper;
-        public AddressMapper(List<AddressSection> fileMappingSections, List<AddressSection> versionMappingSections) {
+        public AddressMapper(List<AddressSection> fileMappingSections) {
             this.fileMapper = new AddressSectionMapper(fileMappingSections);
+        }
+
+        public void setVersionMappingSections(List<AddressSection> versionMappingSections)
+        {
             this.versionMapper = new AddressSectionMapper(versionMappingSections);
         }
+
         public bool canConvertToFileAddress(VAVAddr versionAddress)
         {
             return fileMapper.findSection((long)versionAddress) != null;
