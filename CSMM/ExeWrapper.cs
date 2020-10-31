@@ -38,7 +38,7 @@ namespace CustomStreetManager
             using (ZipArchive archive = ZipFile.OpenRead(zipFilePath))
             {
                 int i = 0;
-                progressSub?.Report("Extracting required files ...");
+                progressSub?.Report("Extracting " + name + " ...");
                 foreach (ZipArchiveEntry entry in archive.Entries)
                 {
                     foreach (string requiredFile in requiredFiles)
