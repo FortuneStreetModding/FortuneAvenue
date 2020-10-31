@@ -29,7 +29,7 @@ namespace CustomStreetManager
             string extractDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputWbfsIso));
             await ExeWrapper.extractFullIsoAsync(inputWbfsIso, extractDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
 
-            cacheFileSet = new DataFileSet(Path.Combine(extractDir, "DATA"));
+            cacheFileSet = new DataFileSet(extractDir);
             progress?.Report("Detect the sections in main.dol file...");
             List<AddressSection> sections = await ExeWrapper.readSections(cacheFileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 90, 95)).ConfigureAwait(false);
 

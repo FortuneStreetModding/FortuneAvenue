@@ -209,7 +209,7 @@ namespace CustomStreetManager
         }
         public static async Task<string> extractFiles(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "COPY --progress --fst --preserve --overwrite --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb;+/files/game/game_sequence*.arc;+/files/game/lang*/game_sequence*.arc; \"" + inputFile + "\" \"" + Path.Combine(outputDirectory, "DATA") + "\"";
+            string arguments = "COPY --progress --fst --preserve --overwrite --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb;+/files/game/game_sequence*.arc;+/files/game/lang*/game_sequence*.arc; \"" + inputFile + "\" \"" + outputDirectory + "\"";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             return result;
         }
@@ -218,7 +218,7 @@ namespace CustomStreetManager
 
             if (!Directory.Exists(outputDirectory))
             {
-                string arguments = "COPY --progress --fst --preserve --overwrite \"" + inputFile + "\" \"" + outputDirectory + "\"";
+                string arguments = "COPY --progress --psel data --fst --preserve --overwrite \"" + inputFile + "\" \"" + outputDirectory + "\"";
                 return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             }
             else
