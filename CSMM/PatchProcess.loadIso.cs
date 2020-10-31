@@ -38,7 +38,7 @@ namespace CustomStreetManager
             {
                 EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
                 mainDol = new MainDol();
-                mapDescriptors = mainDol.readMainDol(binReader, sections);
+                mapDescriptors = mainDol.readMainDol(binReader, sections, progress);
 
                 progress?.Report(97);
                 progress?.Report("Read localization files...");

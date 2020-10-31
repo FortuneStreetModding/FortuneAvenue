@@ -25,14 +25,16 @@ namespace CustomStreetManager
             return HexUtil.byteArrayToString(buff);
         }
 
-        public void setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections)
+        public void setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
         {
             addressMapper = new AddressMapper(fileMappingSections);
             // find out the version we are dealing with
-            // Boom Street___: 8007a314: lwz r0,-0x547c(r13)
+
+            // Boom Street: 8007a314: lwz r0,-0x547c(r13)
             stream.Seek(addressMapper.toFileAddress((VAVAddr)0x8007a314), SeekOrigin.Begin);
             if (stream.ReadUInt32() == PowerPcAsm.lwz(0, -0x547c, 13))
             {
+                progress?.Report("Detected game: Boom Street");
                 // boom street address mapper is a no-op, since the ASM hacks use the boom street virtual addresses
                 var versionMappingSections = new List<AddressSection> { AddressSection.identity() };
                 addressMapper.setVersionMappingSections(versionMappingSections);
@@ -43,6 +45,8 @@ namespace CustomStreetManager
                 stream.Seek(addressMapper.toFileAddress((VAVAddr)0x8007a2c0), SeekOrigin.Begin);
                 if (stream.ReadUInt32() == PowerPcAsm.lwz(0, -0x547c, 13))
                 {
+                    progress?.Report("Detected game: Fortune Street");
+
                     var versionMappingSections = new List<AddressSection>();
                     // add mappings to translate boom street virtual addresses to fortune street virtual addresses
                     versionMappingSections.Add(new AddressSection(0x80000100, 0x8007a283, 0x0, ".text, .data0, .data1 and beginning of .text1 until InitSoftLanguage"));
@@ -76,9 +80,9 @@ namespace CustomStreetManager
 
 
 
-        public List<MapDescriptor> readMainDol(EndianBinaryReader stream, List<AddressSection> fileMappingSections)
+        public List<MapDescriptor> readMainDol(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
         {
-            setupAddressMapper(stream, fileMappingSections);
+            setupAddressMapper(stream, fileMappingSections, progress);
 
             List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
 
