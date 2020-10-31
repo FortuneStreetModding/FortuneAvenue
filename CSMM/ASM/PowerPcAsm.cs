@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace CustomStreetManager
 {
@@ -102,73 +103,73 @@ namespace CustomStreetManager
         }
         public static void test()
         {
-            Console.WriteLine(li(31, 0x28).ToString("X"));
-            Console.WriteLine(addi(0, 1, 1).ToString("X"));
-            Console.WriteLine(addi(0, 31, 1).ToString("X"));
-            Console.WriteLine(addi(1, 1, 1).ToString("X"));
-            Console.WriteLine(addi(31, 1, 1).ToString("X"));
-            Console.WriteLine(cmplw(1, 1).ToString("X"));
-            Console.WriteLine(cmplw(1, 3).ToString("X"));
-            Console.WriteLine(cmplwi(1, 3).ToString("X"));
-            Console.WriteLine(cmplwi(31, 0xFFFF).ToString("X"));
-            Console.WriteLine(ori(31, 31, -1).ToString("X"));
-            Console.WriteLine(ori(1, 1, 1).ToString("X"));
+            Debug.WriteLine(li(31, 0x28).ToString("X"));
+            Debug.WriteLine(addi(0, 1, 1).ToString("X"));
+            Debug.WriteLine(addi(0, 31, 1).ToString("X"));
+            Debug.WriteLine(addi(1, 1, 1).ToString("X"));
+            Debug.WriteLine(addi(31, 1, 1).ToString("X"));
+            Debug.WriteLine(cmplw(1, 1).ToString("X"));
+            Debug.WriteLine(cmplw(1, 3).ToString("X"));
+            Debug.WriteLine(cmplwi(1, 3).ToString("X"));
+            Debug.WriteLine(cmplwi(31, 0xFFFF).ToString("X"));
+            Debug.WriteLine(ori(31, 31, -1).ToString("X"));
+            Debug.WriteLine(ori(1, 1, 1).ToString("X"));
             // 7c000378     or         r0,r0,r0
             // 7c210b78     or         r1,r1,r1
             // 7ffffb78     or         r31,r31,r31
             // 7c411b78     or         r1,r2,r3
-            Console.WriteLine(or(0, 0, 0).ToString("X"));
-            Console.WriteLine(or(1, 1, 1).ToString("X"));
-            Console.WriteLine(or(31, 31, 31).ToString("X"));
-            Console.WriteLine(or(1, 2, 3).ToString("X"));
+            Debug.WriteLine(or(0, 0, 0).ToString("X"));
+            Debug.WriteLine(or(1, 1, 1).ToString("X"));
+            Debug.WriteLine(or(31, 31, 31).ToString("X"));
+            Debug.WriteLine(or(1, 2, 3).ToString("X"));
             // 7c01002e     lwzx       r0,r1,r0
             // 7c22182e     lwzx       r1,r2,r3
             // 7ffff82e     lwzx       r31,r31,r31
             // 7c85302e     lwzx       r4,r5,r6
             // 7c21082e     lwzx       r1,r1,r1
-            Console.WriteLine(lwzx(0, 1, 0).ToString("X"));
-            Console.WriteLine(lwzx(1, 2, 3).ToString("X"));
-            Console.WriteLine(lwzx(31, 31, 31).ToString("X"));
-            Console.WriteLine(lwzx(4, 5, 6).ToString("X"));
-            Console.WriteLine(lwzx(1, 1, 1).ToString("X"));
+            Debug.WriteLine(lwzx(0, 1, 0).ToString("X"));
+            Debug.WriteLine(lwzx(1, 2, 3).ToString("X"));
+            Debug.WriteLine(lwzx(31, 31, 31).ToString("X"));
+            Debug.WriteLine(lwzx(4, 5, 6).ToString("X"));
+            Debug.WriteLine(lwzx(1, 1, 1).ToString("X"));
             // 80230002     lwz       r1,0x2,r3
             // 83ffffff     lwz       r31,-0x1,r31
             // 8063001C     lwz       r3,0x1c,r3
-            Console.WriteLine(lwz(1, 2, 3).ToString("X"));
-            Console.WriteLine(lwz(31, -1, 31).ToString("X"));
-            Console.WriteLine(lwz(3, 0x1c, 3).ToString("X"));
+            Debug.WriteLine(lwz(1, 2, 3).ToString("X"));
+            Debug.WriteLine(lwz(31, -1, 31).ToString("X"));
+            Debug.WriteLine(lwz(3, 0x1c, 3).ToString("X"));
             // 7c0101ae     stbx       r0,r1,r0
             // 7c2219ae     stbx       r1,r2,r3
             // 7ffff9ae     stbx       r31,r31,r31
-            Console.WriteLine(stbx(0, 1, 0).ToString("X"));
-            Console.WriteLine(stbx(1, 2, 3).ToString("X"));
-            Console.WriteLine(stbx(31, 31, 31).ToString("X"));
+            Debug.WriteLine(stbx(0, 1, 0).ToString("X"));
+            Debug.WriteLine(stbx(1, 2, 3).ToString("X"));
+            Debug.WriteLine(stbx(31, 31, 31).ToString("X"));
             // 70210001     andi.      r1,r1,0x1
             // 73ff00ff     andi.      r31,r31,0xff
             // 70410003     andi.      r1,r2,0x3
-            Console.WriteLine(andi(1, 1, 1).ToString("X"));
-            Console.WriteLine(andi(31, 31, 0xFF).ToString("X"));
-            Console.WriteLine(andi(1, 2, 3).ToString("X"));
+            Debug.WriteLine(andi(1, 1, 1).ToString("X"));
+            Debug.WriteLine(andi(31, 31, 0xFF).ToString("X"));
+            Debug.WriteLine(andi(1, 2, 3).ToString("X"));
             // 7c000430     srw        r0,r0,r0
             // 7c201430     srw        r0,r1,r2
             // 7ffffc30     srw        r31,r31,r31
-            Console.WriteLine(srw(0, 0, 0).ToString("X"));
-            Console.WriteLine(srw(0, 1, 2).ToString("X"));
-            Console.WriteLine(srw(31, 31, 31).ToString("X"));
+            Debug.WriteLine(srw(0, 0, 0).ToString("X"));
+            Debug.WriteLine(srw(0, 1, 2).ToString("X"));
+            Debug.WriteLine(srw(31, 31, 31).ToString("X"));
             // 1c000000     mulli      r0, r0,0x0
             // 1c210001     mulli      r1, r1,0x1
             // 1c220003     mulli      r1, r2,0x3
             // 1fff00ff     mulli      r31,r31,0xff
-            Console.WriteLine(mulli(0, 0, 0).ToString("X"));
-            Console.WriteLine(mulli(1, 1, 1).ToString("X"));
-            Console.WriteLine(mulli(1, 2, 3).ToString("X"));
-            Console.WriteLine(mulli(31, 31, 0xff).ToString("X"));
+            Debug.WriteLine(mulli(0, 0, 0).ToString("X"));
+            Debug.WriteLine(mulli(1, 1, 1).ToString("X"));
+            Debug.WriteLine(mulli(1, 2, 3).ToString("X"));
+            Debug.WriteLine(mulli(31, 31, 0xff).ToString("X"));
             // 8007e130:  483adf31     bl 0x8042c060
-            Console.WriteLine(bl(0x8007e130, 0x8042c060).ToString("X"));
+            Debug.WriteLine(bl(0x8007e130, 0x8042c060).ToString("X"));
             // 8042c0a8:  4180ffe4     blt        LAB_8042c08c
             // 8042c0b4:  4180ffc4     blt        LAB_8042c078
-            Console.WriteLine(blt(0x8042c0a8, 0x8042c08c).ToString("X"));
-            Console.WriteLine(blt(0x8042c0b4, 0x8042c078).ToString("X"));
+            Debug.WriteLine(blt(0x8042c0a8, 0x8042c08c).ToString("X"));
+            Debug.WriteLine(blt(0x8042c0b4, 0x8042c078).ToString("X"));
         }
         public static UInt32 ori(byte register1, byte register2, short value)
         {

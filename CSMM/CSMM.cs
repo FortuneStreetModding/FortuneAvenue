@@ -73,7 +73,7 @@ namespace CustomStreetManager
                 var progress = new Progress<ProgressInfo>(progressInfo =>
                 {
                     progressBar.update(progressInfo);
-                    Console.WriteLine(progressInfo.line);
+                    Debug.WriteLine(progressInfo.line);
                 });
 
                 try
@@ -94,7 +94,7 @@ namespace CustomStreetManager
                         progressBar.EnableButton();
                     });
 
-                    Console.Error.WriteLine(e2.ToString());
+                    Debug.WriteLine(e2.ToString());
                 }
             }
 
@@ -136,7 +136,7 @@ namespace CustomStreetManager
                 var progress = new Progress<ProgressInfo>(progressInfo =>
                 {
                     progressBar.update(progressInfo);
-                    Console.WriteLine(progressInfo.line);
+                    Debug.WriteLine(progressInfo.line);
                 });
 
                 var inputWbfsIso = setInputISOLocation.Text;
@@ -156,7 +156,7 @@ namespace CustomStreetManager
                     progressBar.appendText(e.Message);
                     progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
                     progressBar.EnableButton();
-                    Console.Error.WriteLine(e.ToString());
+                    Debug.WriteLine(e.ToString());
                 }
                 updateDataGridData(null, null);
             }
@@ -261,7 +261,7 @@ namespace CustomStreetManager
                     var progress = new Progress<ProgressInfo>(progressInfo =>
                     {
                         progressBar.update(progressInfo);
-                        Console.WriteLine(progressInfo.line);
+                        Debug.WriteLine(progressInfo.line);
                     });
 
                     bool overwrite = false;
@@ -286,7 +286,7 @@ namespace CustomStreetManager
                         progressBar.appendText(e.Message);
                         progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
                         progressBar.EnableButton();
-                        Console.Error.WriteLine(e.ToString());
+                        Debug.WriteLine(e.ToString());
                     }
                 }
             }
@@ -310,7 +310,7 @@ namespace CustomStreetManager
                     var progress = new Progress<ProgressInfo>(progressInfo =>
                     {
                         progressBar.update(progressInfo);
-                        Console.WriteLine(progressInfo.line);
+                        Debug.WriteLine(progressInfo.line);
                     });
 
                     try
@@ -325,7 +325,7 @@ namespace CustomStreetManager
                         progressBar.appendText(e.Message);
                         progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
                         progressBar.EnableButton();
-                        Console.Error.WriteLine(e.ToString());
+                        Debug.WriteLine(e.ToString());
                     }
                 }
             }
