@@ -5,6 +5,5 @@ obj/
 MapDescriptorTemplate.cs
 packages/
 .vs
-*.pubxml
 Directory.Build.Props
-Properties/
+publish

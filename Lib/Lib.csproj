@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	<RuntimeIdentifiers>win10-x64;osx.10.12-x64</RuntimeIdentifiers>
+	<RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
     <UseWPF>true</UseWPF>
     <RootNamespace>Lib</RootNamespace>
     <AssemblyName>Lib</AssemblyName>
