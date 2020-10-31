@@ -6,8 +6,8 @@
 	  <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <RootNamespace>Editor</RootNamespace>
-    <AssemblyName>Editor</AssemblyName>
+    <RootNamespace>FortuneAvenue</RootNamespace>
+    <AssemblyName>FortuneAvenue</AssemblyName>
     <DefineConstants>NETCORE</DefineConstants>
     <ApplicationIcon>GroundBoom.ico</ApplicationIcon>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>

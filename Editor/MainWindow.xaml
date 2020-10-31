@@ -118,7 +118,7 @@
                 <HeaderedContentControl Header="Legend:" Margin="0,2,0,0" ClipToBounds="False">
                     <StackPanel>
                         <Grid Width="64" Height="64">
-                            <Image Source="/Editor;component/Images/GroundProperty.png"/>
+                            <Image Source="/FortuneAvenue;component/Images/GroundProperty.png"/>
                             <Border BorderBrush="Black" BorderThickness="1"/>
                             <TextBlock Text="Value" HorizontalAlignment="Center" VerticalAlignment="Center"
                                        FontSize="16" Foreground="White" Background="#7F000000"/>

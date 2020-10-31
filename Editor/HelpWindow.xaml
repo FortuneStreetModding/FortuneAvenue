@@ -33,7 +33,7 @@
         </TabItem>
         <TabItem Header="Making a Path">
             <StackPanel>
-                <Image Source="/Editor;component/Images/Path.jpg" Width="128" Height="128" />
+                <Image Source="/FortuneAvenue;component/Images/Path.png" Width="128" Height="128" />
                 <TextBlock Text="Paths are created by specifying where the player is allowed to move if they've come from a given tile. For example the above picture square 18 would have a waypoint that looks like the following." TextWrapping="Wrap" />
                 <HeaderedContentControl Header="Waypoint1" DataContext="{Binding Waypoint1}">
                     <StackPanel Margin="4, 0,0,0">
