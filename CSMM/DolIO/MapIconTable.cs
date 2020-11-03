@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class MapIconTable : DolIO
+    public class MapIconTable : DolIOTable
     {
         protected Dictionary<string, VAVAddr> writeIconStrings(List<MapDescriptor> mapDescriptors)
         {
@@ -127,7 +127,7 @@ namespace CustomStreetManager
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80211e78), SeekOrigin.Begin); stream.Write(PowerPcAsm.lwz(3, 0x0, 3));
 
         }
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
+        protected override void readAsm(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {

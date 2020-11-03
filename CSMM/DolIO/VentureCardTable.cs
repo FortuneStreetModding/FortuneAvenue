@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class VentureCardTable : DolIO
+    public class VentureCardTable : DolIOTable
     {
         /// <summary>
         /// Write the compressed venture card table
@@ -42,8 +42,6 @@ namespace CustomStreetManager
         /// Hijack the LoadBoard() routine. Intercept the moment when the (now compressed) ventureCardTable is passed on to the InitChanceBoard() routine. 
         /// Call the decompressVentureCardTable routine and pass the resulting decompressed ventureCardTable (located at ventureCardDecompressedTableAddr) to the InitChanceBoard() routine instead.
         /// </summary>
-        /// <param name="tableRowCount"></param>
-        /// <param name="ventureCardCompressedTableAddr"></param>
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {
             var tableRowCount = mapDescriptors.Count;
@@ -58,7 +56,7 @@ namespace CustomStreetManager
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e104), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(24, (UInt16)(tableRowCount - 1)));
             // mulli r0,r24,0x82                                   -> mulli r0,r24,0x10
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e11c), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 24, 0x10));
-            // r4 <- 0x80410648                                    -> r4 <- ventureCardTableAddr
+            // r4 <- 0x80410648                                    -> r4 <- ventureCardCompressedTableAddr
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e120), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
             // li r5,0x0                                           -> bl ventureCardDecompressTableRoutine
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8007e130), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl((UInt32)addressMapper.toVersionAgnosticAddress((BSVAddr)0x8007e130), (UInt32)ventureCardDecompressTableRoutine));
@@ -125,7 +123,7 @@ namespace CustomStreetManager
         /// <param name="s"></param>
         /// <param name="mapDescriptors"></param>
         /// <param name="isVanilla"></param>
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
+        protected override void readAsm(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
             if (isVanilla)
             {

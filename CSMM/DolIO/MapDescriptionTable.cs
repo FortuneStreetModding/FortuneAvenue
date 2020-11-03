@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class MapDescriptionTable : DolIO
+    public class MapDescriptionTable : DolIOTable
     {
         protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
@@ -33,7 +33,7 @@ namespace CustomStreetManager
             // r4 <- 0x80436bc0                                    -> r4 <- mapDescriptionTableAddr
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80212164), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
         }
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
+        protected override void readAsm(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
             if (isVanilla)
                 readVanillaTable(s, mapDescriptors);

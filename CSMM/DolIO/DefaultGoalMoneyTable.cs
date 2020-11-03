@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class DefaultGoalMoneyTable : DolIO
+    public class DefaultGoalMoneyTable : DolIOTable
     {
         protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
@@ -52,7 +52,7 @@ namespace CustomStreetManager
             // mulli r3,r31,0x24                                  ->  mulli r3,r31,0x04
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80211ca0), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(3, 31, 0x04));
         }
-        protected override void readTable(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
+        protected override void readAsm(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
             foreach (var mapDescriptor in mapDescriptors)
             {
