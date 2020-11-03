@@ -31,6 +31,7 @@ namespace CustomStreetManager
         public string FrbFile4 { get; set; }
         public VAVAddr BackgroundAddr { get; set; }
         public string Background { get; set; }
+        public bool IsPracticeBoard { get; set; }
 
         private Optional<UInt32> bgmId = Optional<UInt32>.CreateEmpty();
         public UInt32 BGMID
