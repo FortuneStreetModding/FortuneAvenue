@@ -25,6 +25,7 @@ namespace CustomStreetManager
     {
         PatchProcess patchProcess;
         readonly CancellationTokenSource exitTokenSource;
+        readonly Dictionary<string, ToolStripMenuItem> xmlFileToToolStripMenuItemDict = new Dictionary<string, ToolStripMenuItem>();
 
         public CSMM()
         {
@@ -81,14 +82,16 @@ namespace CustomStreetManager
                     await patchProcess.saveWbfsIso(inputFile, outputFile, false, progress, ct);
 
                     // TODO, better cleanup
-                    Invoke((MethodInvoker)delegate {
+                    Invoke((MethodInvoker)delegate
+                    {
                         progressBar.ShowCheckbox("Cleanup temporary files.", false);
                         progressBar.callback = (c) => { if (c) patchProcess.cleanUp(true, true); };
                     });
                 }
                 catch (Exception e2)
                 {
-                    Invoke((MethodInvoker)delegate {
+                    Invoke((MethodInvoker)delegate
+                    {
                         progressBar.appendText(e2.Message);
                         progressBar.appendText(Environment.NewLine + Environment.NewLine + e2.ToString());
                         progressBar.EnableButton();
@@ -178,13 +181,31 @@ namespace CustomStreetManager
             }
         }
 
-        private void deflaktorsASMHacksToolStripMenuItem_Click(object sender, EventArgs e)
+        private void addRiivolutionPatchXML_Click(object sender, EventArgs e)
         {
-            if (deflaktorsASMHacksToolStripMenuItem.Checked == true)
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Riivolution Patch XML file|*.xml";
+            openFileDialog.Title = "Which Riivolution Patch XML should we include?";
+
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog.FileName))
             {
-                MessageBox.Show("Please be aware that I'm not checking for this -- " +
-                    "but you need a PAL ISO to enable Deflaktor's ASM Hacks, otherwise " +
-                    "your game will crash on startup.");
+                var xmlFile = openFileDialog.FileName;
+                var xmlBaseFileName = Path.GetFileNameWithoutExtension(xmlFile);
+
+                if (xmlFileToToolStripMenuItemDict.ContainsKey(xmlBaseFileName))
+                {
+                    MessageBox.Show("A Riivolution Patch XML file with the name " + xmlBaseFileName + " has already been added. The existing one will be replaced with the newly selected one.");
+                }
+
+                var newItem = new ToolStripMenuItem();
+                newItem.CheckOnClick = true;
+                newItem.Checked = true;
+                newItem.ImageScaling = ToolStripItemImageScaling.None;
+                newItem.Name = xmlFile;
+                newItem.Size = new Size(257, 22);
+                newItem.Text = xmlBaseFileName;
+                xmlFileToToolStripMenuItemDict[xmlBaseFileName] = newItem;
+                optionsToolStripMenuItem.DropDownItems.Add(newItem);
             }
         }
 

@@ -43,9 +43,7 @@ namespace CustomStreetManager
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deflaktorsASMHacksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.removeIntroMenuAndMapBgmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.patchToWiimmfiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addRiivolutionPatchXML = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verboseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -134,38 +132,18 @@ namespace CustomStreetManager
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.deflaktorsASMHacksToolStripMenuItem,
-            this.removeIntroMenuAndMapBgmToolStripMenuItem,
-            this.patchToWiimmfiToolStripMenuItem});
-            this.optionsToolStripMenuItem.Enabled = false;
+            this.addRiivolutionPatchXML});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.optionsToolStripMenuItem.Text = "Optional Patches";
             // 
-            // deflaktorsASMHacksToolStripMenuItem
+            // addRiivolutionPatchXML
             // 
-            this.deflaktorsASMHacksToolStripMenuItem.CheckOnClick = true;
-            this.deflaktorsASMHacksToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.deflaktorsASMHacksToolStripMenuItem.Name = "deflaktorsASMHacksToolStripMenuItem";
-            this.deflaktorsASMHacksToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
-            this.deflaktorsASMHacksToolStripMenuItem.Text = "Deflaktor\'s ASM Hacks (PAL ONLY)";
-            this.deflaktorsASMHacksToolStripMenuItem.Click += new System.EventHandler(this.deflaktorsASMHacksToolStripMenuItem_Click);
-            // 
-            // removeIntroMenuAndMapBgmToolStripMenuItem
-            // 
-            this.removeIntroMenuAndMapBgmToolStripMenuItem.CheckOnClick = true;
-            this.removeIntroMenuAndMapBgmToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.removeIntroMenuAndMapBgmToolStripMenuItem.Name = "removeIntroMenuAndMapBgmToolStripMenuItem";
-            this.removeIntroMenuAndMapBgmToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
-            this.removeIntroMenuAndMapBgmToolStripMenuItem.Text = "Disable All Music";
-            // 
-            // patchToWiimmfiToolStripMenuItem
-            // 
-            this.patchToWiimmfiToolStripMenuItem.CheckOnClick = true;
-            this.patchToWiimmfiToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.patchToWiimmfiToolStripMenuItem.Name = "patchToWiimmfiToolStripMenuItem";
-            this.patchToWiimmfiToolStripMenuItem.Size = new System.Drawing.Size(257, 22);
-            this.patchToWiimmfiToolStripMenuItem.Text = "Wiimmfi";
+            this.addRiivolutionPatchXML.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.addRiivolutionPatchXML.Name = "addRiivolutionPatchXML";
+            this.addRiivolutionPatchXML.Size = new System.Drawing.Size(216, 22);
+            this.addRiivolutionPatchXML.Text = "Add Riivolution Patch XML";
+            this.addRiivolutionPatchXML.Click += new System.EventHandler(this.addRiivolutionPatchXML_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -497,8 +475,7 @@ namespace CustomStreetManager
         private System.Windows.Forms.OpenFileDialog addMapsDialog;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem removeIntroMenuAndMapBgmToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem patchToWiimmfiToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addRiivolutionPatchXML;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
@@ -506,7 +483,6 @@ namespace CustomStreetManager
         private System.Windows.Forms.Label setOutputPathLabel;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label setInputISOLocation;
-        private System.Windows.Forms.ToolStripMenuItem deflaktorsASMHacksToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
