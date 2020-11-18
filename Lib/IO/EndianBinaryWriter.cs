@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using MiscUtil.Conversion;
@@ -22,16 +23,16 @@ namespace MiscUtil.IO {
 		/// Buffer used for Write(char)
 		/// </summary>
 		char[] charBuffer = new char[1];
-		#endregion
+        #endregion
 
-		#region Constructors
-		/// <summary>
-		/// Constructs a new binary writer with the given bit converter, writing
-		/// to the given stream, using UTF-8 encoding.
-		/// </summary>
-		/// <param name="bitConverter">Converter to use when writing data</param>
-		/// <param name="stream">Stream to write data to</param>
-		public EndianBinaryWriter(EndianBitConverter bitConverter,
+        #region Constructors
+        /// <summary>
+        /// Constructs a new binary writer with the given bit converter, writing
+        /// to the given stream, using UTF-8 encoding.
+        /// </summary>
+        /// <param name="bitConverter">Converter to use when writing data</param>
+        /// <param name="stream">Stream to write data to</param>
+        public EndianBinaryWriter(EndianBitConverter bitConverter,
 			Stream stream)
 			: this(bitConverter, stream, Encoding.UTF8) {
 		}
@@ -229,6 +230,12 @@ namespace MiscUtil.IO {
 		public void Write(sbyte value) {
 			buffer[0] = unchecked((byte)value);
 			WriteInternal(buffer, 1);
+		}
+
+		public void Write(List<uint> list)
+		{
+			foreach (uint element in list)
+				Write(element);
 		}
 
 		/// <summary>

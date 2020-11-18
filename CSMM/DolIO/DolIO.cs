@@ -62,8 +62,7 @@ namespace CustomStreetManager
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                foreach (UInt32 opcode in opcodes)
-                    s.Write(opcode);
+                s.Write(opcodes);
                 return _fsm.allocateUnusedSpace(memoryStream.ToArray(), _w, _am, _p, purpose);
             }
         }
