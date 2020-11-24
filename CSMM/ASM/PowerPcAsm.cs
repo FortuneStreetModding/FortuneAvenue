@@ -36,6 +36,7 @@ namespace CustomStreetManager
 
         private static readonly UInt32 blt_opcode = 0x41800000;
         private static readonly UInt32 blr_opcode = 0x4e800020;
+        private static readonly UInt32 beq_opcode = 0x41820000;
         private static readonly UInt32 b_opcode = 0x48000000;
         private static readonly UInt32 bl_opcode = 0x48000001;
 
@@ -236,6 +237,14 @@ namespace CustomStreetManager
         public static uint blt(int currentPos, int targetPos)
         {
             return (uint)(blt_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
+        }
+        public static uint beq(uint currentPos, uint targetPos)
+        {
+            return beq_opcode + ((targetPos - currentPos) & 0x0000FFFF);
+        }
+        public static uint beq(int currentPos, int targetPos)
+        {
+            return (uint)(beq_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
         }
         public static UInt32 cmpwi(byte register, short value)
         {
