@@ -120,6 +120,7 @@ namespace CustomStreetManager
             new MapIconTable().read(stream, addressMapper, mapDescriptors, null);
 
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
+            new VentureCardSwitchSquare().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }

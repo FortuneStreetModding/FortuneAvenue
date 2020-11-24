@@ -22,6 +22,7 @@ namespace CustomStreetManager
         {
             return fileMapper.findSection((long)versionAddress) != null;
         }
+
         public int toFileAddress(VAVAddr versionAddress)
         {
             return (int)fileMapper.map((long)versionAddress);
@@ -38,6 +39,11 @@ namespace CustomStreetManager
         public int toFileAddress(BSVAddr boomStreetVirtualAddress)
         {
             return (int)fileMapper.map((long)toVersionAgnosticAddress(boomStreetVirtualAddress));
+        }
+
+        internal BSVAddr fileAddressToBoomStreetVirtualAddress(long address)
+        {
+            return (BSVAddr)versionMapper.inverseMap(fileMapper.inverseMap(address));
         }
 
         public bool canConvertToVersionAgnosticAddress(BSVAddr boomStreetVirtualAddress)
