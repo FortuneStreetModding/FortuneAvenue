@@ -16,6 +16,7 @@ namespace CustomStreetManager
         private static readonly UInt32 ori_opcode = 0x60000000;
         private static readonly UInt32 srw_opcode = 0x7c000430;
         private static readonly UInt32 andi_opcode = 0x70000000;
+        private static readonly UInt32 rlwinm_opcode = 0x54000000;
 
         private static readonly UInt32 lwzx_opcode = 0x7c00002e;
         private static readonly UInt32 lwz_opcode = 0x80000000;
@@ -28,6 +29,7 @@ namespace CustomStreetManager
         private static readonly UInt32 addi_opcode = li_opcode;
         private static readonly UInt32 addis_opcode = lis_opcode;
         private static readonly UInt32 mulli_opcode = 0x1c000000;
+        private static readonly UInt32 add_opcode = 0x7c000214;
 
         private static readonly UInt32 cmpw_opcode = 0x7c000000;
         private static readonly UInt32 cmplw_opcode = 0x7c000040;
@@ -37,6 +39,7 @@ namespace CustomStreetManager
         private static readonly UInt32 blt_opcode = 0x41800000;
         private static readonly UInt32 blr_opcode = 0x4e800020;
         private static readonly UInt32 beq_opcode = 0x41820000;
+        private static readonly UInt32 bne_opcode = 0x40820000;
         private static readonly UInt32 b_opcode = 0x48000000;
         private static readonly UInt32 bl_opcode = 0x48000001;
 
@@ -103,6 +106,12 @@ namespace CustomStreetManager
             if (register2 == 0)
                 throw new ArgumentException("the register2 cannot be r0");
             return addis_opcode + ((UInt32)register1 << 21) + ((UInt32)register2 << 16) + ((UInt32)value & 0x0000FFFF);
+        }
+        public static UInt32 add(byte register1, byte register2, byte register3)
+        {
+            if (register1 > 31 || register2 > 31 || register3 > 31)
+                throw new ArgumentException("the register value must be 31 or below");
+            return add_opcode + ((UInt32)register1 << 21) + ((UInt32)register2 << 16) + ((UInt32)register3 << 11);
         }
         public static void test()
         {
@@ -185,6 +194,12 @@ namespace CustomStreetManager
             Debug.WriteLine(stw(0, 0x0, 1).ToString("X"));
             Debug.WriteLine(stw(1, 0x1, 1).ToString("X"));
             Debug.WriteLine(stw(1, 0x2, 3).ToString("X"));
+            // 7c000214 add r0,r0,r0
+            // 7c210a14 add r1,r1,r1
+            // 7c221a14 add r1,r2,r3
+            Debug.WriteLine(add(0, 0, 0).ToString("X"));
+            Debug.WriteLine(add(1, 1, 1).ToString("X"));
+            Debug.WriteLine(add(1, 2, 3).ToString("X"));
         }
         public static UInt32 ori(byte register1, byte register2, short value)
         {
@@ -246,6 +261,10 @@ namespace CustomStreetManager
         {
             return (uint)(beq_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
         }
+        public static uint bne(int currentPos, int targetPos)
+        {
+            return (uint)(bne_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
+        }
         public static UInt32 cmpwi(byte register, short value)
         {
             if (register > 31)
@@ -295,6 +314,14 @@ namespace CustomStreetManager
             if (register1 > 31 || register2 > 31 || register3 > 31)
                 throw new ArgumentException("the register value must be 31 or below");
             return srw_opcode + ((UInt32)register1 << 16) + ((UInt32)register2 << 21) + ((UInt32)register3 << 11);
+        }
+        public static uint rlwinm(byte register1, byte register2, byte value1, byte value2, byte value3)
+        {
+            if (register1 > 31 || register2 > 31)
+                throw new ArgumentException("the register value must be 31 or below");
+            if (value1 > 31 || value2 > 31 || value3 > 31)
+                throw new ArgumentException("the scalar value must be 31 or below");
+            return rlwinm_opcode + ((UInt32)register1 << 16) + ((UInt32)register2 << 21) + ((UInt32)value1 << 11) + ((UInt32)value2 << 6) + ((UInt32)value3 << 1);
         }
         public static uint stw(byte register1, short value, byte register2)
         {
