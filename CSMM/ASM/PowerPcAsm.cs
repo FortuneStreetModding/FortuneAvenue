@@ -235,10 +235,26 @@ namespace CustomStreetManager
                 throw new ArgumentException("the register value must be 31 or below");
             return cmplw_opcode + ((UInt32)register1 << 16) + ((UInt32)register2 << 11);
         }
+        public static UInt32 bl(VAVAddr startPos, VAVAddr targetPos)
+        {
+            return bl(startPos, 0, targetPos);
+        }
+        public static UInt32 bl(VAVAddr startPos, int offset, VAVAddr targetPos)
+        {
+            return bl((uint)(startPos + offset * 4), (uint) targetPos);
+        }
         public static UInt32 bl(uint currentPos, uint targetPos)
         {
             UInt32 offset = ((targetPos - currentPos) >> 2) & 0x00FFFFFF;
             return bl_opcode + (offset << 2);
+        }
+        public static UInt32 b(VAVAddr startPos, VAVAddr targetPos)
+        {
+            return b(startPos, 0, targetPos);
+        }
+        public static UInt32 b(VAVAddr startPos, int offset, VAVAddr targetPos)
+        {
+            return b((uint)(startPos + offset * 4), (uint)targetPos);
         }
         public static UInt32 b(uint currentPos, uint targetPos)
         {
