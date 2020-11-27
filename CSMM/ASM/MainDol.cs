@@ -221,6 +221,7 @@ namespace CustomStreetManager
             new MapDescriptionTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapIconTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new VentureCardSwitchSquare().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
