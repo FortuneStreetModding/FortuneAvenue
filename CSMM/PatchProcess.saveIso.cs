@@ -25,7 +25,6 @@ namespace CustomStreetManager
             await patchMainDolAsync(ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
-            progress?.Report("Writing map icons...");
             await injectMapIcons(ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
 
             using (CancellationTokenSource source = new CancellationTokenSource())
