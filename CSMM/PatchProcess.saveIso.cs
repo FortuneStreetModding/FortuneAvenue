@@ -146,6 +146,24 @@ namespace CustomStreetManager
 
         private async Task<bool> injectMapIcons(IProgress<ProgressInfo> progress, CancellationToken ct)
         {
+            // first check if we need to inject any map icons in the first place. We do not need to if only vanilla map icons are used.
+            bool allMapIconsVanilla = true;
+            foreach (var mapDescriptor in mapDescriptors)
+            {
+                var mapIcon = mapDescriptor.MapIcon;
+                if (string.IsNullOrEmpty(mapIcon))
+                    continue;
+                if (!VanillaDatabase.getVanillaTpl(mapIcon).Any())
+                {
+                    allMapIconsVanilla = false;
+                    break;
+                }
+            }
+            if(allMapIconsVanilla)
+            {
+                return true;
+            }
+
             await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
             await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(false);
 
@@ -338,7 +356,7 @@ namespace CustomStreetManager
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }
-
+            await Task.Delay(1000);
             progress.Report(100);
 
             return true;
