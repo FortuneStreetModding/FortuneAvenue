@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class VentureCardSwitchSquare : DolIO
+    public class EventSquare : DolIO
     {
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {

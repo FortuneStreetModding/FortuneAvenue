@@ -54,7 +54,11 @@ namespace FSEditor.FSData {
         unknown0x2B = 0x2B,
         unknown0x2C = 0x2C,
         unknown0x2D = 0x2D,
-        unknown0x2E = 0x2E,
+
+		/// <summary>
+		/// A custom square implemented with an ASM Hack. See CustomStreetManager/*/EventSquare.cs
+		/// </summary>
+        EventSquare = 0x2E,
         unknown0x2F = 0x2F,
 
         VacantPlot = 0x30

@@ -46,6 +46,7 @@ namespace Editor
                 case SquareType.TakeABreakSquare: return "/FortuneAvenue;component/Images/GroundTakeABreak.png";
                 case SquareType.VacantPlot: return "/FortuneAvenue;component/Images/GroundVacant.png";
                 case SquareType.VentureSquare: return "/FortuneAvenue;component/Images/GroundVenture.png";
+                case SquareType.EventSquare: return "/FortuneAvenue;component/Images/EventSquare.png";
             }
             return "/FortuneAvenue;component/Images/GroundDefault.png";
         }

@@ -68,7 +68,7 @@ namespace Editor
             {SquareType.MagmaliceSquare, "Magmalice"},
             {SquareType.LiftSquareEnd, "Lift End"},
 
-            {SquareType.unknown0x2E, "Unknown 0x2E"},
+            {SquareType.EventSquare, "Event Square"},
         };
         public static readonly Dictionary<Byte, String> ShopTypeList = new Dictionary<Byte, String>()
         {
