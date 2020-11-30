@@ -275,11 +275,19 @@ namespace CustomStreetManager
         }
         public static uint beq(int currentPos, int targetPos)
         {
-            return (uint)(beq_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
+            return beq(targetPos - currentPos);
+        }
+        public static uint beq(int offset)
+        {
+            return (uint)(beq_opcode + ((4 * offset) & 0x0000FFFF));
         }
         public static uint bne(int currentPos, int targetPos)
         {
-            return (uint)(bne_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
+            return bne(targetPos - currentPos);
+        }
+        public static uint bne(int offset)
+        {
+            return (uint)(bne_opcode + ((4 * offset) & 0x0000FFFF));
         }
         public static UInt32 cmpwi(byte register, short value)
         {

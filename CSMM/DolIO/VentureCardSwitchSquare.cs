@@ -15,13 +15,13 @@ namespace CustomStreetManager
     {
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {
-            var forceVentureCardVariable = allocate(new byte[4], "ForceVentureCard");
-            var procStopEventSquareRoutine = allocate(writeProcStopEventSquareRoutine(addressMapper, forceVentureCardVariable, (VAVAddr)0), "procStopEventSquareRoutine");
-            stream.Seek(addressMapper.toFileAddress(procStopEventSquareRoutine), SeekOrigin.Begin);
-            stream.Write(writeProcStopEventSquareRoutine(addressMapper, forceVentureCardVariable, procStopEventSquareRoutine)); // re-write the routine again since now we know where it is located in the main dol
-
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80475838), SeekOrigin.Begin);
-            stream.Write((UInt32)procStopEventSquareRoutine);
+            // this is the virtual address for the ForceVentureCardVariable: 0x804363c4
+            // instead of allocating space for the venture card variable with the free space manager, we use a fixed virtual address
+            // so that this variable can be reused by other hacks outside of CSMM. 
+            var forceVentureCardVariable = addressMapper.toVersionAgnosticAddress((BSVAddr)0x804363c4);
+            stream.Seek(addressMapper.toFileAddress(forceVentureCardVariable), SeekOrigin.Begin);
+            // write zeroes to it
+            stream.Write(new byte[4]);
 
             // --- Model ---
             // some examples:
@@ -93,7 +93,25 @@ namespace CustomStreetManager
             // bl Game::uitext::get_string   -> bl customDescriptionRoutine
             stream.Write(PowerPcAsm.bl(virtualPos, customDescriptionRoutine));
 
+            // --- Behavior ---
+            // the idea is that whenever someone stops at the event square, it sets our custom variable "ForceVentureCardVariable" to the id of the venture card and changes to the Venture Card Mode (0x1c). The custom variable is used to remember which venture card should be played the next time a venture card is executed.
+            var procStopEventSquareRoutine = allocate(writeProcStopEventSquareRoutine(addressMapper, forceVentureCardVariable, (VAVAddr)0), "procStopEventSquareRoutine");
+            stream.Seek(addressMapper.toFileAddress(procStopEventSquareRoutine), SeekOrigin.Begin);
+            stream.Write(writeProcStopEventSquareRoutine(addressMapper, forceVentureCardVariable, procStopEventSquareRoutine)); // re-write the routine again since now we know where it is located in the main dol
 
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80475838), SeekOrigin.Begin);
+            stream.Write((UInt32)procStopEventSquareRoutine);
+
+            // --- Hijack Venture Card Mode ---
+            // We are hijacking the execute venture card mode (0x1f) to check if our custom variable "ForceVentureCardVariable" has been set to anything other than 0. If it was, then setup that specific venture card to be executed.
+            var forceFetchFakeVentureCard = allocate(writeSubroutineForceFetchFakeVentureCard(forceVentureCardVariable), "forceFetchFakeVentureCard");
+            virtualPos = addressMapper.toVersionAgnosticAddress((BSVAddr)0x801b7f44);
+            stream.Seek(addressMapper.toFileAddress(virtualPos), SeekOrigin.Begin);
+            // li r4,-0x1   -> bl forceFetchFakeVentureCard
+            stream.Write(PowerPcAsm.bl(virtualPos, forceFetchFakeVentureCard));
+            // li r8,0x3    -> nop
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801b7f74), SeekOrigin.Begin);
+            stream.Write(PowerPcAsm.nop());
         }
 
         private List<UInt32> writeGetDescriptionForCustomSquareRoutine(AddressMapper addressMapper, VAVAddr routineStartAddress)
@@ -109,7 +127,7 @@ namespace CustomStreetManager
             asm.Add(PowerPcAsm.add(6, 7, 8));                                                // r6 <- the current square
             asm.Add(PowerPcAsm.lbz(8, 0x4d, 6));                                             // r8 <- square.squareType
             asm.Add(PowerPcAsm.cmpwi(8, 0x2e));                                              // if(square.squareType == 0x2e) 
-            asm.Add(PowerPcAsm.bne(0, 3));                                                   // {
+            asm.Add(PowerPcAsm.bne(3));                                                      // {
             asm.Add(PowerPcAsm.lbz(4, 0x18, 6));                                             //   r4 <- square.district_color
             asm.Add(PowerPcAsm.b(routineStartAddress, asm.Count, gameUiTextGetCardMsg));     //   goto Game::uitext::get_card_message(r4)
                                                                                              // }
@@ -126,7 +144,7 @@ namespace CustomStreetManager
             var asm = new List<UInt32>();
             asm.Add(PowerPcAsm.li(register_textureType, 0x1));    // textureType = 1
             asm.Add(PowerPcAsm.cmpwi(register_squareType, 0x2e)); // if(squareType == 0x2e)
-            asm.Add(PowerPcAsm.beq(0, 2));                        // {
+            asm.Add(PowerPcAsm.beq(2));                           // {
             asm.Add(PowerPcAsm.blr());                            //   return textureType; 
                                                                   // } else {
             asm.Add(PowerPcAsm.li(register_textureType, 0x5));    //   textureType = 5
@@ -139,6 +157,7 @@ namespace CustomStreetManager
         {
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair((UInt32)forceVentureCardVariable);
             var gameProgressChangeModeRoutine = addressMapper.toVersionAgnosticAddress((BSVAddr)0x800c093c);
+            var endOfSwitchCase = addressMapper.toVersionAgnosticAddress((BSVAddr)0x800fac38);
 
             var asm = new List<UInt32>();
             asm.Add(PowerPcAsm.lwz(3, 0x188, 28));         // \
@@ -149,11 +168,13 @@ namespace CustomStreetManager
             asm.Add(PowerPcAsm.addi(3, 3, v.lower16Bit));  // | forceVentureCardVariable <- r6_ventureCardId
             asm.Add(PowerPcAsm.stw(6, 0x0, 3));            // / 
 
-            asm.Add(PowerPcAsm.li(4, 0x1d));               // \ li r4,0x1d
+            asm.Add(PowerPcAsm.lwz(3, 0x18, 20));          // \ lwz r3,0x18(r20)
+            asm.Add(PowerPcAsm.li(4, 0x1f));               // | li r4,0x1f  (the GameProgress mode id 0x1f is for executing a venture card)
             asm.Add(PowerPcAsm.li(5, -0x1));               // | li r5,-0x1
             asm.Add(PowerPcAsm.li(6, -0x1));               // | li r6,-0x1
             asm.Add(PowerPcAsm.li(7, 0x0));                // | li r7,0x0
-            asm.Add(PowerPcAsm.bl(routineStartAddress, asm.Count, gameProgressChangeModeRoutine));        // / bl Game::GameProgress::changeMode
+            asm.Add(PowerPcAsm.bl(routineStartAddress, asm.Count, gameProgressChangeModeRoutine));        // | bl Game::GameProgress::changeMode
+            asm.Add(PowerPcAsm.b(routineStartAddress, asm.Count, endOfSwitchCase));        // / goto end of switch case 
             return asm;
         }
 
@@ -161,17 +182,28 @@ namespace CustomStreetManager
         {
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair((UInt32)fakeVentureCard);
 
+            // precondition: r3 is ChanceCardUI *
+            // ChanceCardUI->field_0x34 is ChanceBoard *
+            // ChanceBoard->field_0x158 is current venture card id
+
             var asm = new List<UInt32>();
             asm.Add(PowerPcAsm.lis(6, v.upper16Bit));      // \
-            asm.Add(PowerPcAsm.addi(6, 6, v.lower16Bit));  // | r6 <- fakeVentureCard
-            asm.Add(PowerPcAsm.lwz(6, 0x0, 6));            // / 
-            asm.Add(PowerPcAsm.cmpwi(6, 0x0));             // | if(fakeVentureCard != 0)
-            asm.Add(PowerPcAsm.beq(0, 2));                 // | {
-            asm.Add(PowerPcAsm.mr(4, 6));                  // |   r4 <- fakeVentureCard
-            asm.Add(PowerPcAsm.blr());                     // |   return r4
+            asm.Add(PowerPcAsm.addi(6, 6, v.lower16Bit));  // / r6 <- forceVentureCardVariable
+            asm.Add(PowerPcAsm.lwz(4, 0x0, 6));            // | r4 <- forceVentureCard
+            asm.Add(PowerPcAsm.cmpwi(4, 0x0));             // | if(forceVentureCard != 0)
+            asm.Add(PowerPcAsm.beq(7));                    // | {
+            asm.Add(PowerPcAsm.lwz(5, 0x34, 3));           // |   r5 <- ChanceCardUI.ChanceBoard
+            asm.Add(PowerPcAsm.stw(4, 0x158, 5));          // |   ChanceBoard.currentVentureCardId <- r4
+            asm.Add(PowerPcAsm.li(5, 0));                  // |\  forceVentureCard <- 0
+            asm.Add(PowerPcAsm.stw(5, 0x0, 6));            // |/ 
+            asm.Add(PowerPcAsm.li(8, 0x0));                // |   r8 <- 0 (the venture card is initialized)
+            asm.Add(PowerPcAsm.blr());                     // |   return r4 and r8
                                                            // | }
             asm.Add(PowerPcAsm.li(4, -0x1));               // | r4 <- -1
-            asm.Add(PowerPcAsm.blr());                     // | return r4
+            asm.Add(PowerPcAsm.li(8, 0x3));                // | r8 <- 3 (the venture card is continued to be executed)
+            asm.Add(PowerPcAsm.blr());                     // | return r4 and r8
+
+
             return asm;
         }
 
