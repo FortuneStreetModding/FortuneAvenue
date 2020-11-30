@@ -133,6 +133,7 @@ namespace CustomStreetManager
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addRiivolutionPatchXML});
+            this.optionsToolStripMenuItem.Enabled = false;
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.optionsToolStripMenuItem.Text = "Optional Patches";
