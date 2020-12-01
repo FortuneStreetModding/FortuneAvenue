@@ -25,7 +25,7 @@ namespace CustomStreetManager
                 while (i < mapDescriptor.VentureCard.Count())
                 {
                     byte bitPackedVentureCardValue = 0;
-                    for (int j = 0; j < 8; j++, i++)
+                    for (int j = 7; j >= 0; j--, i++)
                     {
                         if (i < mapDescriptor.VentureCard.Count())
                         {
@@ -93,17 +93,17 @@ namespace CustomStreetManager
             {                                                                                       //      
                 asm.Add(PowerPcAsm.li(0, 0));                                                       //     \ load the next compressed word from ventureCardCompressedTableAddr 
                 asm.Add(PowerPcAsm.lwzx(7, 5, 0));                                                  //     /  into r7. We will decompress the venture card table word by word.
-                asm.Add(PowerPcAsm.li(8, 0));                                                       //     bitIndex = 0
-                int whileBitIndexSmaller32 = asm.Count;                                             //     do 
+                asm.Add(PowerPcAsm.li(8, 31));                                                      //     bitIndex = 31
+                int whileBitIndexGreaterEqual32 = asm.Count;                                        //     do 
                 {                                                                                   //     {
                     asm.Add(PowerPcAsm.mr(0, 7));                                                   //         get the current compressed word
                     asm.Add(PowerPcAsm.srw(0, 0, 8));                                               //         shift it bitIndex times to the right
                     asm.Add(PowerPcAsm.andi(0, 0, 1));                                              //         retrieve the lowest bit of it -> r0 contains the decompressed venture card byte now.
                     asm.Add(PowerPcAsm.stbx(0, 4, 6));                                              //         store it into ventureCardDecompressedTableAddr[ventureCardId]
-                    asm.Add(PowerPcAsm.addi(8, 8, 1));                                              //         bitIndex++
+                    asm.Add(PowerPcAsm.subi(8, 8, 1));                                              //         bitIndex--
                     asm.Add(PowerPcAsm.addi(4, 4, 1));                                              //         ventureCardId++
-                    asm.Add(PowerPcAsm.cmpwi(8, 32));                                               //      
-                    asm.Add(PowerPcAsm.blt(asm.Count, whileBitIndexSmaller32));                     //     } while(bitIndex < 32)
+                    asm.Add(PowerPcAsm.cmpwi(8, 0));                                                //      
+                    asm.Add(PowerPcAsm.bge(asm.Count, whileBitIndexGreaterEqual32));                //     } while(bitIndex >= 0)
                 }                                                                                   //     
                 asm.Add(PowerPcAsm.addi(5, 5, 4));                                                  //     ventureCardCompressedTableAddr += 4
                 asm.Add(PowerPcAsm.cmpwi(4, 128));                                                  //     
@@ -156,7 +156,7 @@ namespace CustomStreetManager
                 while (i < mapDescriptor.VentureCard.Count())
                 {
                     byte bitPackedVentureCardValue = s.ReadByte();
-                    for (int j = 0; j < 8; j++, i++)
+                    for (int j = 7; j >= 0; j--, i++)
                     {
                         if (i < mapDescriptor.VentureCard.Count())
                         {

@@ -40,6 +40,7 @@ namespace CustomStreetManager
         private static readonly UInt32 blr_opcode = 0x4e800020;
         private static readonly UInt32 beq_opcode = 0x41820000;
         private static readonly UInt32 bne_opcode = 0x40820000;
+        private static readonly UInt32 bge_opcode = 0x40800000;
         private static readonly UInt32 b_opcode = 0x48000000;
         private static readonly UInt32 bl_opcode = 0x48000001;
 
@@ -201,6 +202,7 @@ namespace CustomStreetManager
             Debug.WriteLine(add(1, 1, 1).ToString("X"));
             Debug.WriteLine(add(1, 2, 3).ToString("X"));
         }
+
         public static UInt32 ori(byte register1, byte register2, short value)
         {
             if (register1 > 31 || register2 > 31)
@@ -280,6 +282,14 @@ namespace CustomStreetManager
         public static uint beq(int offset)
         {
             return (uint)(beq_opcode + ((4 * offset) & 0x0000FFFF));
+        }
+        public static uint bge(int currentPos, int targetPos)
+        {
+            return bge(targetPos - currentPos);
+        }
+        public static uint bge(int offset)
+        {
+            return (uint)(bge_opcode + ((4 * offset) & 0x0000FFFF));
         }
         public static uint bne(int currentPos, int targetPos)
         {
