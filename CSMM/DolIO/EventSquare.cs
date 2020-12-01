@@ -51,7 +51,7 @@ namespace CustomStreetManager
 
             // --- Icon ---
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x804160c8), SeekOrigin.Begin);
-            stream.Write((uint)addressMapper.toVersionAgnosticAddress((BSVAddr)0x80415ee0)); // pointer to the texture name (0x80415ee0 points to the texture "p_mark_21" which is the switch square icon
+            stream.Write((uint)addressMapper.toVersionAgnosticAddress((BSVAddr)0x80415ee0)); // pointer to the texture name (0x80415ee0 points to the string "p_mark_21" which is the switch icon texture
             stream.Write((uint)addressMapper.toVersionAgnosticAddress((BSVAddr)0x80415ee0)); // we need to write it twice: once for each design type (Mario and DragonQuest)
 
             // --- Name ---
@@ -94,7 +94,8 @@ namespace CustomStreetManager
             stream.Write(PowerPcAsm.bl(virtualPos, customDescriptionRoutine));
 
             // --- Behavior ---
-            // the idea is that whenever someone stops at the event square, it sets our custom variable "ForceVentureCardVariable" to the id of the venture card and changes to the Venture Card Mode (0x1c). The custom variable is used to remember which venture card should be played the next time a venture card is executed.
+            // the idea is that whenever someone stops at the event square, it sets our custom variable "ForceVentureCardVariable" to the id of the venture card and runs the Venture Card Mode (0x1c). 
+            // The custom variable is used to remember which venture card should be played the next time a venture card is executed.
             var procStopEventSquareRoutine = allocate(writeProcStopEventSquareRoutine(addressMapper, forceVentureCardVariable, (VAVAddr)0), "procStopEventSquareRoutine");
             stream.Seek(addressMapper.toFileAddress(procStopEventSquareRoutine), SeekOrigin.Begin);
             stream.Write(writeProcStopEventSquareRoutine(addressMapper, forceVentureCardVariable, procStopEventSquareRoutine)); // re-write the routine again since now we know where it is located in the main dol
@@ -103,7 +104,8 @@ namespace CustomStreetManager
             stream.Write((UInt32)procStopEventSquareRoutine);
 
             // --- Hijack Venture Card Mode ---
-            // We are hijacking the execute venture card mode (0x1f) to check if our custom variable "ForceVentureCardVariable" has been set to anything other than 0. If it was, then setup that specific venture card to be executed.
+            // We are hijacking the execute venture card mode (0x1f) to check if our custom variable "ForceVentureCardVariable" has been set to anything other than 0.
+            // If it was, then setup that specific venture card to be executed. Also reset our custom variable "ForceVentureCardVariable" so that normal venture cards still work.
             var forceFetchFakeVentureCard = allocate(writeSubroutineForceFetchFakeVentureCard(forceVentureCardVariable), "forceFetchFakeVentureCard");
             virtualPos = addressMapper.toVersionAgnosticAddress((BSVAddr)0x801b7f44);
             stream.Seek(addressMapper.toFileAddress(virtualPos), SeekOrigin.Begin);
@@ -209,27 +211,7 @@ namespace CustomStreetManager
 
         protected override void readAsm(EndianBinaryReader stream, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper)
         {
-            Debug.WriteLine("0x471918 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x471918));
-            Debug.WriteLine("0xf9e7c " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf9e7c));
-            Debug.WriteLine("0x44f410 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x44f410));
-            Debug.WriteLine("0x82138 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x82138));
-            Debug.WriteLine("0xf9f00 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf9f00));
-            Debug.WriteLine("0x82dc4 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x82dc4));
-            Debug.WriteLine("0xf9f38 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf9f38));
-            Debug.WriteLine("0x471660 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x471660));
-            Debug.WriteLine("0xdf414 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xdf414));
-            Debug.WriteLine("0xF9E44 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xF9E44));
-            Debug.WriteLine("0xDF1B4 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xDF1B4));
-            Debug.WriteLine("0xF9E60 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xF9E60));
-            Debug.WriteLine("0xf40c4 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf40c4));
-            Debug.WriteLine("0xf40e4 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf40e4));
-            Debug.WriteLine("0xf9f80 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf9f80));
-
-            Debug.WriteLine("0xf5d90 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf5d90));
-            Debug.WriteLine("0x1b31c8 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x1b31c8));
-            Debug.WriteLine("0xf9d84 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf9d84));
-            Debug.WriteLine("0x1b318c " + addressMapper.fileAddressToBoomStreetVirtualAddress(0x1b318c));
-            Debug.WriteLine("0xf9e00 " + addressMapper.fileAddressToBoomStreetVirtualAddress(0xf9e00));
+            // nothing to do
         }
     }
 }
