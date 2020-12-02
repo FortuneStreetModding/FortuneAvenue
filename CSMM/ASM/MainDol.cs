@@ -129,6 +129,7 @@ namespace CustomStreetManager
             new EventSquare().read(stream, addressMapper, mapDescriptors, null);
             new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
             new TourBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, null);
+            new TourInitialCashTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -227,6 +228,7 @@ namespace CustomStreetManager
 
             new DefaultTargetAmountTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new TourBankruptcyLimitTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new TourInitialCashTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapDescriptionTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapIconTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
