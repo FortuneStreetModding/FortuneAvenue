@@ -76,6 +76,13 @@ namespace CustomStreetManager
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042dfc0), addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042e22f));
             // Unused costume string table 3
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042ef30), addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042f7ef));
+            // Unused menu id=0x06 (MapSelectScene_E3)
+            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801f8520), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801f94bb));
+            // Unused menu id=0x38 (WorldMenuScene)
+            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ed6a8), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801edab7));
+            // Unused menu id=0x39 (FreePlayScene)
+            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801edad4), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ee71f));
+
         }
 
 
