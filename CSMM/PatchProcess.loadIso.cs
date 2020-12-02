@@ -42,7 +42,7 @@ namespace CustomStreetManager
 
                 progress?.Report(97);
                 progress?.Report("Read localization files...");
-                progress?.Report(loadUIMessages(mapDescriptors, cacheFileSet));
+                loadUIMessages(mapDescriptors, cacheFileSet, ProgressInfo.makeSubProgress(progress, 20, 60), ct);
             }
 
             this.cleanUp(false, false);
@@ -52,9 +52,8 @@ namespace CustomStreetManager
 
             return mapDescriptors;
         }
-        private string loadUIMessages(List<MapDescriptor> mapDescriptors, DataFileSet fileSet)
+        private void loadUIMessages(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            string warnings = "";
             foreach (string locale in Locale.ALL)
             {
                 ui_messages[locale] = new UI_Message(fileSet.ui_message_csv[locale], locale);
@@ -84,10 +83,8 @@ namespace CustomStreetManager
                         mapDescriptor.Desc[locale] = "";
                     }
                 }
-                // add warnings
-                warnings += mapDescriptor.readFrbFileInfo(fileSet.param_folder);
+                mapDescriptor.readFrbFileInfo(fileSet.param_folder, progress, ct);
             }
-            return warnings;
         }
     }
 }

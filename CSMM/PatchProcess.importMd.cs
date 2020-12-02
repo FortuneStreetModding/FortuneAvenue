@@ -31,18 +31,30 @@ namespace CustomStreetManager
             }
 
             mapDescriptorImport.readMapDescriptorFromFile(mapDescriptorImportFile, internalName);
+            progress.Report(new ProgressInfo(20, "Imported " + mapDescriptorImportFile));
 
-            if (mapDescriptorImport.VentureCardActiveCount != 64)
+            var usedSquareTypes = mapDescriptorImport.readFrbFileInfo(dir, ProgressInfo.makeSubProgress(progress, 20, 60), ct);
+            if (mapDescriptorImport.VentureCardActiveCount == 0)
             {
-                progress.Report("Warning: The venture card count needs to be 64 or the game will choose a default venture card table." + Environment.NewLine);
+                progress.Report("The map " + internalName + " does not have a venture card table specified. A default venture card table will be used." + Environment.NewLine);
+                mapDescriptorImport.VentureCard = VanillaDatabase.getDefaultVentureCardTable(mapDescriptorImport.RuleSet, usedSquareTypes);
+            }
+            else if (mapDescriptorImport.VentureCardActiveCount < 64)
+            {
+                progress.Report("Warning: The map " + internalName + " has a venture card count smaller than 64. The behavior is undefined and glitchy." + Environment.NewLine);
+            }
+            else if (mapDescriptorImport.VentureCardActiveCount > 64)
+            {
+                progress.Report("Warning: The map " + internalName + " has a venture card count larger than 64. Only the first 64 venture cards will be used." + Environment.NewLine);
+            }
+            int problematicVentureCard = VanillaDatabase.hasProblemWithVentureCardMissingNeededSquareType(mapDescriptorImport.VentureCard, usedSquareTypes);
+            if (problematicVentureCard != -1)
+            {
+                progress.Report("The map " + internalName + " uses venture card " + problematicVentureCard + ". This venture card needs certain square types which have not been placed on the map." + Environment.NewLine);
+                mapDescriptorImport.VentureCard = VanillaDatabase.getDefaultVentureCardTable(mapDescriptorImport.RuleSet, usedSquareTypes);
             }
 
-            progress.Report("Imported " + mapDescriptorImportFile);
-
-            progress.Report(new ProgressInfo(20, "Imported " + mapDescriptorImportFile));
-            mapDescriptorImport.readFrbFileInfo(dir);
-
-            progress.Report(new ProgressInfo(40, "Copy frb file(s) to tmp..."));
+            progress.Report(new ProgressInfo(60, "Copy frb file(s) to tmp..."));
 
             var frbFileName = mapDescriptorImport.FrbFile1;
             var importFile = Path.Combine(dir, frbFileName + ".frb");

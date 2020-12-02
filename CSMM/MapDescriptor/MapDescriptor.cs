@@ -8,6 +8,7 @@ using MiscUtil.IO;
 using System.ComponentModel;
 using MiscUtil.Conversion;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace CustomStreetManager
 {
@@ -52,7 +53,7 @@ namespace CustomStreetManager
         }
         public UInt32 Desc_MSG_ID { get; set; }
         public Dictionary<string, string> Desc { get; private set; }
-        public byte[] VentureCard { get; private set; }
+        public byte[] VentureCard { get; set; }
         public int VentureCardActiveCount
         {
             get
@@ -67,7 +68,7 @@ namespace CustomStreetManager
                 }
                 return activeCount;
             }
-            set { }
+            private set { }
         }
         public VAVAddr MapSwitchParamAddr { get; set; }
         public Dictionary<int, OriginPoint> SwitchRotationOriginPoints { get; private set; }
@@ -213,9 +214,9 @@ namespace CustomStreetManager
             stream.Write(0); // stream.Write(TourGeneralPlayTime);
         }
 
-        public string readFrbFileInfo(string param_folder)
+        public HashSet<SquareType> readFrbFileInfo(string param_folder, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            string warning = "";
+            var usedSquareTypes = new HashSet<SquareType>();
             var file = Path.Combine(param_folder, FrbFile1 + ".frb");
             using (var stream = File.OpenRead(file))
             {
@@ -229,22 +230,26 @@ namespace CustomStreetManager
                     TourInitialCash = InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
-                    warning += "[" + ID + "] " + Name[Locale.EN] + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect." + Environment.NewLine;
+                    progress.Report("[" + ID + "] " + Name[Locale.EN] + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect.");
                 }
                 LoopingMode = board.BoardInfo.GalaxyStatus;
                 if (LoopingMode != LoopingMode.None)
                 {
                     if (LoopingModeRadius == 0 || LoopingModeVerticalSquareCount == 0)
                     {
-                        warning += "[" + ID + "] " + Name[Locale.EN] + ": frb has looping enabled, but looping parameters are missing in the md." + Environment.NewLine;
+                        progress.Report("[" + ID + "] " + Name[Locale.EN] + ": frb has looping enabled, but looping parameters are missing in the md.");
                     }
                 }
                 else if (LoopingMode == LoopingMode.None)
                 {
                     if (LoopingModeRadius != 0 || LoopingModeHorizontalPadding != 0 || LoopingModeVerticalSquareCount != 0)
                     {
-                        warning += "[" + ID + "] " + Name[Locale.EN] + ": frb has looping disabled. The looping parameters defined in the md will have no effect." + Environment.NewLine;
+                        progress.Report("[" + ID + "] " + Name[Locale.EN] + ": frb has looping disabled. The looping parameters defined in the md will have no effect.");
                     }
+                }
+                foreach(var square in board.BoardData.Squares)
+                {
+                    usedSquareTypes.Add(square.SquareType);
                 }
             }
             // check the other frb files for validity
@@ -275,7 +280,7 @@ namespace CustomStreetManager
                     BoardFile.LoadFromStream(binReader);
                 }
             }
-            return warning;
+            return usedSquareTypes;
         }
 
         enum MDParserState
