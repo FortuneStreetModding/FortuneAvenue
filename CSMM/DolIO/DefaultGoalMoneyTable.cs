@@ -61,7 +61,7 @@ namespace CustomStreetManager
                 {
                     // in vanilla main.dol the table has other stuff in it like initial cash and tour opponents of the map
                     // this we need to skip to go the next target amount in the table
-                    s.Seek(0x20, SeekOrigin.Current);
+                    s.Seek(0x24 - 0x4, SeekOrigin.Current);
                 }
             }
         }

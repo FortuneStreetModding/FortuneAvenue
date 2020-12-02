@@ -121,6 +121,7 @@ namespace CustomStreetManager
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
             new EventSquare().read(stream, addressMapper, mapDescriptors, null);
             new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
+            new TourPlayerBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -218,6 +219,7 @@ namespace CustomStreetManager
             }
 
             new DefaultGoalMoneyTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new TourPlayerBankruptcyLimitTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapDescriptionTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapIconTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
