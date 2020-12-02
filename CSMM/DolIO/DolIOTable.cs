@@ -15,7 +15,7 @@ namespace CustomStreetManager
         {
             var isVanilla = readIsVanilla(stream, addressMapper);
             var rowCount = readTableRowCount(stream, addressMapper, isVanilla);
-            if (rowCount != mapDescriptors.Count)
+            if (rowCount != -1 && rowCount != mapDescriptors.Count)
             {
                 if (isVanilla)
                 {

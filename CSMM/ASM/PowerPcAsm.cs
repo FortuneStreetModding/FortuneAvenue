@@ -30,6 +30,7 @@ namespace CustomStreetManager
         private static readonly UInt32 addis_opcode = lis_opcode;
         private static readonly UInt32 mulli_opcode = 0x1c000000;
         private static readonly UInt32 add_opcode = 0x7c000214;
+        private static readonly UInt32 lha_opcode = 0xa8000000;
 
         private static readonly UInt32 cmpw_opcode = 0x7c000000;
         private static readonly UInt32 cmplw_opcode = 0x7c000040;
@@ -43,6 +44,8 @@ namespace CustomStreetManager
         private static readonly UInt32 bge_opcode = 0x40800000;
         private static readonly UInt32 b_opcode = 0x48000000;
         private static readonly UInt32 bl_opcode = 0x48000001;
+        private static readonly UInt32 mflr_opcode = 0x7c0802a6;
+        private static readonly UInt32 mtlr_opcode = 0x7c0803a6;
 
         public struct Pair16Bit
         {
@@ -72,10 +75,12 @@ namespace CustomStreetManager
             }
             return addrPair;
         }
+
         public static Int16 getOpcodeParameter(UInt32 opcode)
         {
             return (Int16)(opcode & 0x0000FFFF);
         }
+
         public static UInt32 li(byte register, short value)
         {
             if (register > 31)
@@ -91,6 +96,14 @@ namespace CustomStreetManager
         public static UInt32 subi(byte register1, byte register2, short value)
         {
             return addi(register1, register2, (short)-value);
+        }
+        public static UInt32 lha(byte register1, short value, byte register2)
+        {
+            if (register1 > 31 || register2 > 31)
+                throw new ArgumentException("the register value must be 31 or below");
+            if (register2 == 0)
+                throw new ArgumentException("the register2 cannot be r0");
+            return lha_opcode + ((UInt32)register1 << 21) + ((UInt32)register2 << 16) + ((UInt32)value & 0x0000FFFF);
         }
         public static UInt32 addi(byte register1, byte register2, short value)
         {
@@ -189,7 +202,7 @@ namespace CustomStreetManager
             // 800feb40 90 01 00 00     stw r0,0x0(r1)
             // 800feb44 90 21 00 01     stw r1,0x1(r1)
             // 800feb48 90 23 00 02     stw r1,0x2(r3)
-            Debug.WriteLine(lbz(31,0xff,31).ToString("X"));
+            Debug.WriteLine(lbz(31, 0xff, 31).ToString("X"));
             Debug.WriteLine(lbz(0, 0x1, 2).ToString("X"));
             Debug.WriteLine(lbz(1, 0x1, 1).ToString("X"));
             Debug.WriteLine(stw(0, 0x0, 1).ToString("X"));
@@ -201,6 +214,20 @@ namespace CustomStreetManager
             Debug.WriteLine(add(0, 0, 0).ToString("X"));
             Debug.WriteLine(add(1, 1, 1).ToString("X"));
             Debug.WriteLine(add(1, 2, 3).ToString("X"));
+            // a8010000 lha r0,0x0(r1)
+            // a8210001 lha r1,0x1(r1)
+            // a8230002 lha r1,0x2(param_1)
+            Debug.WriteLine(lha(0, 0, 1).ToString("X"));
+            Debug.WriteLine(lha(1, 1, 1).ToString("X"));
+            Debug.WriteLine(lha(1, 2, 3).ToString("X"));
+            // 7c0802a6 mfspr r0,LR
+            // 7fe802a6 mfspr r31,LR
+            // 7c0803a6 mtspr LR,r0
+            // 7fe803a6 mtspr LR,r31
+            Debug.WriteLine(mflr(0).ToString("X"));
+            Debug.WriteLine(mflr(31).ToString("X"));
+            Debug.WriteLine(mtlr(0).ToString("X"));
+            Debug.WriteLine(mtlr(31).ToString("X"));
         }
 
         public static UInt32 ori(byte register1, byte register2, short value)
@@ -243,7 +270,7 @@ namespace CustomStreetManager
         }
         public static UInt32 bl(VAVAddr startPos, int offset, VAVAddr targetPos)
         {
-            return bl((uint)(startPos + offset * 4), (uint) targetPos);
+            return bl((uint)(startPos + offset * 4), (uint)targetPos);
         }
         public static UInt32 bl(uint currentPos, uint targetPos)
         {
@@ -318,6 +345,18 @@ namespace CustomStreetManager
         public static UInt32 nop()
         {
             return ori(0, 0, 0);
+        }
+        public static uint mflr(byte register)
+        {
+            if (register > 31)
+                throw new ArgumentException("the register value must be 31 or below");
+            return mflr_opcode + ((UInt32)register << 21);
+        }
+        public static uint mtlr(byte register)
+        {
+            if (register > 31)
+                throw new ArgumentException("the register value must be 31 or below");
+            return mtlr_opcode + ((UInt32)register << 21);
         }
         public static uint lwzx(byte register1, byte register2, byte register3)
         {

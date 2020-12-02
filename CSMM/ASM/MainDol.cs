@@ -118,9 +118,9 @@ namespace CustomStreetManager
             }
 
             new MapIconTable().read(stream, addressMapper, mapDescriptors, null);
-
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
             new EventSquare().read(stream, addressMapper, mapDescriptors, null);
+            new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -222,6 +222,7 @@ namespace CustomStreetManager
             new MapIconTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new EventSquare().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new RuleSetTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
