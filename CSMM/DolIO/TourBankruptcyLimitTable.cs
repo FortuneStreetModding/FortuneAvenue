@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class TourPlayerBankruptcyLimitTable : DolIOTable
+    public class TourBankruptcyLimitTable : DolIOTable
     {
         protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
-            var tourPlayerBankruptLimitTable = new List<UInt32>();
+            var tourBankruptcyLimitTable = new List<UInt32>();
             foreach (var mapDescriptor in mapDescriptors)
             {
-                tourPlayerBankruptLimitTable.Add(mapDescriptor.TourBankruptcyLimit);
+                tourBankruptcyLimitTable.Add(mapDescriptor.TourBankruptcyLimit);
             }
-            return allocate(tourPlayerBankruptLimitTable, "TourPlayerBankruptcyLimitTable");
+            return allocate(tourBankruptcyLimitTable, "TourBankruptcyLimitTable");
         }
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {

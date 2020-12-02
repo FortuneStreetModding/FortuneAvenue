@@ -106,7 +106,7 @@ namespace CustomStreetManager
                 MapDescriptor mapDescriptor = mapDescriptors[i];
                 mapDescriptor.readMapDefaultsFromStream(stream);
             }
-            new DefaultGoalMoneyTable().read(stream, addressMapper, mapDescriptors, null);
+            new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
 
             new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, null);
 
@@ -128,7 +128,7 @@ namespace CustomStreetManager
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
             new EventSquare().read(stream, addressMapper, mapDescriptors, null);
             new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
-            new TourPlayerBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, null);
+            new TourBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -225,8 +225,8 @@ namespace CustomStreetManager
                 mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428968));
             }
 
-            new DefaultGoalMoneyTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new TourPlayerBankruptcyLimitTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new DefaultTargetAmountTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new TourBankruptcyLimitTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapDescriptionTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapIconTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new VentureCardTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);

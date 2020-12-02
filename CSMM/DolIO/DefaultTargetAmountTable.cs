@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CustomStreetManager
 {
-    public class DefaultGoalMoneyTable : DolIOTable
+    public class DefaultTargetAmountTable : DolIOTable
     {
         protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
