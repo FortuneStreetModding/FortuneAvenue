@@ -59,8 +59,8 @@ namespace CustomStreetManager
             DataTable table = new DataTable();
             table.Columns.Add("Id", typeof(byte));
             table.Columns.Add("Description", typeof(string));
-            table.Columns.Add("Standard Mode Frequency", typeof(UInt32));
-            table.Columns.Add("Easy Mode Frequency", typeof(UInt32));
+            table.Columns.Add("Standard Mode Frequency", typeof(UInt32)); // In how many different vanilla standard maps that particular venture card has been enabled
+            table.Columns.Add("Easy Mode Frequency", typeof(UInt32)); // In how many different vanilla easy maps that particular venture card has been enabled
             table.Columns.Add("Needed Square Types", typeof(SquareType[]));
             table.Rows.Add(   1, "Adventurous turning point! You can choose which way to move on your next go, (player's name)."                    , 13 , 15 );
             table.Rows.Add(   2, "Venture on! Roll the die again and move forward."                                                                 , 16 , 17 );
