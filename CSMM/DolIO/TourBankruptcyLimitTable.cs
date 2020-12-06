@@ -60,7 +60,7 @@ namespace CustomStreetManager
         {
             if (isVanilla)
             {
-                s.Seek(0x4, SeekOrigin.Current);
+                s.Seek(0x4, SeekOrigin.Current); // offset
             }
             foreach (var mapDescriptor in mapDescriptors)
             {

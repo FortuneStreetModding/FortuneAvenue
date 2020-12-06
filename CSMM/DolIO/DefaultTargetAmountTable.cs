@@ -54,6 +54,10 @@ namespace CustomStreetManager
         }
         protected override void readAsm(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
+            if (isVanilla)
+            {
+                s.Seek(0x0, SeekOrigin.Current); // offset
+            }
             foreach (var mapDescriptor in mapDescriptors)
             {
                 mapDescriptor.TargetAmount = s.ReadUInt32();
