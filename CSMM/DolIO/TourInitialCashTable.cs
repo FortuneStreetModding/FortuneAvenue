@@ -64,7 +64,7 @@ namespace CustomStreetManager
             }
             foreach (var mapDescriptor in mapDescriptors)
             {
-                mapDescriptor.TourBankruptcyLimit = s.ReadUInt32();
+                mapDescriptor.TourInitialCash = s.ReadUInt32();
                 if (isVanilla)
                 {
                     // in vanilla main.dol the table has other stuff in it like initial cash and tour opponents of the map
