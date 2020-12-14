@@ -71,7 +71,7 @@ namespace FSEditor.FSData {
 		public Position Position { get; set; }
 
         /// <summary>
-        /// 
+        /// Is unused by the game
         /// </summary>
         public UInt16 Unknown1 { get; set; }
 
@@ -152,9 +152,9 @@ namespace FSEditor.FSData {
         private UInt16 _Price;
 
 		/// <summary>
-		/// Gets or sets an unknown value.
+		/// Is unused by the game
 		/// </summary>
-		public Byte Unknown3 { get; set; }
+		public Byte Unknown2 { get; set; }
 
 		/// <summary>
 		/// Gets or sets the Shop Model ID.
@@ -255,7 +255,7 @@ namespace FSEditor.FSData {
 			data.Price = stream.ReadUInt16();
 
 			// Read Unknown Value
-			data.Unknown3 = stream.ReadByte();
+			data.Unknown2 = stream.ReadByte();
 
 			// Read Shop Model ID
 			data.ShopModelId = stream.ReadByte();
@@ -286,7 +286,7 @@ namespace FSEditor.FSData {
 
             stream.Write(Price);
 
-            stream.Write(Unknown3);
+            stream.Write(Unknown2);
 
             stream.Write(ShopModelId);
         }
