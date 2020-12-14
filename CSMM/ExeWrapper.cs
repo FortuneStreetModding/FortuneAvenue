@@ -114,6 +114,11 @@ namespace CustomStreetManager
             string[] requiredFilesBenzin = new string[] { "benzin.exe", "cygwin1.dll" };
             return await makeSureInstalled("Benzin", requiredFilesBenzin, "https://github.com/Deflaktor/benzin", "https://github.com/Deflaktor/benzin/releases/download/2.1.11Beta/benzin-2.1.11BETA-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
+        public static async Task<bool> makeSurePpcCompilerInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            string[] requiredFilesPpcCompiler = new string[] { "powerpc-eabi-as.exe", "powerpc-eabi-objcopy.exe" };
+            return await makeSureInstalled("PowerPC Compiler", requiredFilesPpcCompiler, "https://github.com/BullyWiiPlaza/power-pc-eabi-assembling", "https://github.com/BullyWiiPlaza/power-pc-eabi-assembling/archive/master.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+        }
         private static void parsePercentageValue(string line, IProgress<ProgressInfo> progress)
         {
             var pi = new ProgressInfo();
@@ -207,11 +212,37 @@ namespace CustomStreetManager
             var psi = preparePsi("benzin.exe", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
+        private static async Task<string> callPowerPcAs(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            await makeSurePpcCompilerInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
+            var psi = preparePsi("powerpc-eabi-as.exe", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
+        }
+        private static async Task<string> callPowerPcObjcopy(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            await makeSurePpcCompilerInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
+            var psi = preparePsi("powerpc-eabi-objcopy.exe", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
+        }
         public static async Task<string> extractFiles(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "COPY --progress --fst --preserve --overwrite --psel DATA --files +/sys/main.dol;+/files/localize/ui_message;+/files/param/*.frb;+/files/game/game_sequence*.arc;+/files/game/lang*/game_sequence*.arc; \"" + inputFile + "\" \"" + outputDirectory + "\"";
             var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
             return result;
+        }
+        public static async Task<byte[]> compilePpcAsm(UInt32 baseAddress, string powerPcAsm, string purpose, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "tmp"));
+            string tmpSource = Path.Combine(Directory.GetCurrentDirectory(), "tmp", purpose + ".s");
+            string tmpObject = Path.Combine(Directory.GetCurrentDirectory(), "tmp", purpose + ".ob");
+            string tmpBin = Path.Combine(Directory.GetCurrentDirectory(), "tmp", purpose + ".bin");
+            using (var tw = new StreamWriter(tmpSource, false))
+            {
+                await tw.WriteAsync(powerPcAsm);
+            }
+            await callPowerPcAs("-mregnames -mgekko --defsym ba=0x"+ baseAddress.ToString("X8") + " \"" + tmpSource + "\" -o \"" + tmpObject + "\"", cancelToken, ProgressInfo.makeSubProgress(progress, 0, 50));
+            await callPowerPcObjcopy("-O \"binary\" -R .data \"" + tmpObject + "\" \"" + tmpBin + "\"", cancelToken, ProgressInfo.makeSubProgress(progress, 50, 100));
+            return await File.ReadAllBytesAsync(tmpBin, cancelToken); ;
         }
         public static async Task<string> extractFullIsoAsync(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {

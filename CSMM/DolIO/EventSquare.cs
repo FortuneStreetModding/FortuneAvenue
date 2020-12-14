@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CustomStreetManager
@@ -183,6 +184,30 @@ namespace CustomStreetManager
         private List<UInt32> writeSubroutineForceFetchFakeVentureCard(VAVAddr fakeVentureCard)
         {
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair((UInt32)fakeVentureCard);
+
+            string declarations = "";
+            declarations += ".set fakeVentureCard,0x" + ((UInt32) fakeVentureCard).ToString("X8") + "\n";
+            string asmCode = declarations + @"
+lis r6, fakeVentureCard@h
+addi r6, r6, fakeVentureCard@l
+lwz r4, 0x0, r6
+cmpwi r4, 0x0
+beq skip
+lwz r5, 0x34(r3)
+stw r4, 0x158(r5)
+li r5, 0
+stw r5, 0x0(r6)
+li r8, 0
+blr
+skip:
+li r4, -0x1
+li r8, 0x3
+blr
+";
+            var task = Task.Run(async () => await ExeWrapper.compilePpcAsm(0x0000000, asmCode, "forceFetchFakeVentureCard", CancellationToken.None, null));
+            task.Wait();
+            var result = task.Result;
+            Debug.WriteLine(result);
 
             // precondition: r3 is ChanceCardUI *
             // ChanceCardUI->field_0x34 is ChanceBoard *
