@@ -58,7 +58,7 @@ namespace CustomStreetManager
             return new Progress<ProgressInfo>(progressInfo =>
             {
                 progressInfo.progress = ProgressInfo.lerp(minProgress, maxProgress, progressInfo.progress);
-                progress.Report(progressInfo);
+                progress?.Report(progressInfo);
             });
         }
         public static IProgress<ProgressInfo> makeNoProgress(IProgress<ProgressInfo> progress)
@@ -66,7 +66,7 @@ namespace CustomStreetManager
             return new Progress<ProgressInfo>(progressInfo =>
             {
                 progressInfo.progress = -1;
-                progress.Report(progressInfo);
+                progress?.Report(progressInfo);
             });
         }
 
