@@ -82,7 +82,8 @@ namespace CustomStreetManager
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ed6a8), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801edab7));
             // Unused menu id=0x39 (FreePlayScene)
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801edad4), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ee71f));
-
+            // Unused menu class (SelectMapUI)
+            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801fce28), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ff777));
         }
 
 
