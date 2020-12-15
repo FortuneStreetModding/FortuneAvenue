@@ -130,6 +130,7 @@ namespace CustomStreetManager
             new TourOpponentsTable().read(stream, addressMapper, mapDescriptors, null);
             new TourClearRankTable().read(stream, addressMapper, mapDescriptors, null);
             new StageNameIDTable().read(stream, addressMapper, mapDescriptors, null);
+            new BGMIDTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -237,6 +238,7 @@ namespace CustomStreetManager
             new TourOpponentsTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new TourClearRankTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new StageNameIDTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new BGMIDTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
