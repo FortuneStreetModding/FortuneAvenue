@@ -36,7 +36,7 @@ namespace CustomStreetManager
 
         protected VAVAddr allocate(string str, string purpose = null)
         {
-            if (str == null)
+            if (string.IsNullOrEmpty(str))
                 return VAVAddr.NullAddress;
             using (MemoryStream memoryStream = new MemoryStream())
             {
