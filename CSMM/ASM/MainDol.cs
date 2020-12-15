@@ -135,6 +135,7 @@ namespace CustomStreetManager
             new DesignTypeTable().read(stream, addressMapper, mapDescriptors, null);
             new FrbMapTable().read(stream, addressMapper, mapDescriptors, null);
             new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, null);
+            new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -247,6 +248,7 @@ namespace CustomStreetManager
             new DesignTypeTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new FrbMapTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapSwitchParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new MapGalaxyParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
