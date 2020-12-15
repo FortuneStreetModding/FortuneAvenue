@@ -133,6 +133,7 @@ namespace CustomStreetManager
             new BGMIDTable().read(stream, addressMapper, mapDescriptors, null);
             new BackgroundTable().read(stream, addressMapper, mapDescriptors, null);
             new DesignTypeTable().read(stream, addressMapper, mapDescriptors, null);
+            new FrbMapTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -243,6 +244,7 @@ namespace CustomStreetManager
             new BGMIDTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new BackgroundTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new DesignTypeTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new FrbMapTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
