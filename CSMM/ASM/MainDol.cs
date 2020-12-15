@@ -138,6 +138,7 @@ namespace CustomStreetManager
             new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
             new MapOriginTable().read(stream, addressMapper, mapDescriptors, null);
             new BGSequenceTable().read(stream, addressMapper, mapDescriptors, null);
+            new InternalNameTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -253,6 +254,7 @@ namespace CustomStreetManager
             new MapGalaxyParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapOriginTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new BGSequenceTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new InternalNameTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
