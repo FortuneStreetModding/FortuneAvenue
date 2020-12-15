@@ -94,7 +94,7 @@ namespace CustomStreetManager
             UInt32 opcode;
             // stream.Seek(addressMapper.toFileAddress((BSVAddr)0x), SeekOrigin.Begin); opcode = stream.ReadUInt32();
             // return (Int16)(PowerPcAsm.getOpcodeParameter(opcode));
-            return 0;
+            return -1;
         }
         protected override bool readIsVanilla(EndianBinaryReader stream, AddressMapper addressMapper)
         {
