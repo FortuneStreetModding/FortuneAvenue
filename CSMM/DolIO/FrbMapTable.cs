@@ -30,17 +30,17 @@ namespace CustomStreetManager
             PowerPcAsm.Pair16Bit v = PowerPcAsm.make16bitValuePair((UInt32)tableAddr);
 
             // --- Game::GetMapFrbName ---
-            // mulli r3,r3,0x38 ->  mulli r3,r3,0x10
+            // mulli r3,r3,0x38  ->  mulli r3,r3,0x10
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccab0), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(3, 3, 0x10));
-            // r5 <- 0x80428e50 ->  r5 <- tableAddr
+            // r5 <- 0x80428e50  ->  r5 <- tableAddr
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccab4), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(5, v.upper16Bit)); stream.Seek(0x4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(5, 5, v.lower16Bit));
-            // lwz r0,0x18(r4)   ->  lwz r0,0x0(r4)
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccac8), SeekOrigin.Begin); stream.Write(PowerPcAsm.lwz(0, 0x0, 4));
+            // lwz r3,0x18(r3)   ->  lwz r3,0x0(r3)
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccac8), SeekOrigin.Begin); stream.Write(PowerPcAsm.lwz(3, 0x0, 3));
 
             // --- Game::GetMapMapNum ---
-            // mulli r0,r3,0x38 ->  mulli r0,r3,0x10
+            // mulli r0,r3,0x38  ->  mulli r0,r3,0x10
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccad0), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 3, 0x10));
-            // r4 <- 0x80428e50 ->  r4 <- tableAddr
+            // r4 <- 0x80428e50  ->  r4 <- tableAddr
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccad4), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(4, v.upper16Bit)); stream.Seek(0x4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(4, 4, v.lower16Bit));
             // lwz r0,0x18(r4)   ->  lwz r0,0x0(r4)
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801ccae4), SeekOrigin.Begin); stream.Write(PowerPcAsm.lwz(0, 0x0, 4));

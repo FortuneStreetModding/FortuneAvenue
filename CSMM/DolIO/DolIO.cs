@@ -36,6 +36,8 @@ namespace CustomStreetManager
 
         protected VAVAddr allocate(string str, string purpose = null)
         {
+            if (str == null)
+                return (VAVAddr)0;
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
