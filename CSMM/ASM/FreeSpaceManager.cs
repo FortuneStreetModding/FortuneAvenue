@@ -16,7 +16,7 @@ namespace CustomStreetManager
         /// </summary>
         private Dictionary<VAVAddr, VAVAddr> remainingFreeSpaceBlocks = new Dictionary<VAVAddr, VAVAddr>();
         private readonly Dictionary<VAVAddr, VAVAddr> totalFreeSpaceBlocks = new Dictionary<VAVAddr, VAVAddr>();
-        private readonly Dictionary<byte[], VAVAddr> reuseValues = new Dictionary<byte[], VAVAddr>();
+        private readonly Dictionary<byte[], VAVAddr> reuseValues = new Dictionary<byte[], VAVAddr>(new ByteArrayComparer());
         private bool startedAllocating = false;
 
         public void addFreeSpace(VAVAddr start, VAVAddr end)
