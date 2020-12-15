@@ -39,10 +39,10 @@ namespace CustomStreetManager
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80210598), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
             */
             // mulli r0,r0,0x24                                   ->  mulli r0,r0,0x04
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x802105a4), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(4, 0, 0x04));
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x802105a4), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 0, 0x04));
             // r3 <- 804363c8                                     ->  r3 <- tableAddr
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x802105a8), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(3, v.upper16Bit)); stream.Seek(0x4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(3, 3, v.lower16Bit));
-            // mulli r0,r29,0x24                                  ->  mulli r0,r29,0x24
+            // mulli r0,r29,0x24                                  ->  mulli r0,r29,0x04
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x802105c4), SeekOrigin.Begin); stream.Write(PowerPcAsm.mulli(0, 29, 0x04));
             // lwz r4,0x18(r3)                                    ->  lwz r4,0x0(r3)
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x802105d8), SeekOrigin.Begin); stream.Write(PowerPcAsm.lwz(4, 0x0, 3));

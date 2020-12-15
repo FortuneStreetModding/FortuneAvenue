@@ -109,7 +109,11 @@ namespace CustomStreetManager
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e8a8), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(30, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(30, 30, v.lower16Bit));
             // r30 <- 0x8047f5c0                                   -> r30 <- iconTableAddr
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e830), SeekOrigin.Begin); stream.Write(PowerPcAsm.lis(30, v.upper16Bit)); stream.Seek(4, SeekOrigin.Current); stream.Write(PowerPcAsm.addi(30, 30, v.lower16Bit));
-
+            // mr r3,r28                                           -> mr r3,r26
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e94c), SeekOrigin.Begin); stream.Write(PowerPcAsm.mr(3, 26));
+            // mr r3,r28                                           -> mr r3,r26
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e968), SeekOrigin.Begin); stream.Write(PowerPcAsm.mr(3, 26));
+            
             // Modify the GetMapDifficulty routine to retrieve the current map icon addr addr
             // subi r31,r3,0x15                                   ->  nop
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80211dc8), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
