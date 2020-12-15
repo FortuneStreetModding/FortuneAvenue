@@ -14,15 +14,15 @@ namespace CustomStreetManager
     {
         protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
-            var ruleSetTable = new List<VAVAddr>();
+            var frbMapTable = new List<VAVAddr>();
             foreach (var mapDescriptor in mapDescriptors)
             {
-                ruleSetTable.Add(allocate(mapDescriptor.FrbFile1));
-                ruleSetTable.Add(allocate(mapDescriptor.FrbFile2));
-                ruleSetTable.Add(allocate(mapDescriptor.FrbFile3));
-                ruleSetTable.Add(allocate(mapDescriptor.FrbFile4));
+                frbMapTable.Add(allocate(mapDescriptor.FrbFile1));
+                frbMapTable.Add(allocate(mapDescriptor.FrbFile2));
+                frbMapTable.Add(allocate(mapDescriptor.FrbFile3));
+                frbMapTable.Add(allocate(mapDescriptor.FrbFile4));
             }
-            return allocate(ruleSetTable, "FrbMapTable");
+            return allocate(frbMapTable, "FrbMapTable");
         }
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {

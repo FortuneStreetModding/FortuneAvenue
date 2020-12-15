@@ -15,12 +15,12 @@ namespace CustomStreetManager
     {
         protected VAVAddr writeTable(List<MapDescriptor> mapDescriptors)
         {
-            var ruleSetTable = new List<UInt32>();
+            var designTypeTable = new List<UInt32>();
             foreach (var mapDescriptor in mapDescriptors)
             {
-                ruleSetTable.Add((UInt32)mapDescriptor.Theme);
+                designTypeTable.Add((UInt32)mapDescriptor.Theme);
             }
-            return allocate(ruleSetTable, "DesignTypeTable");
+            return allocate(designTypeTable, "DesignTypeTable");
         }
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {
