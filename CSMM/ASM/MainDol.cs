@@ -70,6 +70,8 @@ namespace CustomStreetManager
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80410648), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80411b9b));
             // Map Data String Table
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428978), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428e4f));
+            // Map Default Settings Table
+            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x804363c8), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80436a87));
             // Unused costume string table 1
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042bc78), addressMapper.toVersionAgnosticAddress((BSVAddr)0x8042c23f));
             // Unused costume string table 2
@@ -100,12 +102,6 @@ namespace CustomStreetManager
                 MapDescriptor mapDescriptor = new MapDescriptor();
                 mapDescriptor.readMapDataFromStream(stream);
                 mapDescriptors.Add(mapDescriptor);
-            }
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x804363c8), SeekOrigin.Begin);
-            for (int i = 0; i < 48; i++)
-            {
-                MapDescriptor mapDescriptor = mapDescriptors[i];
-                mapDescriptor.readMapDefaultsFromStream(stream);
             }
             new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
 

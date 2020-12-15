@@ -189,31 +189,6 @@ namespace CustomStreetManager
             // the BGSequence is only used for mario stadium to animate the Miis playing baseball in the background. As such this will be hardcoded whenever bg004 is selected.
             stream.Write(Background == "bg004" ? (UInt32)bgSequenceMarioStadium : (UInt32)0);
         }
-        public void readMapDefaultsFromStream(EndianBinaryReader stream)
-        {
-            TargetAmount = stream.ReadUInt32();
-            TourBankruptcyLimit = stream.ReadUInt32();
-            TourInitialCash = stream.ReadUInt32();
-            TourOpponent1 = (Character)stream.ReadUInt32();
-            TourOpponent2 = (Character)stream.ReadUInt32();
-            TourOpponent3 = (Character)stream.ReadUInt32();
-            TourClearRank = stream.ReadUInt32();
-            MapIconAddrAddr = (VAVAddr)stream.ReadUInt32(); // this is normally TourMapDifficulty, but since it is unused it has been repurposed so that each map can have a unique icon
-            var TourGeneralPlayTime = stream.ReadUInt32(); // ignore unused tour general play time
-        }
-        public void writeMapDefaults(EndianBinaryWriter stream, UInt32 mapIconAddrAddr)
-        {
-            stream.Write(TargetAmount);
-            stream.Write(TourBankruptcyLimit);
-            stream.Write(TourInitialCash);
-            stream.Write((UInt32)TourOpponent1);
-            stream.Write((UInt32)TourOpponent2);
-            stream.Write((UInt32)TourOpponent3);
-            stream.Write(TourClearRank);
-            stream.Write(mapIconAddrAddr); // stream.Write(TourDifficulty);
-            stream.Write(0); // stream.Write(TourGeneralPlayTime);
-        }
-
         public HashSet<SquareType> readFrbFileInfo(string param_folder, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var usedSquareTypes = new HashSet<SquareType>();
