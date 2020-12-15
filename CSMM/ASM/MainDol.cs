@@ -137,6 +137,7 @@ namespace CustomStreetManager
             new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, null);
             new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
             new MapOriginTable().read(stream, addressMapper, mapDescriptors, null);
+            new BGSequenceTable().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -251,6 +252,7 @@ namespace CustomStreetManager
             new MapSwitchParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapGalaxyParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapOriginTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new BGSequenceTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
