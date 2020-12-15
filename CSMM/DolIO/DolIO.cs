@@ -81,8 +81,10 @@ namespace CustomStreetManager
             if (virtualAddress == VAVAddr.NullAddress)
                 return null;
             int fileAddress = addressMapper.toFileAddress(virtualAddress);
+            var pos = stream.BaseStream.Position;
             stream.Seek(fileAddress, SeekOrigin.Begin);
             byte[] buff = stream.ReadBytes(64);
+            stream.BaseStream.Seek(pos, SeekOrigin.Begin);
             return HexUtil.byteArrayToString(buff);
         }
     }

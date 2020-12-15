@@ -156,8 +156,10 @@ namespace CustomStreetManager
             if (virtualAddressAddress == VAVAddr.NullAddress)
                 return null;
             int fileAddress = addressMapper.toFileAddress(virtualAddressAddress);
+            var pos = stream.BaseStream.Position;
             stream.Seek(fileAddress, SeekOrigin.Begin);
             VAVAddr virtualAddress = (VAVAddr)stream.ReadUInt32();
+            stream.BaseStream.Seek(pos, SeekOrigin.Begin);
             return resolveAddressToString(virtualAddress, stream, addressMapper);
         }
 
