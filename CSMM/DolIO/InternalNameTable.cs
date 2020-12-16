@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CustomStreetManager
@@ -39,7 +40,9 @@ namespace CustomStreetManager
             }
             foreach (var mapDescriptor in mapDescriptors)
             {
-                mapDescriptor.InternalName = resolveAddressToString((VAVAddr)s.ReadUInt32(), s, addressMapper);
+                var internalName = resolveAddressToString((VAVAddr)s.ReadUInt32(), s, addressMapper).Trim();
+                // clear the internal name of characters which are not allowed in a file system
+                mapDescriptor.InternalName = Regex.Replace(internalName, @"[<>:/\|?*""]+", "");
                 if (isVanilla)
                 {
                     // in vanilla main.dol the table has other stuff in it like bgm id, map frb files, etc.

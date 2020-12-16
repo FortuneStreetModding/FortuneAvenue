@@ -336,7 +336,7 @@ namespace CustomStreetManager
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }
-
+            await Task.Delay(1000);
             progress.Report("Pack game_sequence files...");
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
