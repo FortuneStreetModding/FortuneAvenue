@@ -170,13 +170,12 @@ namespace CustomStreetManager
         {
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80211e5c), SeekOrigin.Begin);
             var lis_opcode = stream.ReadUInt32();
-            stream.Seek(4, SeekOrigin.Current);
             var addi_opcode = stream.ReadUInt32();
             return (VAVAddr)PowerPcAsm.make32bitValueFromPair(lis_opcode, addi_opcode);
         }
         protected override Int16 readTableRowCount(EndianBinaryReader stream, AddressMapper addressMapper, bool isVanilla)
         {
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e7c0), SeekOrigin.Begin);
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80211dd4), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
             return PowerPcAsm.getOpcodeParameter(opcode);
         }
