@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -95,12 +96,33 @@ namespace CustomStreetManager
                 importFile = Path.Combine(dir, mapIcon + ".png");
                 destFile = Path.Combine(tmpFileSet.param_folder, mapIcon + ".png");
                 Directory.CreateDirectory(tmpFileSet.param_folder);
-                File.Copy(importFile, destFile, true);
-                progress.Report("Imported " + importFile);
+                if (File.Exists(destFile))
+                    File.Delete(destFile);
+                // we have a map icon for the tutorial map ready, we can use it
+                if (mapIcon == "p_bg_901")
+                {
+                    WriteResourceToFile("CustomStreetManager.Images.p_bg_901.png", destFile);
+                }
+                else
+                {
+                    File.Copy(importFile, destFile);
+                    progress.Report("Imported " + importFile);
+                }
             }
             mapDescriptor.set(mapDescriptorImport);
             mapDescriptor.Dirty = true;
             progress.Report(new ProgressInfo(100, "Done."));
+
+        }
+        public void WriteResourceToFile(string resourceName, string fileName)
+        {
+            using (var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+            {
+                using (var file = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    resource.CopyTo(file);
+                }
+            }
         }
     }
 }

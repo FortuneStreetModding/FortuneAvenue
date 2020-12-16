@@ -226,7 +226,12 @@ namespace CustomStreetManager
                         {
                             Background = flaggedValueOrNull;
                             if (string.IsNullOrEmpty(MapIcon))
-                                VanillaDatabase.getMapIconFromVanillaBackground(Background).IfPresent(value => MapIcon = value);
+                            {
+                                if (Background == "bg901")
+                                    MapIcon = "p_bg_901";
+                                else
+                                    VanillaDatabase.getMapIconFromVanillaBackground(Background).IfPresent(value => MapIcon = value);
+                            }
                             if (!IsBgmIdInitialized())
                                 VanillaDatabase.getBgmIdFromVanillaBackground(Background).IfPresent(value => BGMID = value);
                         }
