@@ -106,12 +106,15 @@ namespace CustomStreetManager
                 mapDescriptors.Add(mapDescriptor);
             }
 
+            new MapOriginTable().read(stream, addressMapper, mapDescriptors, null);
+            // map description table must be after map origin table
+            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, null);
             new BackgroundTable().read(stream, addressMapper, mapDescriptors, null);
-            // map icon table must be after the map background table
+            // map icon table must be after the map background table and map origin table
             new MapIconTable().read(stream, addressMapper, mapDescriptors, null);
 
+            // the rest does not have any dependencies
             new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
-            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, null);
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
             new EventSquare().read(stream, addressMapper, mapDescriptors, null);
             new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
@@ -125,7 +128,6 @@ namespace CustomStreetManager
             new FrbMapTable().read(stream, addressMapper, mapDescriptors, null);
             new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, null);
             new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
-            new MapOriginTable().read(stream, addressMapper, mapDescriptors, null);
             new BGSequenceTable().read(stream, addressMapper, mapDescriptors, null);
             new InternalNameTable().read(stream, addressMapper, mapDescriptors, null);
 

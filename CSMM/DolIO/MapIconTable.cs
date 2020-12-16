@@ -182,7 +182,6 @@ namespace CustomStreetManager
         }
         protected override bool readIsVanilla(EndianBinaryReader stream, AddressMapper addressMapper)
         {
-            // has the hack for expanded Description message table already been applied?
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e790), SeekOrigin.Begin);
             var opcode = stream.ReadUInt32();
             return opcode == PowerPcAsm.cmpw(28, 30);
