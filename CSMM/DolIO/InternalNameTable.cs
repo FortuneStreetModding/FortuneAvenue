@@ -67,7 +67,7 @@ namespace CustomStreetManager
         {
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x804363b8), SeekOrigin.Begin);
             var bytes = stream.ReadBytes(4);
-            return bytes != Encoding.ASCII.GetBytes("NAME");
+            return !new ByteArrayComparer().Equals(bytes, Encoding.ASCII.GetBytes("NAME"));
         }
     }
 }
