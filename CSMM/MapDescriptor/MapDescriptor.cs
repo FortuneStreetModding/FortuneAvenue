@@ -40,11 +40,6 @@ namespace CustomStreetManager
         }
         public UInt32 Name_MSG_ID { get; set; }
         public Dictionary<string, string> Name { get; private set; }
-        public string Name_EN
-        {
-            get { return Name[Locale.EN]; }
-            set { }
-        }
         public UInt32 Desc_MSG_ID { get; set; }
         public Dictionary<string, string> Desc { get; private set; }
         public byte[] VentureCard { get; set; }
