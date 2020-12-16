@@ -86,21 +86,25 @@ namespace CustomStreetManager
             // custom map icon hack (change it that way that it will call the GetMapDifficulty routine instead of the GetMapOrigin routine
             // the GetMapDifficulty routine is mostly unused by the game and we repurpose it to return the pointer to the pointer of the string of the map icon instead
             // then we go through all map icon pointer pointers and check if it is the same as the one retrieved. If it is then we make it visible, otherwise we set the visibility to false.
+            var GetMapDifficulty = addressMapper.toVersionAgnosticAddress((BSVAddr) 0x80211da4);
 
             // bl GetMapOrigin                                     -> bl GetMapDifficulty
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e77c), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(0x8021e77c, 0x80211da4));
+            var offset = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e77c);
+            stream.Seek(addressMapper.toFileAddress(offset), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(offset, GetMapDifficulty));
             // cmpw r28,r30                                        -> cmpw r29,r30
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e790), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpw(29, 30));
             // cmplwi r28,0x12                                     -> cmplwi r28,iconCount
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e7c0), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(28, iconCount));
             // bl GetMapOrigin                                     -> bl GetMapDifficulty
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e8a4), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(0x8021e8a4, 0x80211da4));
+            offset = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e77c);
+            stream.Seek(addressMapper.toFileAddress(offset), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(offset, GetMapDifficulty));
             // cmpw r29,r28                                        -> cmpw r30,r28
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e8b8), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmpw(30, 28));
             // cmplwi r29,0x12                                     -> cmplwi r29,iconCount
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e8e8), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(29, iconCount));
             // bl GetMapOrigin                                     -> bl GetMapDifficulty
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e824), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(0x8021e824, 0x80211da4));
+            offset = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e77c);
+            stream.Seek(addressMapper.toFileAddress(offset), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(offset, GetMapDifficulty));
             // cmplwi r28,0x12                                     -> cmplwi r28,iconCount
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021e84c), SeekOrigin.Begin); stream.Write(PowerPcAsm.cmplwi(28, iconCount));
             // r29 <- 0x8047f5c0                                   -> r29 <- iconTableAddr
