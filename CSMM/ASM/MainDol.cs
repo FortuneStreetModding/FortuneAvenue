@@ -68,8 +68,8 @@ namespace CustomStreetManager
             freeSpaceManager = new FreeSpaceManager();
             // Venture Card Table
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80410648), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80411b9b));
-            // Map Data String Table
-            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428978), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428e4f));
+            // Map Data String Table and Map Data Table
+            freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428978), addressMapper.toVersionAgnosticAddress((BSVAddr)0x804298cf));
             // Map Default Settings Table
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x804363c8), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80436a87));
             // Unused costume string table 1
@@ -94,34 +94,24 @@ namespace CustomStreetManager
         {
             setupAddressMapper(stream, fileMappingSections, progress);
 
-            List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
+            // GetMapCount
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801cca30), SeekOrigin.Begin);
+            UInt32 opcode = stream.ReadUInt32();
+            var count = (Int16)(PowerPcAsm.getOpcodeParameter(opcode));
 
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80428e50), SeekOrigin.Begin);
-            for (int i = 0; i < 48; i++)
+            List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
+            for(int i = 0; i < count; i++)
             {
                 MapDescriptor mapDescriptor = new MapDescriptor();
-                mapDescriptor.readMapDataFromStream(stream);
                 mapDescriptors.Add(mapDescriptor);
             }
-            new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
 
-            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, null);
-
-            foreach (MapDescriptor mapDescriptor in mapDescriptors)
-            {
-                var internalName = resolveAddressToString(mapDescriptor.InternalNameAddr, stream).Trim();
-                mapDescriptor.InternalName = Regex.Replace(internalName, @"[<>:/\|?*""]+", "");
-
-                mapDescriptor.Background = resolveAddressToString(mapDescriptor.BackgroundAddr, stream);
-                mapDescriptor.FrbFile1 = resolveAddressToString(mapDescriptor.FrbFile1Addr, stream);
-                mapDescriptor.FrbFile2 = resolveAddressToString(mapDescriptor.FrbFile2Addr, stream);
-                mapDescriptor.FrbFile3 = resolveAddressToString(mapDescriptor.FrbFile3Addr, stream);
-                mapDescriptor.FrbFile4 = resolveAddressToString(mapDescriptor.FrbFile4Addr, stream);
-                mapDescriptor.readRotationOriginPoints(stream, addressMapper);
-                mapDescriptor.readLoopingModeParams(stream, addressMapper);
-            }
-
+            new BackgroundTable().read(stream, addressMapper, mapDescriptors, null);
+            // map icon table must be after the map background table
             new MapIconTable().read(stream, addressMapper, mapDescriptors, null);
+
+            new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
+            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, null);
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
             new EventSquare().read(stream, addressMapper, mapDescriptors, null);
             new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
@@ -131,7 +121,6 @@ namespace CustomStreetManager
             new TourClearRankTable().read(stream, addressMapper, mapDescriptors, null);
             new StageNameIDTable().read(stream, addressMapper, mapDescriptors, null);
             new BGMIDTable().read(stream, addressMapper, mapDescriptors, null);
-            new BackgroundTable().read(stream, addressMapper, mapDescriptors, null);
             new DesignTypeTable().read(stream, addressMapper, mapDescriptors, null);
             new FrbMapTable().read(stream, addressMapper, mapDescriptors, null);
             new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, null);
@@ -144,97 +133,6 @@ namespace CustomStreetManager
         }
         public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
-            if (mapDescriptors.Count != 48)
-            {
-                throw new ArgumentException("length of map descriptor list is not 48.");
-            }
-
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80428e50), SeekOrigin.Begin);
-            for (int i = 0; i < 48; i++)
-            {
-                int seek = (int)stream.BaseStream.Position;
-                MapDescriptor mapDescriptor = mapDescriptors[i];
-                VAVAddr internalNameAddr = VAVAddr.NullAddress;
-                VAVAddr backgroundAddr = VAVAddr.NullAddress;
-                VAVAddr frbFile1Addr = VAVAddr.NullAddress;
-                VAVAddr frbFile2Addr = VAVAddr.NullAddress;
-                VAVAddr frbFile3Addr = VAVAddr.NullAddress;
-                VAVAddr frbFile4Addr = VAVAddr.NullAddress;
-                VAVAddr mapSwitchParamAddr = VAVAddr.NullAddress;
-                VAVAddr loopingModeParamAddr = VAVAddr.NullAddress;
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                    s.Write(mapDescriptor.InternalName);
-                    s.Write((byte)0);
-                    internalNameAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress);
-                }
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                    s.Write(mapDescriptor.Background);
-                    s.Write((byte)0);
-                    backgroundAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress);
-                }
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                    s.Write(mapDescriptor.FrbFile1);
-                    s.Write((byte)0);
-                    frbFile1Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress);
-                }
-                if (!string.IsNullOrEmpty(mapDescriptor.FrbFile2))
-                {
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                        s.Write(mapDescriptor.FrbFile2);
-                        s.Write((byte)0);
-                        frbFile2Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress);
-                    }
-                }
-                if (!string.IsNullOrEmpty(mapDescriptor.FrbFile3))
-                {
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                        s.Write(mapDescriptor.FrbFile3);
-                        s.Write((byte)0);
-                        frbFile3Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress);
-                    }
-                }
-                if (!string.IsNullOrEmpty(mapDescriptor.FrbFile4))
-                {
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                        s.Write(mapDescriptor.FrbFile4);
-                        s.Write((byte)0);
-                        frbFile4Addr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress);
-                    }
-                }
-                if (mapDescriptor.LoopingMode != LoopingMode.None)
-                {
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                        mapDescriptor.writeLoopingModeParams(s);
-                        loopingModeParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress, "Looping Mode Config");
-                    }
-                }
-                if (mapDescriptor.SwitchRotationOriginPoints.Count != 0)
-                {
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        EndianBinaryWriter s = new EndianBinaryWriter(EndianBitConverter.Big, memoryStream);
-                        mapDescriptor.writeSwitchRotationOriginPoints(s);
-                        mapSwitchParamAddr = freeSpaceManager.allocateUnusedSpace(memoryStream.ToArray(), stream, addressMapper, progress, "Switch Rotation Origin Points");
-                    }
-                }
-                stream.Seek(seek, SeekOrigin.Begin);
-                mapDescriptor.writeMapData(stream, internalNameAddr, backgroundAddr, frbFile1Addr, frbFile2Addr, frbFile3Addr, frbFile4Addr, mapSwitchParamAddr, loopingModeParamAddr, addressMapper.toVersionAgnosticAddress((BSVAddr)0x80428968));
-            }
-
             new DefaultTargetAmountTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new TourBankruptcyLimitTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new TourInitialCashTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);

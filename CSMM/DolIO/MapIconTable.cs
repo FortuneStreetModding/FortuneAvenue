@@ -140,7 +140,6 @@ namespace CustomStreetManager
                     // in vanilla there is a mapping of bgXXX to p_bg_XXX which we will assume here without actually reading what is inside the main.dol
                     if (mapDescriptor.ID < 18)
                     {
-                        mapDescriptor.MapIconAddrAddr = VAVAddr.NullAddress;
                         var number = Regex.Match(mapDescriptor.Background, @"\d+").Value;
                         mapDescriptor.MapIcon = "p_bg_" + number;
                     }

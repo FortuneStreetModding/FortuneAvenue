@@ -143,8 +143,8 @@ namespace CustomStreetManager
                     mapDescriptors[i].VentureCard[j] = s.ReadByte();
                 }
                 // discard the last two bytes
-                s.ReadByte();
-                s.ReadByte();
+                _ = s.ReadByte();
+                _ = s.ReadByte();
             }
         }
 
