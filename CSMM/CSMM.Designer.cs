@@ -35,7 +35,11 @@ namespace CustomStreetManager
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Lavender;
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            DataGridViewCellStyle readOnlyColumStyle = new DataGridViewCellStyle();
+            readOnlyColumStyle.BackColor = System.Drawing.Color.LightGray;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
             this.clearListButton = new System.Windows.Forms.Button();
             this.addMapsDialog = new System.Windows.Forms.OpenFileDialog();
@@ -58,15 +62,15 @@ namespace CustomStreetManager
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Category = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Zone = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Order = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.UnlockID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.nameENDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.targetAmountDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.themeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ruleSetDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.frbFile1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.frbFile4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Background = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.BGMID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Venture_Card_Count = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -283,19 +287,18 @@ namespace CustomStreetManager
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Lavender;
             this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ID,
+            this.Category,
+            this.Zone,
+            this.Order,
+            this.UnlockID,
             this.nameENDataGridViewTextBoxColumn,
             this.targetAmountDataGridViewTextBoxColumn,
             this.themeDataGridViewTextBoxColumn,
             this.ruleSetDataGridViewTextBoxColumn,
             this.frbFile1DataGridViewTextBoxColumn,
-            this.frbFile2DataGridViewTextBoxColumn,
-            this.frbFile3DataGridViewTextBoxColumn,
-            this.frbFile4DataGridViewTextBoxColumn,
             this.Background,
             this.BGMID,
             this.Venture_Card_Count,
@@ -307,21 +310,44 @@ namespace CustomStreetManager
             this.dataGridView1.Location = new System.Drawing.Point(4, 49);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            this.dataGridView1.ReadOnly = false;
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridView1.Size = new System.Drawing.Size(1575, 970);
+            this.dataGridView1.Size = new System.Drawing.Size(1600, 900);
             this.dataGridView1.TabIndex = 45;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.dataGridView1_RowPrePaint);
             // 
+            // Category
+            // 
+            this.Category.DataPropertyName = "Category";
+            this.Category.HeaderText = "Category";
+            this.Category.Name = "Category";
+            this.Category.ReadOnly = false;
+            this.Category.Width = 60;
+            // 
+            // Zone
+            // 
+            this.Zone.DataPropertyName = "Zone";
+            this.Zone.HeaderText = "Zone";
+            this.Zone.Name = "Zone";
+            this.Zone.ReadOnly = false;
+            this.Zone.Width = 40;
+            // 
+            // Order
+            // 
+            this.Order.DataPropertyName = "Order";
+            this.Order.HeaderText = "Order";
+            this.Order.Name = "Order";
+            this.Order.ReadOnly = false;
+            this.Order.Width = 40;
+            // 
             // ID
             // 
-            this.ID.DataPropertyName = "ID";
-            this.ID.HeaderText = "ID";
-            this.ID.Name = "ID";
-            this.ID.ReadOnly = true;
-            this.ID.Width = 30;
+            this.UnlockID.DataPropertyName = "UnlockID";
+            this.UnlockID.HeaderText = "UnlockID";
+            this.UnlockID.Name = "UnlockID";
+            this.UnlockID.ReadOnly = false;
+            this.UnlockID.Width = 60;
             // 
             // nameENDataGridViewTextBoxColumn
             // 
@@ -330,6 +356,7 @@ namespace CustomStreetManager
             this.nameENDataGridViewTextBoxColumn.Name = "nameENDataGridViewTextBoxColumn";
             this.nameENDataGridViewTextBoxColumn.ReadOnly = true;
             this.nameENDataGridViewTextBoxColumn.Width = 150;
+            this.nameENDataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumStyle;
             // 
             // targetAmountDataGridViewTextBoxColumn
             // 
@@ -362,27 +389,6 @@ namespace CustomStreetManager
             this.frbFile1DataGridViewTextBoxColumn.Name = "frbFile1DataGridViewTextBoxColumn";
             this.frbFile1DataGridViewTextBoxColumn.ReadOnly = true;
             this.frbFile1DataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // frbFile2DataGridViewTextBoxColumn
-            // 
-            this.frbFile2DataGridViewTextBoxColumn.DataPropertyName = "FrbFile2";
-            this.frbFile2DataGridViewTextBoxColumn.HeaderText = "FrbFile2";
-            this.frbFile2DataGridViewTextBoxColumn.Name = "frbFile2DataGridViewTextBoxColumn";
-            this.frbFile2DataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // frbFile3DataGridViewTextBoxColumn
-            // 
-            this.frbFile3DataGridViewTextBoxColumn.DataPropertyName = "FrbFile3";
-            this.frbFile3DataGridViewTextBoxColumn.HeaderText = "FrbFile3";
-            this.frbFile3DataGridViewTextBoxColumn.Name = "frbFile3DataGridViewTextBoxColumn";
-            this.frbFile3DataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // frbFile4DataGridViewTextBoxColumn
-            // 
-            this.frbFile4DataGridViewTextBoxColumn.DataPropertyName = "FrbFile4";
-            this.frbFile4DataGridViewTextBoxColumn.HeaderText = "FrbFile4";
-            this.frbFile4DataGridViewTextBoxColumn.Name = "frbFile4DataGridViewTextBoxColumn";
-            this.frbFile4DataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // Background
             // 
@@ -492,15 +498,15 @@ namespace CustomStreetManager
         private System.Windows.Forms.BindingSource mapDescriptorBindingSource;
         private System.Windows.Forms.Button Go;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Category;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Zone;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Order;
+        private System.Windows.Forms.DataGridViewTextBoxColumn UnlockID;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameENDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn targetAmountDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn themeDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn ruleSetDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn frbFile1DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile2DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile3DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frbFile4DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn Background;
         private System.Windows.Forms.DataGridViewTextBoxColumn BGMID;
         private System.Windows.Forms.DataGridViewTextBoxColumn Venture_Card_Count;

@@ -14,8 +14,11 @@ namespace CustomStreetManager
 {
     public class MapDescriptor
     {
+        public int Category { get; set; }
+        public int Zone { get; set; }
+        public int Order { get; set; }
         public bool Dirty { get; set; }
-        public UInt32 ID { get; set; }
+        public UInt32 UnlockID { get; set; }
         public UInt32 InitialCash { get; set; }
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
@@ -39,6 +42,12 @@ namespace CustomStreetManager
             return bgmId.Any();
         }
         public UInt32 Name_MSG_ID { get; set; }
+        public string Name_En
+        {
+            get {
+                return Name.GetValueOrDefault(Locale.EN, ""); }
+            private set {  }
+        }
         public Dictionary<string, string> Name { get; private set; }
         public UInt32 Desc_MSG_ID { get; set; }
         public Dictionary<string, string> Desc { get; private set; }
@@ -99,21 +108,21 @@ namespace CustomStreetManager
                     TourInitialCash = InitialCash;
                 if (TargetAmount != board.BoardInfo.TargetAmount)
                 {
-                    progress.Report("[" + ID + "] " + Name[Locale.EN] + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect.");
+                    progress.Report("[" + UnlockID + "] " + Name[Locale.EN] + ": frb target amount is " + board.BoardInfo.TargetAmount + " but md target amount is " + TargetAmount + ". The frb target amount has no effect.");
                 }
                 LoopingMode = board.BoardInfo.GalaxyStatus;
                 if (LoopingMode != LoopingMode.None)
                 {
                     if (LoopingModeRadius == 0 || LoopingModeVerticalSquareCount == 0)
                     {
-                        progress.Report("[" + ID + "] " + Name[Locale.EN] + ": frb has looping enabled, but looping parameters are missing in the md.");
+                        progress.Report("[" + UnlockID + "] " + Name[Locale.EN] + ": frb has looping enabled, but looping parameters are missing in the md.");
                     }
                 }
                 else if (LoopingMode == LoopingMode.None)
                 {
                     if (LoopingModeRadius != 0 || LoopingModeHorizontalPadding != 0 || LoopingModeVerticalSquareCount != 0)
                     {
-                        progress.Report("[" + ID + "] " + Name[Locale.EN] + ": frb has looping disabled. The looping parameters defined in the md will have no effect.");
+                        progress.Report("[" + UnlockID + "] " + Name[Locale.EN] + ": frb has looping disabled. The looping parameters defined in the md will have no effect.");
                     }
                 }
                 foreach(var square in board.BoardData.Squares)

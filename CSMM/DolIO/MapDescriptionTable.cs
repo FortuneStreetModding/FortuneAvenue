@@ -53,7 +53,7 @@ namespace CustomStreetManager
             var j = 0;
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {
-                if (mapDescriptor.ID < 18)
+                if (mapDescriptor.UnlockID < 18)
                 {
                     mapDescriptor.Desc_MSG_ID = descMsgIdTable[j];
                     j++;

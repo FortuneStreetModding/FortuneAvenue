@@ -17,7 +17,7 @@ namespace CustomStreetManager
             var mapOriginTable = new List<UInt32>();
             foreach (var mapDescriptor in mapDescriptors)
             {
-                mapOriginTable.Add((UInt32)mapDescriptor.ID);
+                mapOriginTable.Add((UInt32)mapDescriptor.UnlockID);
             }
             return allocate(mapOriginTable, "MapOriginTable");
         }
@@ -42,7 +42,7 @@ namespace CustomStreetManager
             }
             foreach (var mapDescriptor in mapDescriptors)
             {
-                mapDescriptor.ID = s.ReadUInt32();
+                mapDescriptor.UnlockID = s.ReadUInt32();
                 if (isVanilla)
                 {
                     // in vanilla main.dol the table has other stuff in it like bgm id, map frb files, etc.

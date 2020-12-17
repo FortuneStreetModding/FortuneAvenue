@@ -142,7 +142,7 @@ namespace CustomStreetManager
                 if (isVanilla)
                 {
                     // in vanilla there is a mapping of bgXXX to p_bg_XXX which we will assume here without actually reading what is inside the main.dol
-                    if (mapDescriptor.ID < 18)
+                    if (mapDescriptor.UnlockID < 18)
                     {
                         var number = Regex.Match(mapDescriptor.Background, @"\d+").Value;
                         mapDescriptor.MapIcon = "p_bg_" + number;

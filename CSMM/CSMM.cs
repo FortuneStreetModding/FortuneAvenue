@@ -162,6 +162,8 @@ namespace CustomStreetManager
                     Debug.WriteLine(e.ToString());
                 }
                 updateDataGridData(null, null);
+                this.dataGridView1.AllowUserToAddRows = true;
+                this.dataGridView1.AllowUserToDeleteRows = true;
             }
         }
 
@@ -225,7 +227,7 @@ namespace CustomStreetManager
                 }
                 else
                 {
-                    bs.DataSource = patchProcess.mapDescriptors.FindAll(md => md.ID >= 0 && md.ID < 18);
+                    bs.DataSource = patchProcess.mapDescriptors.FindAll(md => md.UnlockID >= 0 && md.UnlockID < 18);
                 }
             }
             else
@@ -256,7 +258,7 @@ namespace CustomStreetManager
         private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
             MapDescriptor mapDescriptor = dataGridView1.Rows[e.RowIndex].DataBoundItem as MapDescriptor;
-            if (mapDescriptor.Dirty)
+            if (mapDescriptor != null && mapDescriptor.Dirty)
             {
                 dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
             }
