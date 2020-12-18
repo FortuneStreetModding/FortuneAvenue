@@ -748,6 +748,7 @@ namespace CustomStreetManager
             TourClearRank = mapDescriptor.TourClearRank;
 
             MapIcon = mapDescriptor.MapIcon;
+            Dirty = mapDescriptor.Dirty;
         }
 
         public string generateMapDescriptorFileContent()

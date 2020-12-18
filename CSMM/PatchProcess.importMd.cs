@@ -16,7 +16,7 @@ namespace CustomStreetManager
 {
     public partial class PatchProcess
     {
-        public void importMd(string selectedFile, MapDescriptor mapDescriptor, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public MapDescriptor importMd(string selectedFile, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             MapDescriptor mapDescriptorImport = new MapDescriptor();
 
@@ -109,10 +109,9 @@ namespace CustomStreetManager
                     progress.Report("Imported " + importFile);
                 }
             }
-            mapDescriptor.set(mapDescriptorImport);
-            mapDescriptor.Dirty = true;
+            mapDescriptorImport.Dirty = true;
             progress.Report(new ProgressInfo(100, "Done."));
-
+            return mapDescriptorImport;
         }
         public void WriteResourceToFile(string resourceName, string fileName)
         {

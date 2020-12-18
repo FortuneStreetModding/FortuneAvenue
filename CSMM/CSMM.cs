@@ -247,8 +247,6 @@ namespace CustomStreetManager
                     Debug.WriteLine(e.ToString());
                 }
                 updateDataGridData(null, null);
-                this.dataGridView1.AllowUserToAddRows = true;
-                this.dataGridView1.AllowUserToDeleteRows = true;
             }
         }
 
@@ -312,7 +310,7 @@ namespace CustomStreetManager
                 }
                 else
                 {
-                    bs.DataSource = patchProcess.mapDescriptors.FindAll(md => md.UnlockID >= 0 && md.UnlockID < 18);
+                    bs.DataSource = patchProcess.mapDescriptors.FindAll(md => md.MapSet >= 0 || md.IsPracticeBoard);
                 }
             }
             else
@@ -351,6 +349,8 @@ namespace CustomStreetManager
 
         private async Task exportMdAsync(MapDescriptor mapDescriptor)
         {
+            if (mapDescriptor == null)
+                return;
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.Filter = "Map Descriptor file and accompanying files|*.md";
             saveFileDialog1.Title = "Where shall the map files be exported?";
@@ -423,7 +423,15 @@ namespace CustomStreetManager
 
                     try
                     {
-                        patchProcess.importMd(openFileDialog1.FileName, mapDescriptor, progress, ct);
+                        var importedMapDescriptor = patchProcess.importMd(openFileDialog1.FileName, progress, ct);
+                        if (mapDescriptor != null)
+                        {
+                            mapDescriptor.set(importedMapDescriptor);
+                        }
+                        else
+                        {
+                            patchProcess.mapDescriptors.Add(importedMapDescriptor);
+                        }
 
                         Go.Enabled = true;
                         updateDataGridData(null, null);

@@ -34,7 +34,7 @@ namespace CustomStreetManager
             var standardPracticeBoard = stream.ReadInt16();
 
             mapDescriptors[easyPracticeBoard].IsPracticeBoard = true;
-            mapDescriptors[standardPracticeBoard].MapSet = 0;
+            mapDescriptors[easyPracticeBoard].MapSet = 1;
             mapDescriptors[standardPracticeBoard].IsPracticeBoard = true;
             mapDescriptors[standardPracticeBoard].MapSet = 0;
         }
