@@ -44,9 +44,11 @@ namespace CustomStreetManager
         public UInt32 Name_MSG_ID { get; set; }
         public string Name_En
         {
-            get {
-                return Name.GetValueOrDefault(Locale.EN, ""); }
-            private set {  }
+            get
+            {
+                return Name.GetValueOrDefault(Locale.EN, "");
+            }
+            private set { }
         }
         public Dictionary<string, string> Name { get; private set; }
         public UInt32 Desc_MSG_ID { get; set; }
@@ -92,6 +94,211 @@ namespace CustomStreetManager
             SwitchRotationOriginPoints = new Dictionary<int, OriginPoint>();
         }
 
+        public static MapDescriptorValidation getPracticeBoards(List<MapDescriptor> mapDescriptors, out short easyPracticeBoard, out short standardPracticeBoard)
+        {
+            var validation = new MapDescriptorValidation();
+            easyPracticeBoard = -1;
+            standardPracticeBoard = -1;
+            for (short i = 0; i < mapDescriptors.Count; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.IsPracticeBoard)
+                {
+                    validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "Only one map for each category can be set as practice board");
+                    if (mapDescriptor.Category == 1)
+                    {
+                        if (easyPracticeBoard == -1)
+                            easyPracticeBoard = i;
+                        else
+                            validation.Passed = false;
+                    }
+                    else
+                    {
+                        if (standardPracticeBoard == -1)
+                            standardPracticeBoard = i;
+                        else
+                            validation.Passed = false;
+                    }
+                }
+            }
+            if (easyPracticeBoard == -1 || standardPracticeBoard == -1)
+            {
+                validation.Passed = false;
+                validation.Clear();
+                if (easyPracticeBoard == -1)
+                {
+                    for (short i = 0; i < mapDescriptors.Count; i++)
+                    {
+                        if (mapDescriptors[i].Category == 1)
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each category must be set as practice board");
+                    }
+                }
+                if (standardPracticeBoard == -1)
+                {
+                    for (short i = 0; i < mapDescriptors.Count; i++)
+                    {
+                        if (mapDescriptors[i].Category == 0)
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each category must be set as practice board");
+                    }
+                }
+            }
+            if (validation.Passed)
+                validation.Clear();
+            return validation;
+        }
+
+        public static MapDescriptorValidation getCategories(List<MapDescriptor> mapDescriptors, out Dictionary<int, int> categories)
+        {
+            var validation = new MapDescriptorValidation();
+            categories = new Dictionary<int, int>();
+            for (short i = 0; i < mapDescriptors.Count; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.Category == 0 || mapDescriptor.Category == 1)
+                {
+                    categories.Add(i, mapDescriptor.Category);
+                }
+                else
+                {
+                    validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Category"), "Category must be either 0 or 1");
+                    validation.Passed = false;
+                }
+            }
+            if (!categories.Values.Contains(0))
+            {
+                validation.AddProblem(typeof(MapDescriptor).GetProperty("Category"), "At least one map must be available for category 0");
+                validation.Passed = false;
+            }
+            if (!categories.Values.Contains(1))
+            {
+                validation.AddProblem(typeof(MapDescriptor).GetProperty("Category"), "At least one map must be available for category 1");
+                validation.Passed = false;
+            }
+            return validation;
+        }
+
+        public static MapDescriptorValidation getZones(List<MapDescriptor> mapDescriptors, int category, out Dictionary<int, int> zones)
+        {
+            var validation = new MapDescriptorValidation();
+            zones = new Dictionary<int, int>();
+            for (short i = 0; i < mapDescriptors.Count; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.Category == category)
+                {
+                    if (mapDescriptor.Zone >= 0 && mapDescriptor.Zone <= 2)
+                    {
+                        zones.Add(i, mapDescriptor.Zone);
+                    }
+                    else
+                    {
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The zone must be either 0, 1 or 2");
+                        validation.Passed = false;
+                    }
+                }
+            }
+            var distinct = zones.Values.Distinct().ToList();
+            if (distinct.Any())
+            {
+                for (short i = 0; i < mapDescriptors.Count; i++)
+                {
+                    var mapDescriptor = mapDescriptors[i];
+                    if (mapDescriptor.Category == category)
+                    {
+                        if (!zones.Values.Contains(0))
+                        {
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 0 in category " + category);
+                            validation.Passed = false;
+                        }
+                        if (!zones.Values.Contains(1))
+                        {
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 1 in category " + category);
+                            validation.Passed = false;
+                        }
+                        if (!zones.Values.Contains(2))
+                        {
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 2 in category " + category);
+                            validation.Passed = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (short i = 0; i < mapDescriptors.Count; i++)
+                {
+                    var mapDescriptor = mapDescriptors[i];
+                    if (mapDescriptor.Category != category)
+                    {
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "No map has been assigned to category " + category);
+                        validation.Passed = false;
+                    }
+                }
+            }
+            return validation;
+        }
+
+        public static MapDescriptorValidation getOrdering(List<MapDescriptor> mapDescriptors, int category, int zone, out Dictionary<int, int> ordering)
+        {
+            var validation = new MapDescriptorValidation();
+            ordering = new Dictionary<int, int>();
+            for (short i = 0; i < mapDescriptors.Count; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.Category == category && mapDescriptor.Zone == zone)
+                {
+                    if (mapDescriptor.Order >= 0)
+                    {
+                        ordering.Add(i, mapDescriptor.Order);
+                    }
+                    else
+                    {
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "The lowest order within a zone must be a positive value");
+                        validation.Passed = false;
+                    }
+                }
+            }
+            var distinct = ordering.Values.Distinct().ToList();
+            if (distinct.Any())
+            {
+                for (short i = 0; i < mapDescriptors.Count; i++)
+                {
+                    var mapDescriptor = mapDescriptors[i];
+                    if (mapDescriptor.Category == category && mapDescriptor.Zone == zone)
+                    {
+                        if (distinct.Count != ordering.Count)
+                        {
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "The order value within a zone must be unique");
+                            validation.Passed = false;
+                        }
+                        if (distinct.Min() != 0)
+                        {
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "The lowest order within a zone must be 0");
+                            validation.Passed = false;
+                        }
+                        if (distinct.Max() != distinct.Count - 1)
+                        {
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "There must be no gaps in the ordering");
+                            validation.Passed = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (short i = 0; i < mapDescriptors.Count; i++)
+                {
+                    var mapDescriptor = mapDescriptors[i];
+                    if (mapDescriptor.Category != category || mapDescriptor.Zone != zone)
+                    {
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "No map has been assigned to zone " + zone + " in category " + category);
+                        validation.Passed = false;
+                    }
+                }
+            }
+            return validation;
+        }
+
         public HashSet<SquareType> readFrbFileInfo(string param_folder, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var usedSquareTypes = new HashSet<SquareType>();
@@ -125,7 +332,7 @@ namespace CustomStreetManager
                         progress.Report("[" + UnlockID + "] " + Name[Locale.EN] + ": frb has looping disabled. The looping parameters defined in the md will have no effect.");
                     }
                 }
-                foreach(var square in board.BoardData.Squares)
+                foreach (var square in board.BoardData.Squares)
                 {
                     usedSquareTypes.Add(square.SquareType);
                 }

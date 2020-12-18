@@ -315,7 +315,11 @@ namespace CustomStreetManager
             this.dataGridView1.Size = new System.Drawing.Size(1600, 900);
             this.dataGridView1.TabIndex = 45;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.dataGridView1.CellEndEdit += DataGridView1_CellEndEdit;
             this.dataGridView1.RowPrePaint += new System.Windows.Forms.DataGridViewRowPrePaintEventHandler(this.dataGridView1_RowPrePaint);
+            this.dataGridView1.ShowEditingIcon = true;
+            this.dataGridView1.ShowCellErrors = true;
+            this.dataGridView1.ShowRowErrors = true;
             // 
             // Category
             // 

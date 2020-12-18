@@ -45,6 +45,91 @@ namespace CustomStreetManager
             exitTokenSource.Cancel();
         }
 
+        private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            clearValidationIssues();
+            List<MapDescriptor> mapDescriptors = (List<MapDescriptor>)((BindingSource)dataGridView1.DataSource).List;
+            var validation = MapDescriptor.getPracticeBoards(mapDescriptors, out _, out _);
+            if (!validation.Passed)
+            {
+                addValidationIssues(validation);
+            }
+            var categories = new Dictionary<int, int>();
+            validation = MapDescriptor.getCategories(mapDescriptors, out categories);
+            if (validation.Passed)
+            {
+                foreach (int category in categories.Values.Distinct())
+                {
+                    var zones = new Dictionary<int, int>();
+                    validation = MapDescriptor.getZones(mapDescriptors, category, out zones);
+                    if (validation.Passed)
+                    {
+                        foreach (int zone in zones.Values.Distinct())
+                        {
+                            var ordering = new Dictionary<int, int>();
+                            validation = MapDescriptor.getOrdering(mapDescriptors, category, zone, out ordering);
+                            if (!validation.Passed)
+                            {
+                                addValidationIssues(validation);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        addValidationIssues(validation);
+                    }
+                }
+            }
+            else
+            {
+                addValidationIssues(validation);
+            }
+        }
+
+        private void clearValidationIssues()
+        {
+            foreach (DataGridViewColumn column in dataGridView1.Columns)
+            {
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    row.Cells[column.Index].ErrorText = "";
+                }
+            }
+        }
+
+        private void addValidationIssues(MapDescriptorValidation validation)
+        {
+            var issues = validation.getIssues();
+            foreach (DataGridViewColumn column in dataGridView1.Columns)
+            {
+                for (int i = 0; i < issues.Count; i++)
+                {
+                    var issue = issues[i];
+                    var index = issue.index;
+                    var prop = issue.prop;
+                    var reason = issue.reason;
+                    if (column.DataPropertyName == prop.Name)
+                    {
+                        if (index != -1)
+                        {
+                            var errorText = dataGridView1.Rows[index].Cells[column.Index].ErrorText;
+                            if (!string.IsNullOrEmpty(errorText)) errorText += Environment.NewLine;
+                            dataGridView1.Rows[index].Cells[column.Index].ErrorText = errorText + reason.ToString();
+                        }
+                        else
+                        {
+                            foreach (DataGridViewRow row in dataGridView1.Rows)
+                            {
+                                var errorText = row.Cells[column.Index].ErrorText;
+                                if (!string.IsNullOrEmpty(errorText)) errorText += Environment.NewLine;
+                                row.Cells[column.Index].ErrorText = errorText + reason.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private void reset()
         {
             patchProcess.cleanUp(false, true);

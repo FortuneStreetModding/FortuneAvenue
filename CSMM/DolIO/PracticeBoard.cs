@@ -16,34 +16,10 @@ namespace CustomStreetManager
         {
             short easyPracticeBoard = -1;
             short standardPracticeBoard = -1;
-            for (short i = 0; i < mapDescriptors.Count; i++)
+            var validation = MapDescriptor.getPracticeBoards(mapDescriptors, out easyPracticeBoard, out standardPracticeBoard);
+            if(!validation.Passed)
             {
-                var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.IsPracticeBoard)
-                {
-                    if (mapDescriptor.RuleSet == RuleSet.Easy)
-                    {
-                        if (easyPracticeBoard == -1)
-                        {
-                            easyPracticeBoard = i;
-                        }
-                        else
-                        {
-                            throw new ArgumentException("Only one stage with easy rule set can be set as practice board.");
-                        }
-                    }
-                    else
-                    {
-                        if (standardPracticeBoard == -1)
-                        {
-                            standardPracticeBoard = i;
-                        }
-                        else
-                        {
-                            throw new ArgumentException("Only one stage with standard rule set can be set as practice board.");
-                        }
-                    }
-                }
+                throw new ArgumentException(validation.GetMessage("\n"));
             }
             // li r0,0x29                                                                 -> li r0,easyPracticeBoard
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80173bf8), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(0, easyPracticeBoard));
