@@ -64,7 +64,7 @@ namespace CustomStreetManager
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Category = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MapSet = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Zone = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Order = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Tutorial = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -293,7 +293,7 @@ namespace CustomStreetManager
             this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Category,
+            this.MapSet,
             this.Zone,
             this.Order,
             this.Tutorial,
@@ -325,14 +325,14 @@ namespace CustomStreetManager
             this.dataGridView1.ShowCellErrors = true;
             this.dataGridView1.ShowRowErrors = true;
             // 
-            // Category
+            // MapSet
             // 
-            this.Category.DataPropertyName = "Category";
-            this.Category.HeaderText = "Category";
-            this.Category.Name = "Category";
-            this.Category.ReadOnly = false;
-            this.Category.Width = 60;
-            this.Category.DefaultCellStyle = editColumnStyle;
+            this.MapSet.DataPropertyName = "MapSet";
+            this.MapSet.HeaderText = "MapSet";
+            this.MapSet.Name = "MapSet";
+            this.MapSet.ReadOnly = false;
+            this.MapSet.Width = 60;
+            this.MapSet.DefaultCellStyle = editColumnStyle;
             // 
             // Zone
             // 
@@ -527,7 +527,7 @@ namespace CustomStreetManager
         private System.Windows.Forms.BindingSource mapDescriptorBindingSource;
         private System.Windows.Forms.Button Go;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Category;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MapSet;
         private System.Windows.Forms.DataGridViewTextBoxColumn Zone;
         private System.Windows.Forms.DataGridViewTextBoxColumn Order;
         private System.Windows.Forms.DataGridViewTextBoxColumn Tutorial;

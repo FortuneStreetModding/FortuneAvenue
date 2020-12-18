@@ -14,7 +14,7 @@ namespace CustomStreetManager
 {
     public class MapDescriptor
     {
-        public int Category { get; set; }
+        public int MapSet { get; set; }
         public int Zone { get; set; }
         public int Order { get; set; }
         public bool Dirty { get; set; }
@@ -104,8 +104,8 @@ namespace CustomStreetManager
                 var mapDescriptor = mapDescriptors[i];
                 if (mapDescriptor.IsPracticeBoard)
                 {
-                    validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "Only one map for each category can be set as practice board");
-                    if (mapDescriptor.Category == 1)
+                    validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "Only one map for each MapSet can be set as practice board");
+                    if (mapDescriptor.MapSet == 1)
                     {
                         if (easyPracticeBoard == -1)
                             easyPracticeBoard = i;
@@ -129,16 +129,16 @@ namespace CustomStreetManager
                 {
                     for (short i = 0; i < mapDescriptors.Count; i++)
                     {
-                        if (mapDescriptors[i].Category == 1)
-                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each category must be set as practice board");
+                        if (mapDescriptors[i].MapSet == 1)
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each MapSet must be set as practice board");
                     }
                 }
                 if (standardPracticeBoard == -1)
                 {
                     for (short i = 0; i < mapDescriptors.Count; i++)
                     {
-                        if (mapDescriptors[i].Category == 0)
-                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each category must be set as practice board");
+                        if (mapDescriptors[i].MapSet == 0)
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each MapSet must be set as practice board");
                     }
                 }
             }
@@ -154,45 +154,45 @@ namespace CustomStreetManager
             for (short i = 0; i < mapDescriptors.Count; i++)
             {
                 var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Category == 0 || mapDescriptor.Category == 1)
+                if (mapDescriptor.MapSet == 0 || mapDescriptor.MapSet == 1)
                 {
-                    categories.Add(i, mapDescriptor.Category);
+                    categories.Add(i, mapDescriptor.MapSet);
                 }
-                else
+                else if (mapDescriptor.MapSet != -1)
                 {
-                    validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Category"), "Category must be either 0 or 1");
+                    validation.AddProblem(i, typeof(MapDescriptor).GetProperty("MapSet"), "MapSet must be either 0 or 1 or -1");
                     validation.Passed = false;
                 }
             }
             if (!categories.Values.Contains(0))
             {
-                validation.AddProblem(typeof(MapDescriptor).GetProperty("Category"), "At least one map must be available for category 0");
+                validation.AddProblem(typeof(MapDescriptor).GetProperty("MapSet"), "At least one map must be available for MapSet 0");
                 validation.Passed = false;
             }
             if (!categories.Values.Contains(1))
             {
-                validation.AddProblem(typeof(MapDescriptor).GetProperty("Category"), "At least one map must be available for category 1");
+                validation.AddProblem(typeof(MapDescriptor).GetProperty("MapSet"), "At least one map must be available for MapSet 1");
                 validation.Passed = false;
             }
             return validation;
         }
 
-        public static MapDescriptorValidation getZones(List<MapDescriptor> mapDescriptors, int category, out Dictionary<int, int> zones)
+        public static MapDescriptorValidation getZones(List<MapDescriptor> mapDescriptors, int mapSet, out Dictionary<int, int> zones)
         {
             var validation = new MapDescriptorValidation();
             zones = new Dictionary<int, int>();
             for (short i = 0; i < mapDescriptors.Count; i++)
             {
                 var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Category == category)
+                if (mapDescriptor.MapSet == mapSet)
                 {
                     if (mapDescriptor.Zone >= 0 && mapDescriptor.Zone <= 2)
                     {
                         zones.Add(i, mapDescriptor.Zone);
                     }
-                    else
+                    else if(mapDescriptor.Zone != -1)
                     {
-                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The zone must be either 0, 1 or 2");
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The zone must be either 0, 1, 2 or -1");
                         validation.Passed = false;
                     }
                 }
@@ -203,21 +203,21 @@ namespace CustomStreetManager
                 for (short i = 0; i < mapDescriptors.Count; i++)
                 {
                     var mapDescriptor = mapDescriptors[i];
-                    if (mapDescriptor.Category == category)
+                    if (mapDescriptor.MapSet == mapSet)
                     {
                         if (!zones.Values.Contains(0))
                         {
-                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 0 in category " + category);
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 0 in MapSet " + mapSet);
                             validation.Passed = false;
                         }
                         if (!zones.Values.Contains(1))
                         {
-                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 1 in category " + category);
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 1 in MapSet " + mapSet);
                             validation.Passed = false;
                         }
                         if (!zones.Values.Contains(2))
                         {
-                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 2 in category " + category);
+                            validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 2 in MapSet " + mapSet);
                             validation.Passed = false;
                         }
                     }
@@ -228,9 +228,9 @@ namespace CustomStreetManager
                 for (short i = 0; i < mapDescriptors.Count; i++)
                 {
                     var mapDescriptor = mapDescriptors[i];
-                    if (mapDescriptor.Category != category)
+                    if (mapDescriptor.MapSet != mapSet)
                     {
-                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "No map has been assigned to category " + category);
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "No map has been assigned to category " + mapSet);
                         validation.Passed = false;
                     }
                 }
@@ -238,14 +238,14 @@ namespace CustomStreetManager
             return validation;
         }
 
-        public static MapDescriptorValidation getOrdering(List<MapDescriptor> mapDescriptors, int category, int zone, out Dictionary<int, int> ordering)
+        public static MapDescriptorValidation getOrdering(List<MapDescriptor> mapDescriptors, int mapSet, int zone, out Dictionary<int, int> ordering)
         {
             var validation = new MapDescriptorValidation();
             ordering = new Dictionary<int, int>();
             for (short i = 0; i < mapDescriptors.Count; i++)
             {
                 var mapDescriptor = mapDescriptors[i];
-                if (mapDescriptor.Category == category && mapDescriptor.Zone == zone)
+                if (mapDescriptor.MapSet == mapSet && mapDescriptor.Zone == zone)
                 {
                     if (mapDescriptor.Order >= 0)
                     {
@@ -264,7 +264,7 @@ namespace CustomStreetManager
                 for (short i = 0; i < mapDescriptors.Count; i++)
                 {
                     var mapDescriptor = mapDescriptors[i];
-                    if (mapDescriptor.Category == category && mapDescriptor.Zone == zone)
+                    if (mapDescriptor.MapSet == mapSet && mapDescriptor.Zone == zone)
                     {
                         if (distinct.Count != ordering.Count)
                         {
@@ -289,9 +289,9 @@ namespace CustomStreetManager
                 for (short i = 0; i < mapDescriptors.Count; i++)
                 {
                     var mapDescriptor = mapDescriptors[i];
-                    if (mapDescriptor.Category != category || mapDescriptor.Zone != zone)
+                    if (mapDescriptor.MapSet != mapSet || mapDescriptor.Zone != zone)
                     {
-                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "No map has been assigned to zone " + zone + " in category " + category);
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Order"), "No map has been assigned to zone " + zone + " in MapSet " + mapSet);
                         validation.Passed = false;
                     }
                 }

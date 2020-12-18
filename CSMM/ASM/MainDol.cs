@@ -113,6 +113,10 @@ namespace CustomStreetManager
             // map icon table must be after the map background table and map origin table
             new MapIconTable().read(stream, addressMapper, mapDescriptors, null);
 
+            new MapSetZoneOrder().read(stream, addressMapper, mapDescriptors, null);
+            // practice board comes after category zone order
+            new PracticeBoard().read(stream, addressMapper, mapDescriptors, null);
+
             // the rest does not have any dependencies
             new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
             new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
@@ -130,7 +134,6 @@ namespace CustomStreetManager
             new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
             new BGSequenceTable().read(stream, addressMapper, mapDescriptors, null);
             new InternalNameTable().read(stream, addressMapper, mapDescriptors, null);
-            new PracticeBoard().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -157,6 +160,7 @@ namespace CustomStreetManager
             new BGSequenceTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new InternalNameTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new PracticeBoard().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new MapSetZoneOrder().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
