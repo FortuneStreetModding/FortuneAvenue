@@ -38,8 +38,10 @@ namespace CustomStreetManager
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.Lavender;
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
-            DataGridViewCellStyle readOnlyColumStyle = new DataGridViewCellStyle();
-            readOnlyColumStyle.BackColor = System.Drawing.Color.LightGray;
+            DataGridViewCellStyle readOnlyColumnStyle = new DataGridViewCellStyle();
+            readOnlyColumnStyle.ForeColor = System.Drawing.Color.Gray;
+            DataGridViewCellStyle editColumnStyle = new DataGridViewCellStyle();
+            editColumnStyle.ForeColor = System.Drawing.Color.MidnightBlue;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
             this.clearListButton = new System.Windows.Forms.Button();
             this.addMapsDialog = new System.Windows.Forms.OpenFileDialog();
@@ -65,6 +67,7 @@ namespace CustomStreetManager
             this.Category = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Zone = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Order = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Tutorial = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.UnlockID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.nameENDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.targetAmountDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -293,6 +296,7 @@ namespace CustomStreetManager
             this.Category,
             this.Zone,
             this.Order,
+            this.Tutorial,
             this.UnlockID,
             this.nameENDataGridViewTextBoxColumn,
             this.targetAmountDataGridViewTextBoxColumn,
@@ -328,6 +332,7 @@ namespace CustomStreetManager
             this.Category.Name = "Category";
             this.Category.ReadOnly = false;
             this.Category.Width = 60;
+            this.Category.DefaultCellStyle = editColumnStyle;
             // 
             // Zone
             // 
@@ -336,6 +341,7 @@ namespace CustomStreetManager
             this.Zone.Name = "Zone";
             this.Zone.ReadOnly = false;
             this.Zone.Width = 40;
+            this.Zone.DefaultCellStyle = editColumnStyle;
             // 
             // Order
             // 
@@ -344,6 +350,16 @@ namespace CustomStreetManager
             this.Order.Name = "Order";
             this.Order.ReadOnly = false;
             this.Order.Width = 40;
+            this.Order.DefaultCellStyle = editColumnStyle;
+            // 
+            // IsPracticeBoard
+            // 
+            this.Tutorial.DataPropertyName = "IsPracticeBoard";
+            this.Tutorial.HeaderText = "Tutorial";
+            this.Tutorial.Name = "Tutorial";
+            this.Tutorial.ReadOnly = false;
+            this.Tutorial.Width = 50;
+            this.Tutorial.DefaultCellStyle = editColumnStyle;
             // 
             // ID
             // 
@@ -352,6 +368,7 @@ namespace CustomStreetManager
             this.UnlockID.Name = "UnlockID";
             this.UnlockID.ReadOnly = false;
             this.UnlockID.Width = 60;
+            this.UnlockID.DefaultCellStyle = editColumnStyle;
             // 
             // nameENDataGridViewTextBoxColumn
             // 
@@ -360,7 +377,8 @@ namespace CustomStreetManager
             this.nameENDataGridViewTextBoxColumn.Name = "nameENDataGridViewTextBoxColumn";
             this.nameENDataGridViewTextBoxColumn.ReadOnly = true;
             this.nameENDataGridViewTextBoxColumn.Width = 150;
-            this.nameENDataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumStyle;
+            this.nameENDataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumnStyle;
+
             // 
             // targetAmountDataGridViewTextBoxColumn
             // 
@@ -369,6 +387,7 @@ namespace CustomStreetManager
             this.targetAmountDataGridViewTextBoxColumn.Name = "targetAmountDataGridViewTextBoxColumn";
             this.targetAmountDataGridViewTextBoxColumn.ReadOnly = true;
             this.targetAmountDataGridViewTextBoxColumn.Width = 80;
+            this.targetAmountDataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // themeDataGridViewTextBoxColumn
             // 
@@ -377,6 +396,7 @@ namespace CustomStreetManager
             this.themeDataGridViewTextBoxColumn.Name = "themeDataGridViewTextBoxColumn";
             this.themeDataGridViewTextBoxColumn.ReadOnly = true;
             this.themeDataGridViewTextBoxColumn.Width = 90;
+            this.themeDataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // ruleSetDataGridViewTextBoxColumn
             // 
@@ -385,6 +405,7 @@ namespace CustomStreetManager
             this.ruleSetDataGridViewTextBoxColumn.Name = "ruleSetDataGridViewTextBoxColumn";
             this.ruleSetDataGridViewTextBoxColumn.ReadOnly = true;
             this.ruleSetDataGridViewTextBoxColumn.Width = 70;
+            this.ruleSetDataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // frbFile1DataGridViewTextBoxColumn
             // 
@@ -393,6 +414,7 @@ namespace CustomStreetManager
             this.frbFile1DataGridViewTextBoxColumn.Name = "frbFile1DataGridViewTextBoxColumn";
             this.frbFile1DataGridViewTextBoxColumn.ReadOnly = true;
             this.frbFile1DataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.frbFile1DataGridViewTextBoxColumn.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // Background
             // 
@@ -400,6 +422,7 @@ namespace CustomStreetManager
             this.Background.HeaderText = "Background";
             this.Background.Name = "Background";
             this.Background.ReadOnly = true;
+            this.Background.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // BGMID
             // 
@@ -408,6 +431,7 @@ namespace CustomStreetManager
             this.BGMID.Name = "BGMID";
             this.BGMID.ReadOnly = true;
             this.BGMID.Width = 50;
+            this.BGMID.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // Venture_Card_Count
             // 
@@ -416,6 +440,7 @@ namespace CustomStreetManager
             this.Venture_Card_Count.Name = "Venture_Card_Count";
             this.Venture_Card_Count.ReadOnly = true;
             this.Venture_Card_Count.Width = 115;
+            this.Venture_Card_Count.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // Export
             // 
@@ -505,6 +530,7 @@ namespace CustomStreetManager
         private System.Windows.Forms.DataGridViewTextBoxColumn Category;
         private System.Windows.Forms.DataGridViewTextBoxColumn Zone;
         private System.Windows.Forms.DataGridViewTextBoxColumn Order;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Tutorial;
         private System.Windows.Forms.DataGridViewTextBoxColumn UnlockID;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameENDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn targetAmountDataGridViewTextBoxColumn;
