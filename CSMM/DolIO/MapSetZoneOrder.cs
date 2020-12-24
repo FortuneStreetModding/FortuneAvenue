@@ -14,6 +14,13 @@ namespace CustomStreetManager
     {
         protected override void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors)
         {
+            // --- Game::GameSequenceDataAdapter::GetNumMapsInZone ---
+            var addr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8020f3ac);
+            stream.Seek(addressMapper.toFileAddress(addr), SeekOrigin.Begin);
+            // li r3,0x6 ->  b yes
+            stream.Write(PowerPcAsm.b(addr, (VAVAddr)0));
+            // --- Game::GameSequenceDataAdapter::GetMapsInZone ---
+
         }
         protected override void readAsm(EndianBinaryReader stream, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper)
         {
