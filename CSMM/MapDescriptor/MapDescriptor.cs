@@ -190,7 +190,7 @@ namespace CustomStreetManager
                     {
                         zones.Add(i, mapDescriptor.Zone);
                     }
-                    else if(mapDescriptor.Zone != -1)
+                    else if (mapDescriptor.Zone != -1)
                     {
                         validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The zone must be either 0, 1, 2 or -1");
                         validation.Passed = false;
@@ -370,13 +370,14 @@ namespace CustomStreetManager
 
         enum MDParserState
         {
-            NoHeading,
+            Content,
             Description,
-            KeyValueTable,
-            BackgroundTable,
-            IconTable,
-            BGMTable,
-            VentureCardTable
+            HeadingIgnore,
+            HeadingKeyValueTable,
+            HeadingBackgroundTable,
+            HeadingIconTable,
+            HeadingBGMTable,
+            HeadingVentureCardTable
         }
         public void readMapDescriptorFromFile(string fileName, string internalName)
         {
@@ -397,7 +398,7 @@ namespace CustomStreetManager
             {
                 string line = lines[i];
                 MDParserState newState = detectHeading(state, line);
-                if (newState == MDParserState.NoHeading)
+                if (newState == MDParserState.Content)
                 {
                     mapDescriptor.parseContent(state, line);
                 }
@@ -420,7 +421,7 @@ namespace CustomStreetManager
                     Desc[Locale.EN] += line.Trim();
                     Desc[Locale.EN] = Desc[Locale.EN].Trim();
                     break;
-                case MDParserState.KeyValueTable:
+                case MDParserState.HeadingKeyValueTable:
                     columns = line.Split('|');
                     if (columns.Length > 1)
                     {
@@ -428,7 +429,7 @@ namespace CustomStreetManager
                         setProperty(keyValuePair);
                     }
                     break;
-                case MDParserState.BackgroundTable:
+                case MDParserState.HeadingBackgroundTable:
                     columns = line.Split('|');
                     if (columns.Length > 1)
                     {
@@ -448,7 +449,7 @@ namespace CustomStreetManager
                         }
                     }
                     break;
-                case MDParserState.IconTable:
+                case MDParserState.HeadingIconTable:
                     columns = line.Split('|');
                     if (columns.Length > 1)
                     {
@@ -459,7 +460,7 @@ namespace CustomStreetManager
                         }
                     }
                     break;
-                case MDParserState.BGMTable:
+                case MDParserState.HeadingBGMTable:
                     columns = line.Split('|');
                     if (columns.Length > 1)
                     {
@@ -470,7 +471,7 @@ namespace CustomStreetManager
                         }
                     }
                     break;
-                case MDParserState.VentureCardTable:
+                case MDParserState.HeadingVentureCardTable:
                     columns = line.Split('|');
                     if (columns.Length > 1)
                     {
@@ -481,6 +482,9 @@ namespace CustomStreetManager
                             VentureCard[index] = 1;
                         }
                     }
+                    break;
+                case MDParserState.HeadingIgnore:
+                    // ignore contents
                     break;
             }
         }
@@ -670,26 +674,30 @@ namespace CustomStreetManager
                 string headingText = line.Replace("#", "").ToLower().Trim();
                 if (headingText.Contains("properties") || headingText.Contains("configuration") || headingText.Contains("localization"))
                 {
-                    return MDParserState.KeyValueTable;
+                    return MDParserState.HeadingKeyValueTable;
                 }
                 else if (headingText.Contains("music"))
                 {
-                    return MDParserState.BGMTable;
+                    return MDParserState.HeadingBGMTable;
                 }
                 else if (headingText.Contains("background"))
                 {
-                    return MDParserState.BackgroundTable;
+                    return MDParserState.HeadingBackgroundTable;
                 }
                 else if (headingText.Contains("icon"))
                 {
-                    return MDParserState.IconTable;
+                    return MDParserState.HeadingIconTable;
                 }
                 else if (headingText.Contains("card"))
                 {
-                    return MDParserState.VentureCardTable;
+                    return MDParserState.HeadingVentureCardTable;
+                }
+                else
+                {
+                    return MDParserState.HeadingIgnore;
                 }
             }
-            return MDParserState.NoHeading;
+            return MDParserState.Content;
         }
 
         public void set(MapDescriptor mapDescriptor)
