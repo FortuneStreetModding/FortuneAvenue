@@ -285,7 +285,7 @@ namespace Editor
 
             if (board == null)
                 return;
-            
+
             var saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Fortune Street Board (.frb) | *.frb";
             saveFileDialog.DefaultExt = "frb";
@@ -325,7 +325,7 @@ namespace Editor
             Int32[] districtSum = new Int32[12];
             Int32 highestDistrict = -1;
 
-            foreach(var square in board.BoardData.Squares)
+            foreach (var square in board.BoardData.Squares)
             {
                 if (square.DistrictDestinationId >= 12)
                     continue; // ignore invalid districts
@@ -355,7 +355,7 @@ namespace Editor
                 stpri *= 0x00000B00;
                 stpri >>= 16;
 
-                stockssb.AppendFormat("District {0}: {1}g\n", ((char)('A'+(char)i)).ToString(), stpri);
+                stockssb.AppendFormat("District {0}: {1}g\n", ((char)('A' + (char)i)).ToString(), stpri);
             }
             MessageBox.Show(stockssb.ToString(), "Stock Prices", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -476,18 +476,8 @@ namespace Editor
             Int32[] districts = new Int32[12];
             Int32 highestDistrict = -1;
 
-            // Clearly not a requirement
-            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) != 1)
-                warnsb.AppendFormat("W{0}: There should be exactly one Bank.\n", ++warnings);
-
-            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.BoonSquare) == 0)
-                warnsb.AppendFormat("W{0}: There should be at least one Boon square, or venture card 125 may cause a crash.\n", ++warnings);
-
-            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.TakeABreakSquare) == 0)
-                warnsb.AppendFormat("W{0}: There should be at least one Take-A-Break square, or various venture cards may cause a crash.\n", ++warnings);
-
-            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.ArcadeSquare) == 0)
-                warnsb.AppendFormat("W{0}: There should be at least one ArcadeSquare square, or various venture cards may cause a crash.\n", ++warnings);
+            if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) == 0)
+                warnsb.AppendFormat("W{0}: There should be at least one Bank.\n", ++warnings);
 
             if (board.BoardData.Squares.Count > 0 && board.BoardData.Squares[0].SquareType != SquareType.Bank)
                 warnsb.AppendFormat("W{0}: The starting square (ID 0) should be a Bank.\n", ++warnings);
@@ -503,7 +493,7 @@ namespace Editor
                 if (square.SquareType == SquareType.Property || square.SquareType == SquareType.VacantPlot)
                 {
                     if (square.DistrictDestinationId > 11)
-                        warnsb.AppendFormat("E{0}: Square {1} uses district ID {2}.  The maximum is 11.\n", ++errors, square.Id, square.DistrictDestinationId);
+                        warnsb.AppendFormat("E{0}: Square {1} uses district ID {2}. The maximum is 11.\n", ++errors, square.Id, square.DistrictDestinationId);
                     else
                     {
                         ++districts[square.DistrictDestinationId];
@@ -519,6 +509,23 @@ namespace Editor
                     || square.SquareType == SquareType.OneWayAlleyDoorC
                     || square.SquareType == SquareType.OneWayAlleyDoorD)
                     continue;
+
+                // Check if too many different destinations
+                var destinations = new HashSet<byte>();
+                foreach (var waypointData in square.Waypoints)
+                {
+                    destinations.Add(waypointData.Destination1);
+                    destinations.Add(waypointData.Destination2);
+                    destinations.Add(waypointData.Destination3);
+                }
+                if(destinations.Contains(255))
+                {
+                    destinations.Remove(255);
+                }
+                if (destinations.Count() > 4)
+                {
+                    errsb.AppendFormat("E{2}: Square {0}, has {1} different destinations. The max amount is 4. \n", square.Id, destinations.Count(), ++errors);
+                }
 
                 for (int i = 0; i < 4; ++i)
                 {
@@ -706,7 +713,7 @@ namespace Editor
         {
             PART_Zoom.Value = 1;
         }
-        
+
         #endregion //Buttons
 
         // Checks contents of the Snap text box for validity and
@@ -840,7 +847,8 @@ namespace Editor
             int value = 0, price = 0;
             Int32.TryParse(Value.Text, out value);
             Int32.TryParse(Price.Text, out price);
-            if (value != 0) { 
+            if (value != 0)
+            {
                 double yield = (double)price / (double)value;
                 PriceRatio.Text = yield.ToString("0.00");
             }
