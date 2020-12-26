@@ -134,7 +134,77 @@ namespace CustomStreetManager
             // lwz r3,0x1c(r3)                                    ->  lwz r3,0x0(r3)
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80211e78), SeekOrigin.Begin); stream.Write(PowerPcAsm.lwz(3, 0x0, 3));
 
+            // --- Hack to make icons invisible which do not have a map ---
+            // -- Init Maps in the map array with -1 --
+            var subroutineInitMapIdsForMapIcons = allocate(writeSubroutineInitMapIdsForMapIcons(addressMapper, VAVAddr.NullAddress), "SubroutineInitMapIdsForMapIcons");
+            stream.Seek(addressMapper.toFileAddress(subroutineInitMapIdsForMapIcons), SeekOrigin.Begin);
+            stream.Write(writeSubroutineInitMapIdsForMapIcons(addressMapper, subroutineInitMapIdsForMapIcons)); // re-write the routine again since now we know where it is located in the main dol
+            // increase the array size
+            // rlwinm r3,r16,0x2,0x0,0x1d                            -> r3,r16,0x3,0x0,0x1d
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80187794), SeekOrigin.Begin); stream.Write(PowerPcAsm.rlwinm(3, 16, 0x3, 0x0, 0x1d));
+            var hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8018779c);
+            // cmpwi r3,0x0                                          ->  bl subroutineInitMapIdsForMapIcons
+            stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(hijackAddr, subroutineInitMapIdsForMapIcons));
+            // mr r24,r3                                             ->  cmpwi r3,0x0
+            stream.Write(PowerPcAsm.cmpwi(3, 0));
+            // increase the array size
+            // rlwinm r3,r16,0x2,0x0,0x1d                            -> r3,r16,0x3,0x0,0x1d
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80187aa4), SeekOrigin.Begin); stream.Write(PowerPcAsm.rlwinm(3, 16, 0x3, 0x0, 0x1d));
+            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x80187aac);
+            // cmpwi r3,0x0                                          ->  bl subroutineInitMapIdsForMapIcons
+            stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(hijackAddr, subroutineInitMapIdsForMapIcons));
+            // mr r24,r3                                             ->  cmpwi r3,0x0
+            stream.Write(PowerPcAsm.cmpwi(3, 0));
+            // -- If a map id is -1, make the map icon invisible --
+            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e8d8);
+            var returnAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e8dc);
+            var subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(VAVAddr.NullAddress, returnAddr), "SubroutineMakeNoneMapIconsInvisible");
+            stream.Seek(addressMapper.toFileAddress(subroutineMakeNoneMapIconsInvisible), SeekOrigin.Begin);
+            stream.Write(writeSubroutineMakeNoneMapIconsInvisible(subroutineMakeNoneMapIconsInvisible, returnAddr)); // re-write the routine again since now we know where it is located in the main dol
+            // li r5,0x1                                          ->  b subroutineMakeNoneMapIconsInvisible
+            stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineMakeNoneMapIconsInvisible));
+            // -- if the map index is over the map array size, do not loop around to the first map index again --
+            // ble 0x80187e1c                                     ->  b 0x80187e1c
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80187dfc), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(8));
         }
+
+        private List<UInt32> writeSubroutineInitMapIdsForMapIcons(AddressMapper addressMapper, VAVAddr entryAddr)
+        {
+            var JUtility_memset = addressMapper.toVersionAgnosticAddress((BSVAddr)0x80004714);
+            // precondition: r3 is newly created map icon array
+            //               r16 is the amount of map ids in the array (size / 4)
+            //               r24 is unused
+            // postcondition: r24 is the map icon array
+            var asm = new List<UInt32>();
+            asm.Add(PowerPcAsm.mflr(24));                                     // save the link register
+            asm.Add(PowerPcAsm.li(4, -1));                                    // fill with 0xff
+            asm.Add(PowerPcAsm.rlwinm(5, 16, 0x3, 0x0, 0x1d));                // get the size of the array
+            asm.Add(PowerPcAsm.bl(entryAddr, asm.Count, JUtility_memset));    // call JUtility_memset(array*, 0xff, array.size)
+            asm.Add(PowerPcAsm.mtlr(24));                                     // restore the link register
+            asm.Add(PowerPcAsm.mr(24, 3));                                    // move array* to r24
+            asm.Add(PowerPcAsm.blr());                                        // return
+            return asm;
+        }
+
+        private List<UInt32> writeSubroutineMakeNoneMapIconsInvisible(VAVAddr entryAddr, VAVAddr returnAddr)
+        {
+            // precondition: r31  MapIconButton*
+            //                r5  is 0
+            // postcondition: r5  boolean whether to make this map icon visible or not
+            var asm = new List<UInt32>();
+
+            asm.Add(PowerPcAsm.lwz(5, 0x188, 31));                    // get current map id into r5
+            asm.Add(PowerPcAsm.cmpwi(5, -1));                         // map id == -1 ?
+            asm.Add(PowerPcAsm.bne(3));                               // {
+            asm.Add(PowerPcAsm.li(5, 0));                             //   make invisible
+            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnAddr));  //   return
+                                                                      // } else {
+            asm.Add(PowerPcAsm.li(5, 1));                             //   make visible
+            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnAddr));  //   return
+                                                                      // }
+            return asm;
+        }
+
         protected override void readAsm(EndianBinaryReader s, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla)
         {
             foreach (MapDescriptor mapDescriptor in mapDescriptors)

@@ -290,6 +290,10 @@ namespace CustomStreetManager
             UInt32 offset = ((targetPos - currentPos) >> 2) & 0x00FFFFFF;
             return b_opcode + (offset << 2);
         }
+        public static UInt32 b(int offset)
+        {
+            return (uint)(b_opcode + ((4 * offset) & 0x0000FFFF));
+        }
         public static uint blt(uint currentPos, uint targetPos)
         {
             return blt_opcode + ((targetPos - currentPos) & 0x0000FFFF);
