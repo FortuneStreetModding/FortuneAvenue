@@ -225,6 +225,11 @@ namespace CustomStreetManager
                                 validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in each zone must be at least 6.");
                                 validation.Passed = false;
                             }
+                            if (a.Count() > 16 && mapDescriptor.Zone == 0)
+                            {
+                                validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in each zone must be less than 16.");
+                                validation.Passed = false;
+                            }
                         }
                         else
                         {
@@ -246,6 +251,11 @@ namespace CustomStreetManager
                                 validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in each zone must be at least 6.");
                                 validation.Passed = false;
                             }
+                            if (a.Count() > 16 && mapDescriptor.Zone == 1)
+                            {
+                                validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in each zone must be less than 16.");
+                                validation.Passed = false;
+                            }
                         }
                         else
                         {
@@ -265,6 +275,11 @@ namespace CustomStreetManager
                             if (a.Count() < 6 && mapDescriptor.Zone == 2)
                             {
                                 validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in each zone must be at least 6.");
+                                validation.Passed = false;
+                            }
+                            if (a.Count() > 16 && mapDescriptor.Zone == 2)
+                            {
+                                validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in each zone must be less than 16.");
                                 validation.Passed = false;
                             }
                         }
