@@ -164,6 +164,10 @@ namespace CustomStreetManager
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
+            // Write the Map Count
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801cca30), SeekOrigin.Begin);
+            stream.Write(PowerPcAsm.li(3, (short) mapDescriptors.Count));
+
             return mapDescriptors;
         }
     }
