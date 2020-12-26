@@ -158,7 +158,14 @@ namespace CustomStreetManager
             // -- If a map id is -1, make the map icon invisible --
             hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e8d8);
             var returnAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e8dc);
-            var subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(VAVAddr.NullAddress, returnAddr), "SubroutineMakeNoneMapIconsInvisible");
+            var subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(VAVAddr.NullAddress, returnAddr), "SubroutineMakeNoneMapIconsInvisibleMultiplayer");
+            stream.Seek(addressMapper.toFileAddress(subroutineMakeNoneMapIconsInvisible), SeekOrigin.Begin);
+            stream.Write(writeSubroutineMakeNoneMapIconsInvisible(subroutineMakeNoneMapIconsInvisible, returnAddr)); // re-write the routine again since now we know where it is located in the main dol
+            // li r5,0x1                                          ->  b subroutineMakeNoneMapIconsInvisible
+            stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineMakeNoneMapIconsInvisible));
+            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e7b0);
+            returnAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e7b4);
+            subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(VAVAddr.NullAddress, returnAddr), "SubroutineMakeNoneMapIconsInvisibleTour");
             stream.Seek(addressMapper.toFileAddress(subroutineMakeNoneMapIconsInvisible), SeekOrigin.Begin);
             stream.Write(writeSubroutineMakeNoneMapIconsInvisible(subroutineMakeNoneMapIconsInvisible, returnAddr)); // re-write the routine again since now we know where it is located in the main dol
             // li r5,0x1                                          ->  b subroutineMakeNoneMapIconsInvisible
