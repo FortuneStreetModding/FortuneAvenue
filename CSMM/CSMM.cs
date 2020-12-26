@@ -55,7 +55,7 @@ namespace CustomStreetManager
                 addValidationIssues(validation);
             }
             var categories = new Dictionary<int, int>();
-            validation = MapDescriptor.getCategories(mapDescriptors, out categories);
+            validation = MapDescriptor.getMapSets(mapDescriptors, out categories);
             if (validation.Passed)
             {
                 foreach (int category in categories.Values.Distinct())

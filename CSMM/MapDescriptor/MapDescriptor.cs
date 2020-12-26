@@ -147,16 +147,16 @@ namespace CustomStreetManager
             return validation;
         }
 
-        public static MapDescriptorValidation getCategories(List<MapDescriptor> mapDescriptors, out Dictionary<int, int> categories)
+        public static MapDescriptorValidation getMapSets(List<MapDescriptor> mapDescriptors, out Dictionary<int, int> mapSets)
         {
             var validation = new MapDescriptorValidation();
-            categories = new Dictionary<int, int>();
+            mapSets = new Dictionary<int, int>();
             for (short i = 0; i < mapDescriptors.Count; i++)
             {
                 var mapDescriptor = mapDescriptors[i];
                 if (mapDescriptor.MapSet == 0 || mapDescriptor.MapSet == 1)
                 {
-                    categories.Add(i, mapDescriptor.MapSet);
+                    mapSets.Add(i, mapDescriptor.MapSet);
                 }
                 else if (mapDescriptor.MapSet != -1)
                 {
@@ -164,12 +164,12 @@ namespace CustomStreetManager
                     validation.Passed = false;
                 }
             }
-            if (!categories.Values.Contains(0))
+            if (!mapSets.Values.Contains(0))
             {
                 validation.AddProblem(typeof(MapDescriptor).GetProperty("MapSet"), "At least one map must be available for MapSet 0");
                 validation.Passed = false;
             }
-            if (!categories.Values.Contains(1))
+            if (!mapSets.Values.Contains(1))
             {
                 validation.AddProblem(typeof(MapDescriptor).GetProperty("MapSet"), "At least one map must be available for MapSet 1");
                 validation.Passed = false;
@@ -179,6 +179,7 @@ namespace CustomStreetManager
 
         public static MapDescriptorValidation getZones(List<MapDescriptor> mapDescriptors, int mapSet, out Dictionary<int, int> zones)
         {
+            // one of the worst spaghetti codes ever (yes I feel bad for it)
             var validation = new MapDescriptorValidation();
             zones = new Dictionary<int, int>();
             for (short i = 0; i < mapDescriptors.Count; i++)
@@ -205,17 +206,51 @@ namespace CustomStreetManager
                     var mapDescriptor = mapDescriptors[i];
                     if (mapDescriptor.MapSet == mapSet)
                     {
-                        if (!zones.Values.Contains(0))
+                        if (zones.Values.Contains(0))
+                        {
+
+                            // count for each mapSet how many maps have been assigned to it
+                            var a = from m in mapDescriptors where m.MapSet == mapSet && m.Zone == 0 select m;
+                            var b = from m in mapDescriptors where m.MapSet != mapSet && m.Zone == 0 select m;
+                            if (a.Count() != b.Count() && mapDescriptor.Zone == 0)
+                            {
+                                validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in zone 0 must be the same in all MapSets.");
+                                validation.Passed = false;
+                            }
+                        }
+                        else
                         {
                             validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 0 in MapSet " + mapSet);
                             validation.Passed = false;
                         }
-                        if (!zones.Values.Contains(1))
+                        if (zones.Values.Contains(1))
+                        {
+                            // count for each mapSet how many maps have been assigned to it
+                            var a = from m in mapDescriptors where m.MapSet == mapSet && m.Zone == 1 select m;
+                            var b = from m in mapDescriptors where m.MapSet != mapSet && m.Zone == 1 select m;
+                            if (a.Count() != b.Count() && mapDescriptor.Zone == 1)
+                            {
+                                validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in zone 1 must be the same in all MapSets.");
+                                validation.Passed = false;
+                            }
+                        }
+                        else
                         {
                             validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 1 in MapSet " + mapSet);
                             validation.Passed = false;
                         }
-                        if (!zones.Values.Contains(2))
+                        if (zones.Values.Contains(2))
+                        {
+                            // count for each mapSet how many maps have been assigned to it
+                            var a = from m in mapDescriptors where m.MapSet == mapSet && m.Zone == 2 select m;
+                            var b = from m in mapDescriptors where m.MapSet != mapSet && m.Zone == 2 select m;
+                            if (a.Count() != b.Count() && mapDescriptor.Zone == 2)
+                            {
+                                validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "The amount of maps in zone 2 must be the same in all MapSets.");
+                                validation.Passed = false;
+                            }
+                        }
+                        else
                         {
                             validation.AddProblem(i, typeof(MapDescriptor).GetProperty("Zone"), "At least one map must be available for zone 2 in MapSet " + mapSet);
                             validation.Passed = false;
