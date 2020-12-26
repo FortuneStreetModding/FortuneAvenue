@@ -16,16 +16,16 @@ namespace CustomStreetManager
     public partial class PatchProcess
     {
 
-        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
-            writeLocalizationFiles();
+            writeLocalizationFiles(mapDescriptors);
 
             progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
-            await patchMainDolAsync(ProgressInfo.makeSubProgress(progress, 0, 6), ct);
+            await patchMainDolAsync(mapDescriptors, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
-            await injectMapIcons(ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
+            await injectMapIcons(mapDescriptors, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
 
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
@@ -47,7 +47,7 @@ namespace CustomStreetManager
             return true;
         }
 
-        private void writeLocalizationFiles()
+        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors)
         {
             // free up the used MSG IDs
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
@@ -110,7 +110,7 @@ namespace CustomStreetManager
             }
         }
 
-        private async Task patchMainDolAsync(IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task patchMainDolAsync(List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(riivFileSet.main_dol));
             File.Copy(cacheFileSet.main_dol, riivFileSet.main_dol, true);
@@ -144,7 +144,7 @@ namespace CustomStreetManager
             }
         }
 
-        private async Task<bool> injectMapIcons(IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             // first check if we need to inject any map icons in the first place. We do not need to if only vanilla map icons are used.
             bool allMapIconsVanilla = true;

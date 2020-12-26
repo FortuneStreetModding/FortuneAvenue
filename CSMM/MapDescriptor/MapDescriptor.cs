@@ -1,4 +1,4 @@
-﻿using FSEditor.FSData;
+using FSEditor.FSData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +17,11 @@ namespace CustomStreetManager
         /// <summary>
         /// 0 = Easy Mode, 1 = Standard Mode
         /// </summary>
-        public sbyte MapSet { get; set; }
-        public sbyte Zone { get; set; }
-        public sbyte Order { get; set; }
+        public sbyte MapSet { get; set; } = -1;
+        public sbyte Zone { get; set; } = -1;
+        public sbyte Order { get; set; } = -1;
         public bool Dirty { get; set; }
-        public UInt32 UnlockID { get; set; }
+        public UInt32 UnlockID { get; set; } = 20;
         public UInt32 InitialCash { get; set; }
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }

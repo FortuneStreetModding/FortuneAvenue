@@ -34,6 +34,8 @@ namespace CustomStreetManager
             List<AddressSection> sections = await ExeWrapper.readSections(cacheFileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 90, 95)).ConfigureAwait(false);
 
             progress?.Report("Read data from main.dol file...");
+
+            List<MapDescriptor> mapDescriptors;
             using (var stream = File.OpenRead(cacheFileSet.main_dol))
             {
                 EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);

@@ -164,7 +164,7 @@ namespace CustomStreetManager
 
                 try
                 {
-                    await patchProcess.saveWbfsIso(inputFile, outputFile, false, progress, ct);
+                    await patchProcess.saveWbfsIso(inputFile, outputFile, GetMapDescriptors(), false, progress, ct);
 
                     // TODO, better cleanup
                     Invoke((MethodInvoker)delegate
@@ -246,10 +246,21 @@ namespace CustomStreetManager
                     progressBar.EnableButton();
                     Debug.WriteLine(e.ToString());
                 }
-                updateDataGridData(null, null);
             }
         }
 
+        private List<MapDescriptor> GetMapDescriptors()
+        {
+            if (dataGridView1.DataSource != null)
+            {
+                var bs = (BindingSource)dataGridView1.DataSource;
+                if (bs.DataSource != null)
+                {
+                    return (List<MapDescriptor>)bs.DataSource;
+                }
+            }
+            return null;
+        }
 
         private void OpenFileDialog(object sender, EventArgs e)
         {
@@ -299,26 +310,29 @@ namespace CustomStreetManager
             reloadWbfsIsoFile();
         }
 
-        private void updateDataGridData(object sender, EventArgs e)
+        private void addMap_Click(object sender, EventArgs e)
         {
+            importMd(null);
             BindingSource bs = dataGridView1.DataSource as BindingSource;
-            if (patchProcess != null && patchProcess.mapDescriptors != null)
-            {
-                if (checkBox1.Checked)
-                {
-                    bs.DataSource = patchProcess.mapDescriptors;
-                }
-                else
-                {
-                    bs.DataSource = patchProcess.mapDescriptors.FindAll(md => md.MapSet >= 0 || md.IsPracticeBoard);
-                }
-            }
-            else
-            {
-                bs.DataSource = null;
-            }
+            if (bs.Count > 42)
+                buttonRemoveMap.Enabled = true;
+            DataGridView1_CellEndEdit(null, null);
+        }
 
-            dataGridView1.DataSource = bs;
+        private void removeMap_Click(object sender, EventArgs e)
+        {
+            var md = GetMapDescriptors()[GetMapDescriptors().Count - 1];
+
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to remove the map " + md.Name_En + "?", "Remove Map", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                BindingSource bs = dataGridView1.DataSource as BindingSource;
+                bs.RemoveAt(bs.Count - 1);
+                Go.Enabled = true;
+                if (bs.Count <= 42)
+                    buttonRemoveMap.Enabled = false;
+                DataGridView1_CellEndEdit(null, null);
+            }
         }
 
         private async void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -430,11 +444,10 @@ namespace CustomStreetManager
                         }
                         else
                         {
-                            patchProcess.mapDescriptors.Add(importedMapDescriptor);
+                            BindingSource bs = dataGridView1.DataSource as BindingSource;
+                            bs.Add(importedMapDescriptor);
                         }
-
                         Go.Enabled = true;
-                        updateDataGridData(null, null);
                     }
                     catch (Exception e)
                     {

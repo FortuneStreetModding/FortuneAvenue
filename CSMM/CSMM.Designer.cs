@@ -57,11 +57,12 @@ namespace CustomStreetManager
             this.setOutputLocationButton = new System.Windows.Forms.Button();
             this.setOutputPathLabel = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.buttonAddMap = new System.Windows.Forms.Button();
+            this.buttonRemoveMap = new System.Windows.Forms.Button();
             this.setInputISOLocation = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.MapSet = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -209,6 +210,28 @@ namespace CustomStreetManager
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.OpenFileDialog);
             // 
+            // buttonAddMap
+            // 
+            this.buttonAddMap.Location = new System.Drawing.Point(220, 1);
+            this.buttonAddMap.Margin = new System.Windows.Forms.Padding(1);
+            this.buttonAddMap.Name = "buttonAddMap";
+            this.buttonAddMap.Size = new System.Drawing.Size(111, 36);
+            this.buttonAddMap.TabIndex = 39;
+            this.buttonAddMap.Text = "Add Map";
+            this.buttonAddMap.UseVisualStyleBackColor = true;
+            this.buttonAddMap.Click += new System.EventHandler(this.addMap_Click);
+            // 
+            // buttonRemoveMap
+            // 
+            this.buttonRemoveMap.Location = new System.Drawing.Point(333, 1);
+            this.buttonRemoveMap.Margin = new System.Windows.Forms.Padding(1);
+            this.buttonRemoveMap.Name = "buttonRemoveMap";
+            this.buttonRemoveMap.Size = new System.Drawing.Size(111, 36);
+            this.buttonRemoveMap.TabIndex = 40;
+            this.buttonRemoveMap.Text = "Remove Map";
+            this.buttonRemoveMap.UseVisualStyleBackColor = true;
+            this.buttonRemoveMap.Click += new System.EventHandler(this.removeMap_Click);
+            // 
             // setInputISOLocation
             // 
             this.setInputISOLocation.Location = new System.Drawing.Point(147, 0);
@@ -254,26 +277,14 @@ namespace CustomStreetManager
             // flowLayoutPanel2
             // 
             this.flowLayoutPanel2.Controls.Add(this.clearListButton);
-            this.flowLayoutPanel2.Controls.Add(this.checkBox1);
+            this.flowLayoutPanel2.Controls.Add(this.buttonAddMap);
+            this.flowLayoutPanel2.Controls.Add(this.buttonRemoveMap);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(4, 1025);
             this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(783, 40);
             this.flowLayoutPanel2.TabIndex = 43;
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBox1.Location = new System.Drawing.Point(117, 3);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(98, 32);
-            this.checkBox1.TabIndex = 38;
-            this.checkBox1.Text = "Show Unused";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.updateDataGridData);
             // 
             // flowLayoutPanel3
             // 
@@ -526,7 +537,6 @@ namespace CustomStreetManager
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.BindingSource mapDescriptorBindingSource;
         private System.Windows.Forms.Button Go;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.DataGridViewTextBoxColumn MapSet;
         private System.Windows.Forms.DataGridViewTextBoxColumn Zone;
         private System.Windows.Forms.DataGridViewTextBoxColumn Order;
@@ -545,6 +555,8 @@ namespace CustomStreetManager
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem verboseToolStripMenuItem;
+        private Button buttonAddMap;
+        private Button buttonRemoveMap;
     }
 }
 

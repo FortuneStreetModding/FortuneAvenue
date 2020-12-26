@@ -15,7 +15,6 @@ namespace CustomStreetManager
 {
     public partial class PatchProcess
     {
-        public List<MapDescriptor> mapDescriptors;
         private MainDol mainDol;
         // Key = locale, Value = file contents
         private Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
