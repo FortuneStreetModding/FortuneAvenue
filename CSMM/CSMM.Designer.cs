@@ -39,7 +39,7 @@ namespace CustomStreetManager
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
             DataGridViewCellStyle readOnlyColumnStyle = new DataGridViewCellStyle();
-            readOnlyColumnStyle.ForeColor = System.Drawing.Color.Gray;
+            readOnlyColumnStyle.ForeColor = System.Drawing.Color.DimGray;
             DataGridViewCellStyle editColumnStyle = new DataGridViewCellStyle();
             editColumnStyle.ForeColor = System.Drawing.Color.MidnightBlue;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
@@ -366,9 +366,9 @@ namespace CustomStreetManager
             this.UnlockID.DataPropertyName = "UnlockID";
             this.UnlockID.HeaderText = "UnlockID";
             this.UnlockID.Name = "UnlockID";
-            this.UnlockID.ReadOnly = false;
+            this.UnlockID.ReadOnly = true;
             this.UnlockID.Width = 60;
-            this.UnlockID.DefaultCellStyle = editColumnStyle;
+            this.UnlockID.DefaultCellStyle = readOnlyColumnStyle;
             // 
             // nameENDataGridViewTextBoxColumn
             // 
