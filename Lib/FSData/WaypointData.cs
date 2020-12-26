@@ -19,7 +19,6 @@ namespace FSEditor.FSData {
 
         public Byte Destination3 { get; set; }
 
-        public byte[] Destinations { get; set; }
 
 		// ----------------------------------------------------------------------------------------------------
 		#endregion
@@ -37,7 +36,6 @@ namespace FSEditor.FSData {
 			data.Destination1 = stream.ReadByte();
 			data.Destination2 = stream.ReadByte();
 			data.Destination3 = stream.ReadByte();
-            data.Destinations = new byte[] { data.Destination1, data.Destination2, data.Destination3 };
 			return data;
 		}
 
