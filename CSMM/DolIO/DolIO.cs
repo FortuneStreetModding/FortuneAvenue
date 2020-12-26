@@ -27,12 +27,12 @@ namespace CustomStreetManager
             this._w = null;
             this._am = null;
         }
-        protected abstract void writeAsm(EndianBinaryWriter writer, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors);
+        protected abstract void writeAsm(EndianBinaryWriter stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors);
         public void read(EndianBinaryReader stream, AddressMapper addressMapper, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
             readAsm(stream, mapDescriptors, addressMapper);
         }
-        protected abstract void readAsm(EndianBinaryReader reader, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper);
+        protected abstract void readAsm(EndianBinaryReader stream, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper);
 
         protected VAVAddr allocate(string str, string purpose = null)
         {
@@ -58,6 +58,13 @@ namespace CustomStreetManager
         protected VAVAddr allocate(List<byte> bytes, string purpose)
         {
             return allocate(bytes.ToArray(), purpose);
+        }
+        protected VAVAddr allocate(List<sbyte> sbytesList, string purpose)
+        {
+            sbyte[] sbytes = sbytesList.ToArray();
+            byte[] bytes = new byte[sbytes.Length];
+            Buffer.BlockCopy(sbytes, 0, bytes, 0, sbytes.Length);
+            return allocate(bytes, purpose);
         }
         protected VAVAddr allocate(List<UInt32> opcodes, string purpose)
         {

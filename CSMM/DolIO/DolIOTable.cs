@@ -31,12 +31,15 @@ namespace CustomStreetManager
                 }
             }
             var addr = readTableAddr(stream, addressMapper, isVanilla);
-            stream.Seek(addressMapper.toFileAddress(addr), SeekOrigin.Begin);
+            if (addr != VAVAddr.NullAddress)
+            {
+                stream.Seek(addressMapper.toFileAddress(addr), SeekOrigin.Begin);
+            }
             readAsm(stream, mapDescriptors, addressMapper, isVanilla);
         }
-        protected abstract void readAsm(EndianBinaryReader reader, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla);
-        protected abstract bool readIsVanilla(EndianBinaryReader reader, AddressMapper addressMapper);
-        protected abstract Int16 readTableRowCount(EndianBinaryReader reader, AddressMapper addressMapper, bool isVanilla);
-        protected abstract VAVAddr readTableAddr(EndianBinaryReader reader, AddressMapper addressMapper, bool isVanilla);
+        protected abstract void readAsm(EndianBinaryReader stream, List<MapDescriptor> mapDescriptors, AddressMapper addressMapper, bool isVanilla);
+        protected abstract bool readIsVanilla(EndianBinaryReader stream, AddressMapper addressMapper);
+        protected abstract Int16 readTableRowCount(EndianBinaryReader stream, AddressMapper addressMapper, bool isVanilla);
+        protected abstract VAVAddr readTableAddr(EndianBinaryReader stream, AddressMapper addressMapper, bool isVanilla);
     }
 }
