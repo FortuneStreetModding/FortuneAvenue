@@ -192,89 +192,97 @@ namespace CustomStreetManager
             table.Rows.Add( 128, "Special bonus! You receive 55 times the number of shops you own in gold coins from the bank!"                     ,  0 ,  6 );
             return table;
         }
+        /// <summary>
+        /// In Vanilla:<br/>
+        /// The MapSet is 0 for easy mode and 1 for standard mode.<br/>
+        /// The zone is 0 for the Mario Tour, 1 for the Dragon Quest Tour and 2 for the Special Tour.<br/>
+        /// The order is the order in which the maps occur within the zone.
+        /// </summary>
+        /// <returns>The MapSetZoneOrdering of the vanilla game</returns>
         public static DataTable getMapSetZoneOrdering()
         {
             DataTable table = new DataTable();
-            table.Columns.Add("MapSet", typeof(int));
-            table.Columns.Add("Zone", typeof(int));
-            table.Columns.Add("Order", typeof(int));
+            table.Columns.Add("MapSet", typeof(sbyte));
+            table.Columns.Add("Zone", typeof(sbyte));
+            table.Columns.Add("Order", typeof(sbyte));
             table.Columns.Add("Map Id", typeof(int));
-            table.Rows.Add(0, 0, 0, 9);
-            table.Rows.Add(0, 0, 1, 17);
-            table.Rows.Add(0, 0, 2, 10);
-            table.Rows.Add(0, 0, 3, 13);
-            table.Rows.Add(0, 0, 4, 12);
-            table.Rows.Add(0, 0, 5, 14);
 
-            table.Rows.Add(0, 1, 0, 3);
-            table.Rows.Add(0, 1, 1, 7);
-            table.Rows.Add(0, 1, 2, 1);
-            table.Rows.Add(0, 1, 3, 0);
-            table.Rows.Add(0, 1, 4, 4);
-            table.Rows.Add(0, 1, 5, 2);
+            table.Rows.Add(1, 0, 0, 3);
+            table.Rows.Add(1, 0, 1, 7);
+            table.Rows.Add(1, 0, 2, 1);
+            table.Rows.Add(1, 0, 3, 0);
+            table.Rows.Add(1, 0, 4, 4);
+            table.Rows.Add(1, 0, 5, 2);
 
-            table.Rows.Add(0, 2, 0, 15);
-            table.Rows.Add(0, 2, 1, 5);
-            table.Rows.Add(0, 2, 2, 6);
-            table.Rows.Add(0, 2, 3, 8);
-            table.Rows.Add(0, 2, 4, 11);
-            table.Rows.Add(0, 2, 5, 16);
+            table.Rows.Add(1, 1, 0, 9);
+            table.Rows.Add(1, 1, 1, 17);
+            table.Rows.Add(1, 1, 2, 10);
+            table.Rows.Add(1, 1, 3, 13);
+            table.Rows.Add(1, 1, 4, 12);
+            table.Rows.Add(1, 1, 5, 14);
 
-            table.Rows.Add(1, 0, 0, 30);
-            table.Rows.Add(1, 0, 1, 38);
-            table.Rows.Add(1, 0, 2, 31);
-            table.Rows.Add(1, 0, 3, 34);
-            table.Rows.Add(1, 0, 4, 33);
-            table.Rows.Add(1, 0, 5, 35);
+            table.Rows.Add(1, 2, 0, 15);
+            table.Rows.Add(1, 2, 1, 5);
+            table.Rows.Add(1, 2, 2, 6);
+            table.Rows.Add(1, 2, 3, 8);
+            table.Rows.Add(1, 2, 4, 11);
+            table.Rows.Add(1, 2, 5, 16);
 
-            table.Rows.Add(1, 1, 0, 24);
-            table.Rows.Add(1, 1, 1, 28);
-            table.Rows.Add(1, 1, 2, 22);
-            table.Rows.Add(1, 1, 3, 21);
-            table.Rows.Add(1, 1, 4, 25);
-            table.Rows.Add(1, 1, 5, 23);
+            table.Rows.Add(0, 0, 0, 24);
+            table.Rows.Add(0, 0, 1, 28);
+            table.Rows.Add(0, 0, 2, 22);
+            table.Rows.Add(0, 0, 3, 21);
+            table.Rows.Add(0, 0, 4, 25);
+            table.Rows.Add(0, 0, 5, 23);
 
-            table.Rows.Add(1, 2, 0, 36);
-            table.Rows.Add(1, 2, 1, 26);
-            table.Rows.Add(1, 2, 2, 27);
-            table.Rows.Add(1, 2, 3, 29);
-            table.Rows.Add(1, 2, 4, 32);
-            table.Rows.Add(1, 2, 5, 37);
+            table.Rows.Add(0, 1, 0, 30);
+            table.Rows.Add(0, 1, 1, 38);
+            table.Rows.Add(0, 1, 2, 31);
+            table.Rows.Add(0, 1, 3, 34);
+            table.Rows.Add(0, 1, 4, 33);
+            table.Rows.Add(0, 1, 5, 35);
+
+            table.Rows.Add(0, 2, 0, 36);
+            table.Rows.Add(0, 2, 1, 26);
+            table.Rows.Add(0, 2, 2, 27);
+            table.Rows.Add(0, 2, 3, 29);
+            table.Rows.Add(0, 2, 4, 32);
+            table.Rows.Add(0, 2, 5, 37);
             return table;
         }
-        public static int getVanillaMapSet(int mapId)
+        public static sbyte getVanillaMapSet(int mapId)
         {
             try
             {
                 var result = from row in VanillaDatabase.getMapSetZoneOrdering().AsEnumerable()
                              where row.Field<int>("Map Id") == mapId
-                             select row.Field<int>("MapSet");
+                             select row.Field<sbyte>("MapSet");
                 if (result.Any())
                     return result.Distinct().Single();
             }
             catch (IndexOutOfRangeException e) { }
             return -1;
         }
-        public static int getVanillaZone(int mapId)
+        public static sbyte getVanillaZone(int mapId)
         {
             try
             {
                 var result = from row in VanillaDatabase.getMapSetZoneOrdering().AsEnumerable()
                              where row.Field<int>("Map Id") == mapId
-                             select row.Field<int>("Zone");
+                             select row.Field<sbyte>("Zone");
                 if (result.Any())
                     return result.Distinct().Single();
             }
             catch (IndexOutOfRangeException e) { }
             return -1;
         }
-        public static int getVanillaOrder(int mapId)
+        public static sbyte getVanillaOrder(int mapId)
         {
             try
             {
                 var result = from row in VanillaDatabase.getMapSetZoneOrdering().AsEnumerable()
                              where row.Field<int>("Map Id") == mapId
-                             select row.Field<int>("Order");
+                             select row.Field<sbyte>("Order");
                 if (result.Any())
                     return result.Distinct().Single();
             }

@@ -14,9 +14,12 @@ namespace CustomStreetManager
 {
     public class MapDescriptor
     {
-        public int MapSet { get; set; }
-        public int Zone { get; set; }
-        public int Order { get; set; }
+        /// <summary>
+        /// 0 = Easy Mode, 1 = Standard Mode
+        /// </summary>
+        public sbyte MapSet { get; set; }
+        public sbyte Zone { get; set; }
+        public sbyte Order { get; set; }
         public bool Dirty { get; set; }
         public UInt32 UnlockID { get; set; }
         public UInt32 InitialCash { get; set; }
@@ -105,14 +108,14 @@ namespace CustomStreetManager
                 if (mapDescriptor.IsPracticeBoard)
                 {
                     validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "Only one map for each MapSet can be set as practice board");
-                    if (mapDescriptor.MapSet == 1)
+                    if (mapDescriptor.MapSet == 0)
                     {
                         if (easyPracticeBoard == -1)
                             easyPracticeBoard = i;
                         else
                             validation.Passed = false;
                     }
-                    else
+                    else if (mapDescriptor.MapSet == 1)
                     {
                         if (standardPracticeBoard == -1)
                             standardPracticeBoard = i;
@@ -129,7 +132,7 @@ namespace CustomStreetManager
                 {
                     for (short i = 0; i < mapDescriptors.Count; i++)
                     {
-                        if (mapDescriptors[i].MapSet == 1)
+                        if (mapDescriptors[i].MapSet == 0)
                             validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each MapSet must be set as practice board");
                     }
                 }
@@ -137,7 +140,7 @@ namespace CustomStreetManager
                 {
                     for (short i = 0; i < mapDescriptors.Count; i++)
                     {
-                        if (mapDescriptors[i].MapSet == 0)
+                        if (mapDescriptors[i].MapSet == 1)
                             validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "At least one map for each MapSet must be set as practice board");
                     }
                 }
