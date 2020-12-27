@@ -170,6 +170,11 @@ namespace CustomStreetManager
             // -- fix map selection going out of bounds in tour mode --
             // bne 0x80188258                                        ->  nop
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80188230), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
+            // -- fix out of array bounds error when opening tour mode and viewing the zones ---
+            // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021f880), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
+            // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021ff4c), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
         }
 
         private List<UInt32> writeSubroutineInitMapIdsForMapIcons(AddressMapper addressMapper, VAVAddr entryAddr)
