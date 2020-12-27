@@ -173,6 +173,9 @@ namespace CustomStreetManager
             // -- if the map index is over the map array size, do not loop around to the first map index again --
             // ble 0x80187e1c                                     ->  b 0x80187e1c
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80187dfc), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(8));
+            // -- fix map selection going out of bounds in tour mode --
+            // bne 0x80188258                                     ->  nop
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80188230), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
         }
 
         private List<UInt32> writeSubroutineInitMapIdsForMapIcons(AddressMapper addressMapper, VAVAddr entryAddr)
