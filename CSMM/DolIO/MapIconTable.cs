@@ -1,4 +1,4 @@
-using MiscUtil.Conversion;
+﻿using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
 using System.Collections.Generic;
@@ -155,26 +155,20 @@ namespace CustomStreetManager
             stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.bl(hijackAddr, subroutineInitMapIdsForMapIcons));
             // mr r24,r3                                             ->  cmpwi r3,0x0
             stream.Write(PowerPcAsm.cmpwi(3, 0));
-            // -- If a map id is -1, make the map icon invisible --
-            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e8d8);
-            var returnAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e8dc);
-            var subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(VAVAddr.NullAddress, returnAddr), "SubroutineMakeNoneMapIconsInvisibleMultiplayer");
+            // -- if a map id is -1, make the map icon invisible --
+            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e73c);
+            var returnContinueAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e740);
+            var returnMakeInvisibleAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e808);
+            var subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(addressMapper, VAVAddr.NullAddress, returnContinueAddr, returnMakeInvisibleAddr), "SubroutineMakeNoneMapIconsInvisibleMultiplayer");
             stream.Seek(addressMapper.toFileAddress(subroutineMakeNoneMapIconsInvisible), SeekOrigin.Begin);
-            stream.Write(writeSubroutineMakeNoneMapIconsInvisible(subroutineMakeNoneMapIconsInvisible, returnAddr)); // re-write the routine again since now we know where it is located in the main dol
-            // li r5,0x1                                          ->  b subroutineMakeNoneMapIconsInvisible
-            stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineMakeNoneMapIconsInvisible));
-            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e7b0);
-            returnAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e7b4);
-            subroutineMakeNoneMapIconsInvisible = allocate(writeSubroutineMakeNoneMapIconsInvisible(VAVAddr.NullAddress, returnAddr), "SubroutineMakeNoneMapIconsInvisibleTour");
-            stream.Seek(addressMapper.toFileAddress(subroutineMakeNoneMapIconsInvisible), SeekOrigin.Begin);
-            stream.Write(writeSubroutineMakeNoneMapIconsInvisible(subroutineMakeNoneMapIconsInvisible, returnAddr)); // re-write the routine again since now we know where it is located in the main dol
-            // li r5,0x1                                          ->  b subroutineMakeNoneMapIconsInvisible
+            stream.Write(writeSubroutineMakeNoneMapIconsInvisible(addressMapper, subroutineMakeNoneMapIconsInvisible, returnContinueAddr, returnMakeInvisibleAddr)); // re-write the routine again since now we know where it is located in the main dol
+            // lwz r0,0x184(r3)                                      ->  b subroutineMakeNoneMapIconsInvisible
             stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineMakeNoneMapIconsInvisible));
             // -- if the map index is over the map array size, do not loop around to the first map index again --
-            // ble 0x80187e1c                                     ->  b 0x80187e1c
+            // ble 0x80187e1c                                        ->  b 0x80187e1c
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80187dfc), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(8));
             // -- fix map selection going out of bounds in tour mode --
-            // bne 0x80188258                                     ->  nop
+            // bne 0x80188258                                        ->  nop
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80188230), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
         }
 
@@ -196,22 +190,28 @@ namespace CustomStreetManager
             return asm;
         }
 
-        private List<UInt32> writeSubroutineMakeNoneMapIconsInvisible(VAVAddr entryAddr, VAVAddr returnAddr)
+        private List<UInt32> writeSubroutineMakeNoneMapIconsInvisible(AddressMapper addressMapper, VAVAddr entryAddr, VAVAddr returnContinueAddr, VAVAddr returnMakeInvisibleAddr)
         {
-            // precondition: r31  MapIconButton*
-            //                r5  is 0
-            // postcondition: r5  boolean whether to make this map icon visible or not
+            var Scene_Layout_Obj_SetVisible = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8006f854);
+            // precondition:  r31  MapIconButton*
+            //                 r5  is unused
+            // postcondition:  r0  is map icon type
+            //                 r5  is 0
             var asm = new List<UInt32>();
-
-            asm.Add(PowerPcAsm.lwz(5, 0x188, 31));                    // get current map id into r5
-            asm.Add(PowerPcAsm.cmpwi(5, -1));                         // map id == -1 ?
-            asm.Add(PowerPcAsm.bne(3));                               // {
-            asm.Add(PowerPcAsm.li(5, 0));                             //   make invisible
-            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnAddr));  //   return
-                                                                      // } else {
-            asm.Add(PowerPcAsm.li(5, 1));                             //   make visible
-            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnAddr));  //   return
-                                                                      // }
+            asm.Add(PowerPcAsm.lwz(5, 0x188, 31));                                     // get current map id into r5
+            asm.Add(PowerPcAsm.cmpwi(5, -1));                                          // map id == -1 ?
+            asm.Add(PowerPcAsm.bne(8));                                                // {
+            asm.Add(PowerPcAsm.lwz(3, 0x28, 31));                                      //   \ 
+            asm.Add(PowerPcAsm.li(5, 0));                                              //   | 
+            asm.Add(PowerPcAsm.lwz(4, -0x6600, 13));                                   //   | make "NEW" text invisible
+            asm.Add(PowerPcAsm.bl(entryAddr, asm.Count, Scene_Layout_Obj_SetVisible)); //   /
+            asm.Add(PowerPcAsm.lwz(3, 0x28, 31));                                      //   \ 
+            asm.Add(PowerPcAsm.li(5, 0));                                              //   / make Locked Map Icon "(?)" invisible
+            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnMakeInvisibleAddr));      //   returnMakeInvisibleAddr
+                                                                                       // } else {
+            asm.Add(PowerPcAsm.lwz(0, 0x184, 3));                                      //   get map icon type (replaced opcode)
+            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnContinueAddr));           //   returnContinueAddr
+                                                                                       // }
             return asm;
         }
 
