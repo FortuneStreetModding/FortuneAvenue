@@ -164,13 +164,15 @@ namespace CustomStreetManager
             stream.Write(writeSubroutineMakeNoneMapIconsInvisible(addressMapper, subroutineMakeNoneMapIconsInvisible, returnContinueAddr, returnMakeInvisibleAddr)); // re-write the routine again since now we know where it is located in the main dol
             // lwz r0,0x184(r3)                                      ->  b subroutineMakeNoneMapIconsInvisible
             stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineMakeNoneMapIconsInvisible));
+
+            // --- Various Map UI Fixes ---
             // -- if the map index is over the map array size, do not loop around to the first map index again --
             // ble 0x80187e1c                                        ->  b 0x80187e1c
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80187dfc), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(8));
             // -- fix map selection going out of bounds in tour mode --
             // bne 0x80188258                                        ->  nop
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80188230), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
-            // -- fix out of array bounds error when opening tour mode and viewing the zones ---
+            // -- fix out of array bounds error when opening tour mode and viewing the zones and having more than 6 maps in a zone ---
             // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021f880), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
             // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
