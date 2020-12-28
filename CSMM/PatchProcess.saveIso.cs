@@ -61,9 +61,10 @@ namespace CustomStreetManager
                 }
             }
             // make new msg ids
+            uint msgId = 25000;
             foreach (var mapDescriptor in mapDescriptors)
             {
-                mapDescriptor.Name_MSG_ID = ui_messages.Values.First().freeKey();
+                mapDescriptor.Name_MSG_ID = msgId++;
                 foreach (var entry in ui_messages)
                 {
                     var locale = entry.Key;
@@ -81,7 +82,7 @@ namespace CustomStreetManager
                         ui_message.set(mapDescriptor.Name_MSG_ID, mapDescriptor.Name[locale]);
                     }
                 }
-                mapDescriptor.Desc_MSG_ID = ui_messages.Values.First().freeKey();
+                mapDescriptor.Desc_MSG_ID = msgId++;
                 foreach (var entry in ui_messages)
                 {
                     var locale = entry.Key;

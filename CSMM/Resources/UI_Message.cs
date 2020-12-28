@@ -30,6 +30,11 @@ namespace CustomStreetManager
         {
             return map[key];
         }
+
+        public bool contains(uint key)
+        {
+            return map.ContainsKey(key);
+        }
         /**
          * Get a free key in this maps by iterating until we find a free key
          */
@@ -54,6 +59,8 @@ namespace CustomStreetManager
 
         public void set(uint freeKey, string v)
         {
+            if (contains(freeKey))
+                throw new InvalidDataException("The ui_message." + locale + ".csv file already contains a text message for key " + freeKey);
             map[freeKey] = v;
         }
 
