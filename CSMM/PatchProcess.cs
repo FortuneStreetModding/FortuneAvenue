@@ -27,27 +27,46 @@ namespace CustomStreetManager
         private readonly DataFileSet tmpFileSet = new DataFileSet(Path.Combine(Directory.GetCurrentDirectory(), "tmp"));
         private DataFileSet cacheFileSet;
 
-        public void cleanUp(bool cleanCache, bool cleanRiivolution)
+        /// <summary>
+        /// Cleans all temporary files which are generated during the patch proccess which do not belong in the iso
+        /// </summary>
+        public void cleanTemp()
         {
             if (Directory.Exists(tmpFileSet.rootDir))
             {
                 Directory.Delete(tmpFileSet.rootDir, true);
             }
-            if (cleanCache)
+        }
+
+        /// <summary>
+        /// Cleans the folder which was extracted from the wbfs/iso for caching purposes.
+        /// </summary>
+        public void cleanCache()
+        {
+            if (Directory.Exists(cacheFileSet.rootDir))
             {
-                if (Directory.Exists(cacheFileSet.rootDir))
-                {
-                    Directory.Delete(cacheFileSet.rootDir, true);
-                }
-            }
-            if (cleanRiivolution)
-            {
-                if (Directory.Exists(riivFileSet.rootDir))
-                {
-                    Directory.Delete(riivFileSet.rootDir, true);
-                }
+                Directory.Delete(cacheFileSet.rootDir, true);
             }
         }
+
+        /// <summary>
+        /// Cleans all files which are needed for the iso
+        /// </summary>
+        public void cleanRiivolution()
+        {
+            if (Directory.Exists(riivFileSet.rootDir))
+            {
+                Directory.Delete(riivFileSet.rootDir, true);
+            }
+        }
+
+        public void cleanFull()
+        {
+            cleanTemp();
+            cleanCache();
+            cleanRiivolution();
+        }
+
         // From: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {

@@ -130,14 +130,6 @@ namespace CustomStreetManager
             }
         }
 
-        private void reset()
-        {
-            patchProcess.cleanUp(false, true);
-            patchProcess = null;
-            setInputISOLocation.Text = "None";
-            Go.Enabled = false;
-        }
-
         private async void Go_Click(object sender, EventArgs e)
         {
             var inputFile = setInputISOLocation.Text;
@@ -170,7 +162,7 @@ namespace CustomStreetManager
                     Invoke((MethodInvoker)delegate
                     {
                         progressBar.ShowCheckbox("Cleanup temporary files.", false);
-                        progressBar.callback = (c) => { if (c) patchProcess.cleanUp(true, true); };
+                        progressBar.callback = (c) => { if (c) patchProcess.cleanFull(); };
                     });
                 }
                 catch (Exception e2)
@@ -243,7 +235,12 @@ namespace CustomStreetManager
                 }
                 catch (Exception e)
                 {
-                    reset();
+                    patchProcess = null;
+                    setInputISOLocation.Text = "None";
+                    Go.Enabled = false;
+                    clearListButton.Enabled = false;
+                    buttonAddMap.Enabled = false;
+                    buttonRemoveMap.Enabled = false;
                     progressBar.appendText(e.Message);
                     progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
                     progressBar.EnableButton();

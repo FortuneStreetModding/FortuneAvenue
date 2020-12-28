@@ -15,7 +15,6 @@ namespace CustomStreetManager
 {
     public partial class PatchProcess
     {
-
         public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
@@ -41,7 +40,7 @@ namespace CustomStreetManager
             progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
             await ExeWrapper.packFullIso(inputFile, outputFile, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
 
-            // this.cleanUp(cleanUp, cleanUp);
+            cleanTemp();
 
             progress.Report(new ProgressInfo(100, "Done."));
             return true;

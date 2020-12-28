@@ -19,13 +19,16 @@ namespace CustomStreetManager
         {
             progress?.Report(0);
             progress?.Report("Extract iso/wbfs...");
-            cleanUp(false, true);
+
             if (string.IsNullOrWhiteSpace(inputWbfsIso) || inputWbfsIso.ToLower() == "none")
             {
                 throw new ArgumentNullException("Can't load wbfs or iso file as the input file name is not set.");
             }
 
             inputFile = inputWbfsIso;
+            cleanTemp();
+            cleanRiivolution();
+            
             string extractDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputWbfsIso));
             await ExeWrapper.extractFullIsoAsync(inputWbfsIso, extractDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
 
@@ -46,8 +49,6 @@ namespace CustomStreetManager
                 progress?.Report("Read localization files...");
                 loadUIMessages(mapDescriptors, cacheFileSet, ProgressInfo.makeSubProgress(progress, 20, 60), ct);
             }
-
-            this.cleanUp(false, false);
 
             progress?.Report(100);
             progress?.Report("Loaded successfully.");
