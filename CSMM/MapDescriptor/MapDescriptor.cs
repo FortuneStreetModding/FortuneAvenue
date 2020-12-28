@@ -21,7 +21,7 @@ namespace CustomStreetManager
         public sbyte Zone { get; set; } = -1;
         public sbyte Order { get; set; } = -1;
         public bool Dirty { get; set; }
-        public UInt32 UnlockID { get; set; } = 20;
+        public UInt32 UnlockID { get; set; } = 0;
         public UInt32 InitialCash { get; set; }
         public UInt32 TargetAmount { get; set; }
         public BoardTheme Theme { get; set; }
