@@ -234,6 +234,9 @@ namespace CustomStreetManager
                     var mapDescriptors = await patchProcess.loadWbfsIsoFile(inputWbfsIso, progress, ct);
 
                     Go.Enabled = false;
+                    clearListButton.Enabled = true;
+                    buttonAddMap.Enabled = true;
+                    buttonRemoveMap.Enabled = true;
                     BindingSource bs = new BindingSource();
                     bs.DataSource = mapDescriptors;
                     dataGridView1.DataSource = bs;

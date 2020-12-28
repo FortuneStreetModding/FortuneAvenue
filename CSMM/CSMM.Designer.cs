@@ -98,6 +98,7 @@ namespace CustomStreetManager
             this.clearListButton.Name = "clearListButton";
             this.clearListButton.Size = new System.Drawing.Size(111, 36);
             this.clearListButton.TabIndex = 37;
+            this.clearListButton.Enabled = false;
             this.clearListButton.Text = "Clear Changes";
             this.clearListButton.UseVisualStyleBackColor = true;
             this.clearListButton.Click += new System.EventHandler(this.clearListButton_Click);
@@ -217,6 +218,7 @@ namespace CustomStreetManager
             this.buttonAddMap.Name = "buttonAddMap";
             this.buttonAddMap.Size = new System.Drawing.Size(111, 36);
             this.buttonAddMap.TabIndex = 39;
+            this.buttonAddMap.Enabled = false;
             this.buttonAddMap.Text = "Add Map";
             this.buttonAddMap.UseVisualStyleBackColor = true;
             this.buttonAddMap.Click += new System.EventHandler(this.addMap_Click);
@@ -228,6 +230,7 @@ namespace CustomStreetManager
             this.buttonRemoveMap.Name = "buttonRemoveMap";
             this.buttonRemoveMap.Size = new System.Drawing.Size(111, 36);
             this.buttonRemoveMap.TabIndex = 40;
+            this.buttonRemoveMap.Enabled = false;
             this.buttonRemoveMap.Text = "Remove Map";
             this.buttonRemoveMap.UseVisualStyleBackColor = true;
             this.buttonRemoveMap.Click += new System.EventHandler(this.removeMap_Click);
