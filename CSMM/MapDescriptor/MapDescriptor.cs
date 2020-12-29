@@ -1,4 +1,4 @@
-﻿using FSEditor.FSData;
+using FSEditor.FSData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +31,7 @@ namespace CustomStreetManager
         // --- Basic Info ---
         // ------------------
         [ReadOnly(true)]
-        public string Name_En
+        public string Name_EN
         {
             get
             {
@@ -980,7 +980,7 @@ namespace CustomStreetManager
             if (Zone != y.Zone) return false;
             if (Order != y.Order) return false;
             if (IsPracticeBoard != y.IsPracticeBoard) return false;
-            if (Name_En != y.Name_En) return false;
+            if (Name_EN != y.Name_EN) return false;
             if (RuleSet != y.RuleSet) return false;
             if (InitialCash != y.InitialCash) return false;
             if (TargetAmount != y.TargetAmount) return false;

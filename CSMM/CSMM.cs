@@ -317,7 +317,7 @@ namespace CustomStreetManager
                         //set width to calculated by autosize
                         if (colw > 75 && column.Name.StartsWith("SwitchRotation"))
                             colw = 75;
-                        if (colw > 100 && column.Name != "Name_En")
+                        if (colw > 100 && column.Name != "Name_EN")
                             colw = 100;
                         column.Width = colw;
 
@@ -337,7 +337,7 @@ namespace CustomStreetManager
                             column.Frozen = true;
                             column.Width += 15;
                         }
-                        if (column.Name == "Name_En")
+                        if (column.Name == "Name_EN")
                         {
                             column.Frozen = true;
                         }
@@ -438,7 +438,7 @@ namespace CustomStreetManager
         {
             var md = GetMapDescriptors()[GetMapDescriptors().Count - 1];
 
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to remove the map " + md.Name_En + "?", "Remove Map", MessageBoxButtons.YesNo);
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to remove the map " + md.Name_EN + "?", "Remove Map", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
                 BindingSource bs = dataGridView1.DataSource as BindingSource;
