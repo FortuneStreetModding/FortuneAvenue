@@ -64,6 +64,8 @@ namespace CustomStreetManager
             this.button1 = new System.Windows.Forms.Button();
             this.buttonAddMap = new System.Windows.Forms.Button();
             this.buttonRemoveMap = new System.Windows.Forms.Button();
+            this.buttonLoadConfiguration = new System.Windows.Forms.Button();
+            this.buttonSaveConfiguration = new System.Windows.Forms.Button();
             this.setInputISOLocation = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
@@ -227,6 +229,28 @@ namespace CustomStreetManager
             this.buttonRemoveMap.UseVisualStyleBackColor = true;
             this.buttonRemoveMap.Click += new System.EventHandler(this.removeMap_Click);
             // 
+            // buttonLoadConfiguration
+            // 
+            this.buttonLoadConfiguration.Location = new System.Drawing.Point(220, 1);
+            this.buttonLoadConfiguration.Margin = new System.Windows.Forms.Padding(1);
+            this.buttonLoadConfiguration.Name = "buttonLoadConfiguration";
+            this.buttonLoadConfiguration.Size = new System.Drawing.Size(140, 36);
+            this.buttonLoadConfiguration.Enabled = false;
+            this.buttonLoadConfiguration.Text = "Load Configuration";
+            this.buttonLoadConfiguration.UseVisualStyleBackColor = true;
+            this.buttonLoadConfiguration.Click += ButtonLoadConfiguration_Click;
+            // 
+            // buttonSaveConfiguration
+            // 
+            this.buttonSaveConfiguration.Location = new System.Drawing.Point(333, 1);
+            this.buttonSaveConfiguration.Margin = new System.Windows.Forms.Padding(1);
+            this.buttonSaveConfiguration.Name = "buttonSaveConfiguration";
+            this.buttonSaveConfiguration.Size = new System.Drawing.Size(140, 36);
+            this.buttonSaveConfiguration.Enabled = false;
+            this.buttonSaveConfiguration.Text = "Save Configuration";
+            this.buttonSaveConfiguration.UseVisualStyleBackColor = true;
+            this.buttonSaveConfiguration.Click += ButtonSaveConfiguration_Click;
+            // 
             // setInputISOLocation
             // 
             this.setInputISOLocation.Location = new System.Drawing.Point(147, 0);
@@ -272,8 +296,12 @@ namespace CustomStreetManager
             // flowLayoutPanel2
             // 
             this.flowLayoutPanel2.Controls.Add(this.clearListButton);
+            this.clearListButton.Margin = new System.Windows.Forms.Padding(4, 1, 32, 1);
             this.flowLayoutPanel2.Controls.Add(this.buttonAddMap);
             this.flowLayoutPanel2.Controls.Add(this.buttonRemoveMap);
+            this.buttonRemoveMap.Margin = new System.Windows.Forms.Padding(4, 1, 32, 1);
+            this.flowLayoutPanel2.Controls.Add(this.buttonLoadConfiguration);
+            this.flowLayoutPanel2.Controls.Add(this.buttonSaveConfiguration);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(4, 1025);
             this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -414,6 +442,8 @@ namespace CustomStreetManager
         private ToolStripMenuItem verboseToolStripMenuItem;
         private Button buttonAddMap;
         private Button buttonRemoveMap;
+        private Button buttonLoadConfiguration;
+        private Button buttonSaveConfiguration;
         private DataGridViewCellStyle readOnlyColumnStyle;
         private DataGridViewCellStyle editColumnStyle;
     }

@@ -438,6 +438,16 @@ namespace CustomStreetManager
             }
         }
 
+        private void ButtonSaveConfiguration_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ButtonLoadConfiguration_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private async void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
