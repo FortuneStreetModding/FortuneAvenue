@@ -1,4 +1,4 @@
-using FSEditor.FSData;
+﻿using FSEditor.FSData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,37 +14,22 @@ namespace CustomStreetManager
 {
     public class MapDescriptor
     {
+        [Browsable(false)]
+        public bool Dirty { get; set; }
+        // --------------------------------------
+        // --- MapSet Zone Order and Practice ---
+        // --------------------------------------
         /// <summary>
         /// 0 = Easy Mode, 1 = Standard Mode
         /// </summary>
         public sbyte MapSet { get; set; } = -1;
         public sbyte Zone { get; set; } = -1;
         public sbyte Order { get; set; } = -1;
-        public bool Dirty { get; set; }
-        public UInt32 UnlockID { get; set; } = 0;
-        public UInt32 InitialCash { get; set; }
-        public UInt32 TargetAmount { get; set; }
-        public BoardTheme Theme { get; set; }
-        public RuleSet RuleSet { get; set; }
-        public string InternalName { get; set; }
-        public string FrbFile1 { get; set; }
-        public string FrbFile2 { get; set; }
-        public string FrbFile3 { get; set; }
-        public string FrbFile4 { get; set; }
-        public string Background { get; set; }
         public bool IsPracticeBoard { get; set; }
-
-        private Optional<UInt32> bgmId = Optional<UInt32>.CreateEmpty();
-        public UInt32 BGMID
-        {
-            get { return bgmId.OrElse(0); }
-            set { bgmId = Optional<UInt32>.Create(value); }
-        }
-        private bool IsBgmIdInitialized()
-        {
-            return bgmId.Any();
-        }
-        public UInt32 Name_MSG_ID { get; set; }
+        // ------------------
+        // --- Basic Info ---
+        // ------------------
+        [ReadOnly(true)]
         public string Name_En
         {
             get
@@ -53,10 +38,22 @@ namespace CustomStreetManager
             }
             private set { }
         }
-        public Dictionary<string, string> Name { get; private set; }
-        public UInt32 Desc_MSG_ID { get; set; }
-        public Dictionary<string, string> Desc { get; private set; }
+        [ReadOnly(true)]
+        public RuleSet RuleSet { get; set; }
+
+        [ReadOnly(true)]
+        public UInt32 InitialCash { get; set; }
+        [ReadOnly(true)]
+        public UInt32 TargetAmount { get; set; }
+        [ReadOnly(true)]
+        public UInt32 BaseSalary { get; set; }
+        [ReadOnly(true)]
+        public UInt32 SalaryIncrement { get; set; }
+        [ReadOnly(true)]
+        public UInt32 MaxDiceRoll { get; set; }
+        [Browsable(false)]
         public byte[] VentureCard { get; set; }
+        [ReadOnly(true)]
         public int VentureCardActiveCount
         {
             get
@@ -73,21 +70,133 @@ namespace CustomStreetManager
             }
             private set { }
         }
+        // ------------------------------------------
+        // --- Frb Files and Switch Configuration ---
+        // ------------------------------------------
+        [ReadOnly(true)]
+        public string FrbFiles
+        {
+            get
+            {
+                var str = FrbFile1 + ", ";
+                if (!string.IsNullOrEmpty(FrbFile2))
+                    str += FrbFile2 + ", ";
+                if (!string.IsNullOrEmpty(FrbFile3))
+                    str += FrbFile3 + ", ";
+                if (!string.IsNullOrEmpty(FrbFile4))
+                    str += FrbFile4 + ", ";
+                return str.Remove(str.Length - 2);
+            }
+            private set { }
+        }
+        [Browsable(false)]
+        public string FrbFile1 { get; set; }
+        [Browsable(false)]
+        public string FrbFile2 { get; set; }
+        [Browsable(false)]
+        public string FrbFile3 { get; set; }
+        [Browsable(false)]
+        public string FrbFile4 { get; set; }
+        [ReadOnly(true)]
+        [DisplayName("SwitchRotationOriginPoints")]
+        public string SwitchRotationOriginPoints_
+        {
+            get
+            {
+                var str = "";
+                foreach (var item in SwitchRotationOriginPoints)
+                {
+                    str += item.Value;
+                }
+                return str;
+            }
+            private set { }
+        }
+        [Browsable(false)]
         public Dictionary<int, OriginPoint> SwitchRotationOriginPoints { get; private set; }
+        // ------------------
+        // --- Background ---
+        // ------------------
+        [ReadOnly(true)]
+        public BoardTheme Theme { get; set; }
+        [ReadOnly(true)]
+        public string Background { get; set; }
+
+        private Optional<UInt32> bgmId = Optional<UInt32>.CreateEmpty();
+        [ReadOnly(true)]
+        public UInt32 BGMID
+        {
+            get { return bgmId.OrElse(0); }
+            set { bgmId = Optional<UInt32>.Create(value); }
+        }
+        private bool IsBgmIdInitialized()
+        {
+            return bgmId.Any();
+        }
+        [ReadOnly(true)]
+        public string MapIcon { get; internal set; }
+        // --------------------
+        // --- Looping Mode ---
+        // --------------------
+        [ReadOnly(true)]
         public LoopingMode LoopingMode { get; set; }
+        [ReadOnly(true)]
         public Single LoopingModeRadius { get; set; }
+        [ReadOnly(true)]
         public Single LoopingModeHorizontalPadding { get; set; }
+        [ReadOnly(true)]
         public Single LoopingModeVerticalSquareCount { get; set; }
-        public UInt32 BaseSalary { get; set; }
-        public UInt32 SalaryIncrement { get; set; }
-        public UInt32 MaxDiceRoll { get; set; }
+        // --------------------------
+        // --- Tour Configuration ---
+        // --------------------------
+        [ReadOnly(true)]
         public UInt32 TourBankruptcyLimit { get; set; } = 1;
         public UInt32 TourInitialCash { get; set; }
+        [ReadOnly(true)]
         public Character TourOpponent1 { get; set; } = Character.Mario;
+        [ReadOnly(true)]
         public Character TourOpponent2 { get; set; } = Character.Luigi;
+        [ReadOnly(true)]
         public Character TourOpponent3 { get; set; } = Character.Peach;
+        [ReadOnly(true)]
         public UInt32 TourClearRank { get; set; } = 2;
-        public string MapIcon { get; internal set; }
+        [ReadOnly(true)]
+        public UInt32 UnlockID { get; set; } = 0;
+        // --------------------
+        // --- Localization ---
+        // --------------------
+        [ReadOnly(true)]
+        public UInt32 Name_MSG_ID { get; set; }
+        [Browsable(false)]
+        public Dictionary<string, string> Name { get; private set; }
+        [ReadOnly(true)]
+        public string Name_DE { get { return Name.GetValueOrDefault(Locale.DE, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Name_FR { get { return Name.GetValueOrDefault(Locale.FR, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Name_IT { get { return Name.GetValueOrDefault(Locale.IT, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Name_JP { get { return Name.GetValueOrDefault(Locale.JP, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Name_ES { get { return Name.GetValueOrDefault(Locale.ES, ""); } private set { } }
+        [ReadOnly(true)]
+        public UInt32 Desc_MSG_ID { get; set; }
+        [Browsable(false)]
+        public Dictionary<string, string> Desc { get; private set; }
+        [ReadOnly(true)]
+        public string Desc_EN { get { return Desc.GetValueOrDefault(Locale.EN, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Desc_DE { get { return Desc.GetValueOrDefault(Locale.DE, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Desc_FR { get { return Desc.GetValueOrDefault(Locale.FR, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Desc_IT { get { return Desc.GetValueOrDefault(Locale.IT, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Desc_JP { get { return Desc.GetValueOrDefault(Locale.JP, ""); } private set { } }
+        [ReadOnly(true)]
+        public string Desc_ES { get { return Desc.GetValueOrDefault(Locale.ES, ""); } private set { } }
+        [ReadOnly(true)]
+        public string InternalName { get; set; }
 
         public MapDescriptor()
         {

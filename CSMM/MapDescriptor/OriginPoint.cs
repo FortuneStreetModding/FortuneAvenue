@@ -20,5 +20,10 @@ namespace CustomStreetManager
             this.X = x;
             this.Y = y;
         }
+
+        public override string ToString()
+        {
+            return "(" + ((int)X) + "," + ((int)Y) + ")";
+        }
     }
 }

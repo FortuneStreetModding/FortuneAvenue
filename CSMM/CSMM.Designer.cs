@@ -305,28 +305,16 @@ namespace CustomStreetManager
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridView1.AutoGenerateColumns = false;
+            this.dataGridView1.AutoGenerateColumns = true;
+            this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.MapSet,
-            this.Zone,
-            this.Order,
-            this.Tutorial,
-            this.UnlockID,
-            this.nameENDataGridViewTextBoxColumn,
-            this.targetAmountDataGridViewTextBoxColumn,
-            this.themeDataGridViewTextBoxColumn,
-            this.ruleSetDataGridViewTextBoxColumn,
-            this.frbFile1DataGridViewTextBoxColumn,
-            this.Background,
-            this.BGMID,
-            this.Venture_Card_Count,
             this.Export,
             this.ImportMd});
             this.tableLayoutPanel1.SetColumnSpan(this.dataGridView1, 2);
             this.dataGridView1.DataSource = this.mapDescriptorBindingSource;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(4, 49);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = false;
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
