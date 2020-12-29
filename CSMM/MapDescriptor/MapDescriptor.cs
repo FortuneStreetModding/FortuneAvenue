@@ -260,6 +260,18 @@ namespace CustomStreetManager
             }
             if (validation.Passed)
                 validation.Clear();
+            for (short i = 0; i < mapDescriptors.Count; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.IsPracticeBoard)
+                {
+                    if (mapDescriptor.MapSet == -1)
+                    {
+                        validation.AddProblem(i, typeof(MapDescriptor).GetProperty("IsPracticeBoard"), "A practice board can only be set for MapSet 0 or MapSet 1");
+                        validation.Passed = false;
+                    }
+                }
+            }
             return validation;
         }
 
