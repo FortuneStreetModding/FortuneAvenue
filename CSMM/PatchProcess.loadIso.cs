@@ -15,24 +15,30 @@ namespace CustomStreetManager
 {
     public partial class PatchProcess
     {
-        public async Task<List<MapDescriptor>> loadWbfsIsoFile(string inputWbfsIso, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<List<MapDescriptor>> loadWbfsIsoFile(string input, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             progress?.Report(0);
-            progress?.Report("Extract iso/wbfs...");
 
-            if (string.IsNullOrWhiteSpace(inputWbfsIso) || inputWbfsIso.ToLower() == "none")
+            if (string.IsNullOrWhiteSpace(input) || input.ToLower() == "none")
             {
                 throw new ArgumentNullException("Can't load wbfs or iso file as the input file name is not set.");
             }
 
-            inputFile = inputWbfsIso;
-            cleanTemp();
-            cleanRiivolution();
-            
-            string extractDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputWbfsIso));
-            await ExeWrapper.extractFullIsoAsync(inputWbfsIso, extractDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
+            if (File.Exists(Path.Combine(input, "sys", "main.dol")))
+            {
+                keepCache = true;
+                string extractDir = input;
+                cacheFileSet = new DataFileSet(extractDir);
+            }
+            else
+            {
+                progress?.Report("Extract iso/wbfs...");
+                keepCache = false;
+                string extractDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
+                await ExeWrapper.extractFullIsoAsync(input, extractDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
+                cacheFileSet = new DataFileSet(extractDir);
+            }
 
-            cacheFileSet = new DataFileSet(extractDir);
             progress?.Report("Detect the sections in main.dol file...");
             List<AddressSection> sections = await ExeWrapper.readSections(cacheFileSet.main_dol, ct, ProgressInfo.makeSubProgress(progress, 90, 95)).ConfigureAwait(false);
 
@@ -52,6 +58,8 @@ namespace CustomStreetManager
 
             progress?.Report(100);
             progress?.Report("Loaded successfully.");
+            cleanTemp();
+            cleanRiivolution();
 
             return mapDescriptors;
         }

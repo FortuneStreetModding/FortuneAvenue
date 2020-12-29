@@ -18,7 +18,10 @@ namespace CustomStreetManager
         private MainDol mainDol;
         // Key = locale, Value = file contents
         private Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
-        private string inputFile;
+        /// <summary>
+        /// This only affects how the cleanup shall be handled at the end. If a dol has been loaded that means the input is an extracted directory. We do not want to clean the input.
+        /// </summary>
+        private bool keepCache = false;
         // The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
         // to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
         // The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.
@@ -43,7 +46,7 @@ namespace CustomStreetManager
         /// </summary>
         public void cleanCache()
         {
-            if (Directory.Exists(cacheFileSet.rootDir))
+            if (Directory.Exists(cacheFileSet.rootDir) && !keepCache)
             {
                 Directory.Delete(cacheFileSet.rootDir, true);
             }
@@ -65,6 +68,11 @@ namespace CustomStreetManager
             cleanTemp();
             cleanCache();
             cleanRiivolution();
+        }
+
+        public bool IsDirectoryEmpty(string path)
+        {
+            return !Directory.EnumerateFileSystemEntries(path).Any();
         }
 
         // From: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
@@ -95,7 +103,7 @@ namespace CustomStreetManager
                 }
 
                 string tempPath = Path.Combine(destDirName, file.Name);
-                progress?.Report(new ProgressInfo(-1, "Copy " + file.FullName + " to " + tempPath + "...", true));
+                progress?.Report(new ProgressInfo(-1, "Copy " + file.FullName + " to " + tempPath, true));
                 file.CopyTo(tempPath, overwrite);
             }
 
@@ -106,6 +114,116 @@ namespace CustomStreetManager
                 {
                     string tempPath = Path.Combine(destDirName, subdir.Name);
                     DirectoryCopy(subdir.FullName, tempPath, copySubDirs, overwrite, progress, ct);
+                }
+            }
+        }
+
+        public bool isOutputImageFileExtension(string path)
+        {
+            var extension = Path.GetExtension(path);
+            return extension.ToLower() == ".wbfs" ||
+                extension.ToLower() == ".iso" ||
+                extension.ToLower() == ".ciso" ||
+                extension.ToLower() == ".wdf" ||
+                extension.ToLower() == ".wdf1" ||
+                extension.ToLower() == ".wdf2" ||
+                extension.ToLower() == ".wia" ||
+                extension.ToLower() == ".wbi";
+        }
+
+        public string doOutputDirectoryPathCorrections(string outputFile)
+        {
+            return doOutputDirectoryPathCorrections(outputFile, out _);
+        }
+
+        public string getExtractedIsoDir(string dir)
+        {
+            if (File.Exists(Path.Combine(dir, "sys", "main.dol")) &&
+                Directory.Exists(Path.Combine(dir, "files", "bg")) &&
+                Directory.Exists(Path.Combine(dir, "files", "param")) &&
+                Directory.Exists(Path.Combine(dir, "files", "sound")) &&
+                Directory.Exists(Path.Combine(dir, "files", "chance_card")) &&
+                Directory.Exists(Path.Combine(dir, "files", "scene")) &&
+                Directory.Exists(Path.Combine(dir, "files", "localize")))
+            {
+                return dir;
+            }
+            else
+            {
+                dir = Directory.GetParent(dir).FullName;
+                if (File.Exists(Path.Combine(dir, "sys", "main.dol")) &&
+                Directory.Exists(Path.Combine(dir, "files", "bg")) &&
+                Directory.Exists(Path.Combine(dir, "files", "param")) &&
+                Directory.Exists(Path.Combine(dir, "files", "sound")) &&
+                Directory.Exists(Path.Combine(dir, "files", "chance_card")) &&
+                Directory.Exists(Path.Combine(dir, "files", "scene")) &&
+                Directory.Exists(Path.Combine(dir, "files", "localize")))
+                {
+                    return dir;
+                }
+            }
+            return null;
+        }
+
+        public string doOutputDirectoryPathCorrections(string outputFile, out bool alreadyExists)
+        {
+            // do file path corrections
+            if (File.Exists(outputFile))
+            {
+                // get the directory of the selected file
+                var directory = Directory.GetParent(outputFile).FullName;
+                if (getExtractedIsoDir(directory) != null)
+                {
+                    alreadyExists = true;
+                    return getExtractedIsoDir(directory);
+                }
+                else
+                    throw new ApplicationException("The path " + outputFile + " cannot be used as output since the target directory must be empty");
+            }
+            else
+            {
+                // get the directory of the selected file
+                var directory = Directory.GetParent(outputFile).FullName;
+                if (IsDirectoryEmpty(directory))
+                {
+                    // the directory is empty -> use it as the output directory
+                    alreadyExists = false;
+                    return directory;
+                }
+                else if (getExtractedIsoDir(directory) != null)
+                {
+                    alreadyExists = true;
+                    return getExtractedIsoDir(directory);
+                }
+                else
+                {
+                    // turn the filename into a directory
+                    directory = Path.Combine(directory, Path.GetFileNameWithoutExtension(outputFile));
+                    if (Directory.Exists(directory))
+                    {
+                        if (IsDirectoryEmpty(directory))
+                        {
+                            // the directory is empty -> use it as the output directory
+                            alreadyExists = false;
+                            return directory;
+                        }
+                        else
+                        {
+                            if (getExtractedIsoDir(directory) != null)
+                            {
+                                alreadyExists = true;
+                                return getExtractedIsoDir(directory);
+                            }
+                            else
+                                throw new ApplicationException("The path " + directory + " cannot be used as output since the target directory must be empty");
+                        }
+                    }
+                    else
+                    {
+                        // the directory does not exist yet -> use it as the output
+                        alreadyExists = false;
+                        return directory;
+                    }
                 }
             }
         }

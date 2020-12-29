@@ -15,8 +15,15 @@ namespace CustomStreetManager
 {
     public partial class PatchProcess
     {
-        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool cleanUp, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<bool> saveWbfsIso(string outputFile, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
+            var packIso = true;
+            if (!isOutputImageFileExtension(outputFile))
+            {
+                packIso = false;
+                outputFile = doOutputDirectoryPathCorrections(outputFile);
+            }
+
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
             writeLocalizationFiles(mapDescriptors);
 
@@ -25,24 +32,52 @@ namespace CustomStreetManager
 
             // lets get to the map icons
             await injectMapIcons(mapDescriptors, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
+            await Task.Delay(500);
 
+            var packIsoInputPath = cacheFileSet.rootDir;
             using (CancellationTokenSource source = new CancellationTokenSource())
             {
                 // start fake progress
-                progress.Report(new ProgressInfo(45, "Copying the modified files to be packed into the image..."));
-                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, 60), source.Token);
+                progress.Report(new ProgressInfo(45, "Copying the modified files..."));
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, packIso ? 60 : 100), source.Token);
 
-                DirectoryCopy(riivFileSet.rootDir, cacheFileSet.rootDir, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                if (packIso)
+                {
+                    if (keepCache)
+                    {
+                        packIsoInputPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension("pack_" + outputFile));
+                        DirectoryCopy(cacheFileSet.rootDir, packIsoInputPath, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                        DirectoryCopy(riivFileSet.rootDir, packIsoInputPath, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                    }
+                    else
+                    {
+                        DirectoryCopy(riivFileSet.rootDir, packIsoInputPath, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                    }
+                }
+                else
+                {
+                    if (cacheFileSet.rootDir != outputFile)
+                    {
+                        DirectoryCopy(cacheFileSet.rootDir, outputFile, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                    }
+                    DirectoryCopy(riivFileSet.rootDir, outputFile, true, true, ProgressInfo.makeNoProgress(progress), ct);
+                }
                 source.Cancel();
                 await fakeProgressTask.ConfigureAwait(false);
             }
 
-            progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
-            await ExeWrapper.packFullIso(inputFile, outputFile, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
+            await Task.Delay(500);
 
-            cleanTemp();
+            if (packIso)
+            {
+                progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
+                await ExeWrapper.packFullIso(packIsoInputPath, outputFile, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
+            }
+
+            await Task.Delay(500);
 
             progress.Report(new ProgressInfo(100, "Done."));
+
             return true;
         }
 
@@ -159,7 +194,7 @@ namespace CustomStreetManager
                     break;
                 }
             }
-            if(allMapIconsVanilla)
+            if (allMapIconsVanilla)
             {
                 return true;
             }

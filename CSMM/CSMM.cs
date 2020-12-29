@@ -132,13 +132,16 @@ namespace CustomStreetManager
 
         private async void Go_Click(object sender, EventArgs e)
         {
-            var inputFile = setInputISOLocation.Text;
             var outputFile = setOutputPathLabel.Text;
 
             if (String.IsNullOrWhiteSpace(outputFile) || outputFile.ToLower() == "none")
             {
-                MessageBox.Show("Please set the output file.");
-                return;
+                var inputFile = setInputISOLocation.Text;
+                DialogResult dialogResult = MessageBox.Show("Do you want to patch the existing location?" + Environment.NewLine + inputFile + Environment.NewLine + Environment.NewLine + "Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                    outputFile = inputFile;
+                else
+                    return;
             }
 
             using (var cancelTokenSource = new CancellationTokenSource())
@@ -156,13 +159,13 @@ namespace CustomStreetManager
 
                 try
                 {
-                    await patchProcess.saveWbfsIso(inputFile, outputFile, GetMapDescriptors(), false, progress, ct);
+                    await patchProcess.saveWbfsIso(outputFile, GetMapDescriptors(), progress, ct);
 
                     // TODO, better cleanup
                     Invoke((MethodInvoker)delegate
                     {
                         progressBar.ShowCheckbox("Cleanup temporary files.", false);
-                        progressBar.callback = (c) => { if (c) patchProcess.cleanFull(); };
+                        progressBar.callback = (c) => { if (c) patchProcess.cleanFull(); else patchProcess.cleanTemp(); };
                     });
                 }
                 catch (Exception e2)
@@ -190,13 +193,47 @@ namespace CustomStreetManager
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to Button2.
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
-            saveFileDialog1.Title = "Where shall the patches ISO/WBFS be saved?";
+            saveFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs;*.ciso|Directory (do not pack ISO/WBFS)|*";
+            saveFileDialog1.Title = "Where shall the output be saved?";
+            saveFileDialog1.OverwritePrompt = false;
             saveFileDialog1.FileName = Path.GetFileName(setInputISOLocation.Text);
 
             if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
-                setOutputPathLabel.Text = saveFileDialog1.FileName;
+                var outputFile = saveFileDialog1.FileName;
+                if (patchProcess.isOutputImageFileExtension(outputFile))
+                {
+                    bool overwrite = File.Exists(outputFile);
+                    if (overwrite)
+                    {
+                        DialogResult dialogResult = MessageBox.Show("An iso/wbfs already exists at " + Environment.NewLine + outputFile + Environment.NewLine + Environment.NewLine + "Do you want to overwrite this wbfs/iso? Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            setOutputPathLabel.Text = outputFile;
+                        }
+                    }
+                    else
+                    {
+                        setOutputPathLabel.Text = outputFile;
+                    }
+                }
+                else
+                {
+                    bool overwrite;
+                    outputFile = patchProcess.doOutputDirectoryPathCorrections(outputFile, out overwrite);
+                    if (overwrite)
+                    {
+                        DialogResult dialogResult = MessageBox.Show("An extracted iso/wbfs directory already exists at " + Environment.NewLine + outputFile + Environment.NewLine + Environment.NewLine + "Do you want to patch this location? Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            setOutputPathLabel.Text = outputFile;
+                        }
+                    }
+                    else
+                    {
+                        setOutputPathLabel.Text = outputFile;
+                    }
+                }
             }
             else
             {
@@ -229,6 +266,7 @@ namespace CustomStreetManager
                     clearListButton.Enabled = true;
                     buttonAddMap.Enabled = true;
                     buttonRemoveMap.Enabled = true;
+                    setOutputLocationButton.Enabled = true;
                     BindingSource bs = new BindingSource();
                     bs.DataSource = mapDescriptors;
                     dataGridView1.DataSource = bs;
@@ -241,6 +279,7 @@ namespace CustomStreetManager
                     clearListButton.Enabled = false;
                     buttonAddMap.Enabled = false;
                     buttonRemoveMap.Enabled = false;
+                    setOutputLocationButton.Enabled = false;
                     progressBar.appendText(e.Message);
                     progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
                     progressBar.EnableButton();
@@ -267,12 +306,18 @@ namespace CustomStreetManager
             // Displays a SaveFileDialog so the user can save the Image
             // assigned to Button2.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs";
-            openFileDialog1.Title = "Which ISO image or WBFS file should we patch?";
+            openFileDialog1.Filter = "ISO/WBFS Image or main.dol of extracted image|*.iso;*.wbfs;*.ciso;main.dol";
+            openFileDialog1.Title = "Which ISO image or WBFS image or extracted image folder should we use for patching?";
 
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
-                setInputISOLocation.Text = openFileDialog1.FileName;
+                var input = openFileDialog1.FileName;
+                if (Path.GetFileName(input).ToLower() == "main.dol")
+                {
+                    input = Directory.GetParent(input).FullName;
+                    input = Directory.GetParent(input).FullName;
+                }
+                setInputISOLocation.Text = input;
                 reloadWbfsIsoFile();
             }
         }

@@ -185,17 +185,17 @@ namespace CustomStreetManager
             this.setOutputLocationButton.Name = "setOutputLocationButton";
             this.setOutputLocationButton.Size = new System.Drawing.Size(135, 27);
             this.setOutputLocationButton.TabIndex = 43;
-            this.setOutputLocationButton.Text = "Set Output ISO";
+            this.setOutputLocationButton.Text = "Set Output";
+            this.setOutputLocationButton.Enabled = false;
             this.setOutputLocationButton.UseVisualStyleBackColor = true;
             this.setOutputLocationButton.Click += new System.EventHandler(this.SaveFileDialog);
             // 
             // setOutputPathLabel
             // 
-            this.setOutputPathLabel.AutoEllipsis = true;
             this.setOutputPathLabel.Location = new System.Drawing.Point(147, 0);
             this.setOutputPathLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.setOutputPathLabel.Name = "setOutputPathLabel";
-            this.setOutputPathLabel.Size = new System.Drawing.Size(329, 24);
+            this.setOutputPathLabel.Size = new System.Drawing.Size(329, 27);
             this.setOutputPathLabel.TabIndex = 44;
             this.setOutputPathLabel.Text = "None";
             this.setOutputPathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -207,7 +207,7 @@ namespace CustomStreetManager
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(135, 27);
             this.button1.TabIndex = 45;
-            this.button1.Text = "Set Input WBFS/ISO";
+            this.button1.Text = "Set Input";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.OpenFileDialog);
             // 

@@ -228,8 +228,7 @@ namespace CustomStreetManager
         }
         public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string tmpExtract = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(inputFile));
-            string arguments = "COPY \"" + tmpExtract + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
+            string arguments = "COPY \"" + inputFile + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
 
