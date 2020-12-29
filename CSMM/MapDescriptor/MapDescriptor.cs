@@ -23,9 +23,13 @@ namespace CustomStreetManager
         /// <summary>
         /// 0 = Easy Mode, 1 = Standard Mode
         /// </summary>
+        [DisplayName("🖊MapSet")]
         public sbyte MapSet { get; set; } = -1;
+        [DisplayName("🖊Zone")]
         public sbyte Zone { get; set; } = -1;
+        [DisplayName("🖊Order")]
         public sbyte Order { get; set; } = -1;
+        [DisplayName("🖊Practice")]
         public bool IsPracticeBoard { get; set; }
         // ------------------
         // --- Basic Info ---
