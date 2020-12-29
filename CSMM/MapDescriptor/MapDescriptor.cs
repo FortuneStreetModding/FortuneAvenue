@@ -199,6 +199,8 @@ namespace CustomStreetManager
         public string Desc_ES { get { return Desc.GetValueOrDefault(Locale.ES, ""); } private set { } }
         [ReadOnly(true)]
         public string InternalName { get; set; }
+        [Browsable(false)]
+        public string MapDescriptorFilePath { get; private set; }
 
         public MapDescriptor()
         {
@@ -562,6 +564,7 @@ namespace CustomStreetManager
         {
             string[] lines = File.ReadAllLines(fileName);
             MapDescriptor mapDescriptor = new MapDescriptor();
+            mapDescriptor.MapDescriptorFilePath = fileName;
             mapDescriptor.InternalName = internalName;
             if (lines[0].StartsWith("# "))
             {
@@ -946,6 +949,7 @@ namespace CustomStreetManager
 
             MapIcon = mapDescriptor.MapIcon;
             Dirty = mapDescriptor.Dirty;
+            MapDescriptorFilePath = mapDescriptor.MapDescriptorFilePath;
         }
 
         public string generateMapDescriptorFileContent()
