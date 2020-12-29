@@ -262,7 +262,7 @@ namespace CustomStreetManager
                 {
                     var mapDescriptors = await patchProcess.loadWbfsIsoFile(inputWbfsIso, progress, ct);
 
-                    Go.Enabled = false;
+                    Go.Enabled = true;
                     clearListButton.Enabled = true;
                     buttonAddMap.Enabled = true;
                     buttonRemoveMap.Enabled = true;
@@ -373,7 +373,6 @@ namespace CustomStreetManager
             {
                 BindingSource bs = dataGridView1.DataSource as BindingSource;
                 bs.RemoveAt(bs.Count - 1);
-                Go.Enabled = true;
                 if (bs.Count <= 42)
                     buttonRemoveMap.Enabled = false;
                 DataGridView1_CellEndEdit(null, null);
@@ -492,7 +491,6 @@ namespace CustomStreetManager
                             BindingSource bs = dataGridView1.DataSource as BindingSource;
                             bs.Add(importedMapDescriptor);
                         }
-                        Go.Enabled = true;
                     }
                     catch (Exception e)
                     {
