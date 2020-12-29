@@ -37,21 +37,21 @@ namespace CustomStreetManager
             var usedSquareTypes = mapDescriptorImport.readFrbFileInfo(dir, ProgressInfo.makeSubProgress(progress, 20, 60), ct);
             if (mapDescriptorImport.VentureCardActiveCount == 0)
             {
-                progress.Report("The map " + internalName + " does not have a venture card table specified. A default venture card table will be used." + Environment.NewLine);
+                progress.Report("The map " + internalName + " does not have a venture card table specified. A default venture card table will be used.");
                 mapDescriptorImport.VentureCard = VanillaDatabase.getDefaultVentureCardTable(mapDescriptorImport.RuleSet, usedSquareTypes);
             }
             else if (mapDescriptorImport.VentureCardActiveCount < 64)
             {
-                progress.Report("Warning: The map " + internalName + " has a venture card count smaller than 64. The behavior is undefined and glitchy." + Environment.NewLine);
+                progress.Report("Warning: The map " + internalName + " has a venture card count smaller than 64. The behavior is undefined and glitchy.");
             }
             else if (mapDescriptorImport.VentureCardActiveCount > 64)
             {
-                progress.Report("Warning: The map " + internalName + " has a venture card count larger than 64. Only the first 64 venture cards will be used." + Environment.NewLine);
+                progress.Report("Warning: The map " + internalName + " has a venture card count larger than 64. Only the first 64 venture cards will be used.");
             }
             int problematicVentureCard = VanillaDatabase.hasProblemWithVentureCardMissingNeededSquareType(mapDescriptorImport.VentureCard, usedSquareTypes);
             if (problematicVentureCard != -1)
             {
-                progress.Report("The map " + internalName + " uses venture card " + problematicVentureCard + ". This venture card needs certain square types which have not been placed on the map." + Environment.NewLine);
+                progress.Report("The map " + internalName + " uses venture card " + problematicVentureCard + ". This venture card needs certain square types which have not been placed on the map.");
                 mapDescriptorImport.VentureCard = VanillaDatabase.getDefaultVentureCardTable(mapDescriptorImport.RuleSet, usedSquareTypes);
             }
 
