@@ -921,8 +921,10 @@ namespace CustomStreetManager
             BGMID = mapDescriptor.BGMID;
             foreach (string locale in Locale.ALL)
             {
-                Name[locale] = mapDescriptor.Name[locale];
-                Desc[locale] = mapDescriptor.Desc[locale];
+                if (mapDescriptor.Name.ContainsKey(locale))
+                    Name[locale] = mapDescriptor.Name[locale];
+                if (mapDescriptor.Desc.ContainsKey(locale))
+                    Desc[locale] = mapDescriptor.Desc[locale];
             }
 
             for (int i = 0; i < VentureCard.Length; i++)
