@@ -91,9 +91,14 @@ namespace CustomStreetManager
                 var md = new MapDescriptor();
                 // only add new maps, if there is a map descriptor file path available
                 if (!string.IsNullOrEmpty(tempMapDescriptors[i].MapDescriptorFilePath))
+                {
                     mapDescriptors.Add(md);
+                }
                 else
+                {
+                    progress?.Report("Warning: Could not load the configuration after map " + i + " because the md files are not set.");
                     break;
+                }
             }
 
             for (int i = 0; i < mapDescriptors.Count; i++)
