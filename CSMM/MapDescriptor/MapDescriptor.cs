@@ -152,6 +152,7 @@ namespace CustomStreetManager
         // --------------------------
         [ReadOnly(true)]
         public UInt32 TourBankruptcyLimit { get; set; } = 1;
+        [ReadOnly(true)]
         public UInt32 TourInitialCash { get; set; }
         [ReadOnly(true)]
         public Character TourOpponent1 { get; set; } = Character.Mario;
