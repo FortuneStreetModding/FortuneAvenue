@@ -25,16 +25,8 @@ namespace CustomStreetManager
         {
             if (IsDisposed)
                 return;
-            if (num != 100)
-            {
-                mapReplaceProgressBar.Value = num + 1;
-                mapReplaceProgressBar.Value--;
-            }
-            else
-            {
-                mapReplaceProgressBar.Value = num;
-                cancelButton.Enabled = true;
-            }
+            mapReplaceProgressBar.Value = num;
+            cancelButton.Enabled = true;
         }
 
         public void EnableButton()
