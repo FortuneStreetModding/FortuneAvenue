@@ -24,7 +24,7 @@ namespace CustomStreetManager
                         filePath = Path.GetRelativePath(dir, filePath);
                     else
                         filePath = "";
-                    stream.WriteLine("{0,2},{1,2},{2,2},{3,2},{4,5},\"{5}\"", i, md.MapSet, md.Zone, md.Order, md.IsPracticeBoard, filePath);
+                    stream.WriteLine("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", i, md.MapSet, md.Zone, md.Order, md.IsPracticeBoard, filePath);
                     progress?.Report(100 * p / result.Count());
                     p++;
                 }
@@ -65,7 +65,7 @@ namespace CustomStreetManager
                 var zone = sbyte.Parse(columns[2].Trim());
                 var order = sbyte.Parse(columns[3].Trim());
                 var isPracticeBoard = bool.Parse(columns[4].Trim());
-                var mapDescriptorFilePath = columns[5].Trim().Replace("\"", "");
+                var mapDescriptorFilePath = columns[5].Trim();
 
                 tempMapDescriptors[i].MapSet = mapSet;
                 tempMapDescriptors[i].Zone = zone;
@@ -82,13 +82,18 @@ namespace CustomStreetManager
                 p++;
             }
 
-            while (mapDescriptors.Count < tempMapDescriptors.Count)
+            while (mapDescriptors.Count > tempMapDescriptors.Count)
             {
                 mapDescriptors.RemoveAt(mapDescriptors.Count - 1);
             }
-            while (mapDescriptors.Count > tempMapDescriptors.Count)
+            for (int i = mapDescriptors.Count; i < tempMapDescriptors.Count; i++)
             {
-                mapDescriptors.Add(new MapDescriptor());
+                var md = new MapDescriptor();
+                // only add new maps, if there is a map descriptor file path available
+                if (!string.IsNullOrEmpty(tempMapDescriptors[i].MapDescriptorFilePath))
+                    mapDescriptors.Add(md);
+                else
+                    break;
             }
 
             for (int i = 0; i < mapDescriptors.Count; i++)

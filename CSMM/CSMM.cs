@@ -508,6 +508,8 @@ namespace CustomStreetManager
                     try
                     {
                         Configuration.load(input, GetMapDescriptors(), patchProcess, progress, ct);
+                        var bs = (BindingSource)dataGridView1.DataSource;
+                        bs.ResetBindings(true);
                         DataGridView1_CellEndEdit(null, null);
                     }
                     catch (Exception e2)
