@@ -26,6 +26,7 @@ namespace CustomStreetManager
         PatchProcess patchProcess;
         readonly CancellationTokenSource exitTokenSource;
         readonly Dictionary<string, ToolStripMenuItem> xmlFileToToolStripMenuItemDict = new Dictionary<string, ToolStripMenuItem>();
+        private MapDescriptor editMd = new MapDescriptor();
 
         public CSMM()
         {
@@ -45,8 +46,25 @@ namespace CustomStreetManager
             exitTokenSource.Cancel();
         }
 
+        private void DataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            if (e != null && e.RowIndex < dataGridView1.Rows.Count)
+            {
+                var editedRow = dataGridView1.Rows[e.RowIndex] as DataGridViewRow;
+                var editedMd = editedRow.DataBoundItem as MapDescriptor;
+                editMd.set(editedMd);
+            }
+        }
+
         private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            if (e != null && e.RowIndex < dataGridView1.Rows.Count)
+            {
+                var editedRow = dataGridView1.Rows[e.RowIndex] as DataGridViewRow;
+                var editedMd = editedRow.DataBoundItem as MapDescriptor;
+                if (!editedMd.Equals(editMd))
+                    editedMd.Dirty = true;
+            }
             clearValidationIssues();
             List<MapDescriptor> mapDescriptors = (List<MapDescriptor>)((BindingSource)dataGridView1.DataSource).List;
             var validation = MapDescriptor.getPracticeBoards(mapDescriptors, out _, out _);
@@ -278,6 +296,39 @@ namespace CustomStreetManager
                         buttonRemoveMap.Enabled = true;
                     else
                         buttonRemoveMap.Enabled = false;
+
+                    foreach (DataGridViewColumn column in this.dataGridView1.Columns)
+                    {
+                        // set autosizing
+                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+                        //store autosized widths
+                        int colw = column.Width;
+                        //remove autosizing
+                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                        //set width to calculated by autosize
+                        column.Width = colw;
+
+                        column.Resizable = DataGridViewTriState.True;
+                        if (column is DataGridViewButtonColumn)
+                        {
+                            column.Frozen = true;
+                            column.Resizable = DataGridViewTriState.False;
+                        }
+                        else if (column.ReadOnly)
+                        {
+                            column.DefaultCellStyle = readOnlyColumnStyle;
+                        }
+                        else
+                        {
+                            column.DefaultCellStyle = editColumnStyle;
+                            column.Frozen = true;
+                            column.Width += 15;
+                        }
+                        if (column.Name == "Name_En")
+                        {
+                            column.Frozen = true;
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -492,7 +543,7 @@ namespace CustomStreetManager
                         var importedMapDescriptor = patchProcess.importMd(openFileDialog1.FileName, progress, ct);
                         if (mapDescriptor != null)
                         {
-                            mapDescriptor.set(importedMapDescriptor);
+                            mapDescriptor.setFromImport(importedMapDescriptor);
                         }
                         else
                         {

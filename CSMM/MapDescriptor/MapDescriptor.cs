@@ -586,8 +586,20 @@ namespace CustomStreetManager
                     state = newState;
                 }
             }
+            // if a locale is missing, use the english as default
+            foreach (string locale in Locale.ALL)
+            {
+                if (!mapDescriptor.Name.ContainsKey(locale))
+                {
+                    mapDescriptor.Name[locale] = mapDescriptor.Name[Locale.EN];
+                }
+                if (!mapDescriptor.Desc.ContainsKey(locale))
+                {
+                    mapDescriptor.Desc[locale] = mapDescriptor.Desc[Locale.EN];
+                }
+            }
             // if everything went well, set the parsed map descriptor values
-            set(mapDescriptor);
+            setFromImport(mapDescriptor);
         }
 
         private void parseContent(MDParserState state, string line)
@@ -881,6 +893,18 @@ namespace CustomStreetManager
 
         public void set(MapDescriptor mapDescriptor)
         {
+            MapSet = mapDescriptor.MapSet;
+            Zone = mapDescriptor.Zone;
+            Order = mapDescriptor.Order;
+            IsPracticeBoard = mapDescriptor.IsPracticeBoard;
+            UnlockID = mapDescriptor.UnlockID;
+            Name_MSG_ID = mapDescriptor.Name_MSG_ID;
+            Desc_MSG_ID = mapDescriptor.Desc_MSG_ID;
+            setFromImport(mapDescriptor);
+        }
+
+        public void setFromImport(MapDescriptor mapDescriptor)
+        {
             InitialCash = mapDescriptor.InitialCash;
             TargetAmount = mapDescriptor.TargetAmount;
             Theme = mapDescriptor.Theme;
@@ -894,22 +918,8 @@ namespace CustomStreetManager
             BGMID = mapDescriptor.BGMID;
             foreach (string locale in Locale.ALL)
             {
-                if (mapDescriptor.Name.ContainsKey(locale))
-                {
-                    Name[locale] = mapDescriptor.Name[locale];
-                }
-                else
-                {
-                    Name[locale] = mapDescriptor.Name[Locale.EN];
-                }
-                if (mapDescriptor.Desc.ContainsKey(locale))
-                {
-                    Desc[locale] = mapDescriptor.Desc[locale];
-                }
-                else
-                {
-                    Desc[locale] = mapDescriptor.Desc[Locale.EN];
-                }
+                Name[locale] = mapDescriptor.Name[locale];
+                Desc[locale] = mapDescriptor.Desc[locale];
             }
 
             for (int i = 0; i < VentureCard.Length; i++)
@@ -942,6 +952,65 @@ namespace CustomStreetManager
         {
             MapDescriptorTemplate t = new MapDescriptorTemplate(this);
             return t.TransformText().TrimStart();
+        }
+
+        public override bool Equals(object x)
+        {
+            if (!(x is MapDescriptor)) return false;
+            var y = x as MapDescriptor;
+            if (MapSet != y.MapSet) return false;
+            if (Zone != y.Zone) return false;
+            if (Order != y.Order) return false;
+            if (IsPracticeBoard != y.IsPracticeBoard) return false;
+            if (Name_En != y.Name_En) return false;
+            if (RuleSet != y.RuleSet) return false;
+            if (InitialCash != y.InitialCash) return false;
+            if (TargetAmount != y.TargetAmount) return false;
+            if (BaseSalary != y.BaseSalary) return false;
+            if (SalaryIncrement != y.SalaryIncrement) return false;
+            if (MaxDiceRoll != y.MaxDiceRoll) return false;
+            if (!VentureCard.SequenceEqual(y.VentureCard)) return false;
+            if (MaxDiceRoll != y.MaxDiceRoll) return false;
+            if (FrbFile1 != y.FrbFile1) return false;
+            if (FrbFile2 != y.FrbFile2) return false;
+            if (FrbFile3 != y.FrbFile3) return false;
+            if (FrbFile4 != y.FrbFile4) return false;
+            if (SwitchRotationOriginPoints_ != y.SwitchRotationOriginPoints_) return false;
+            if (Theme != y.Theme) return false;
+            if (Background != y.Background) return false;
+            if (BGMID != y.BGMID) return false;
+            if (MapIcon != y.MapIcon) return false;
+            if (LoopingMode != y.LoopingMode) return false;
+            if (LoopingModeRadius != y.LoopingModeRadius) return false;
+            if (LoopingModeHorizontalPadding != y.LoopingModeHorizontalPadding) return false;
+            if (LoopingModeVerticalSquareCount != y.LoopingModeVerticalSquareCount) return false;
+            if (TourBankruptcyLimit != y.TourBankruptcyLimit) return false;
+            if (TourInitialCash != y.TourInitialCash) return false;
+            if (TourOpponent1 != y.TourOpponent1) return false;
+            if (TourOpponent2 != y.TourOpponent2) return false;
+            if (TourOpponent3 != y.TourOpponent3) return false;
+            if (TourClearRank != y.TourClearRank) return false;
+            if (UnlockID != y.UnlockID) return false;
+            if (Name_MSG_ID != y.Name_MSG_ID) return false;
+            if (Name_DE != y.Name_DE) return false;
+            if (Name_FR != y.Name_FR) return false;
+            if (Name_IT != y.Name_IT) return false;
+            if (Name_JP != y.Name_JP) return false;
+            if (Name_ES != y.Name_ES) return false;
+            if (Desc_MSG_ID != y.Desc_MSG_ID) return false;
+            if (Desc_EN != y.Desc_EN) return false;
+            if (Desc_DE != y.Desc_DE) return false;
+            if (Desc_FR != y.Desc_FR) return false;
+            if (Desc_IT != y.Desc_IT) return false;
+            if (Desc_JP != y.Desc_JP) return false;
+            if (Desc_ES != y.Desc_ES) return false;
+            if (InternalName != y.InternalName) return false;
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return InternalName.GetHashCode() ^ RuleSet.GetHashCode();
         }
     }
 }
