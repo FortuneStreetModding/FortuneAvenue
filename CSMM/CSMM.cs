@@ -67,6 +67,13 @@ namespace CustomStreetManager
             }
             clearValidationIssues();
             List<MapDescriptor> mapDescriptors = (List<MapDescriptor>)((BindingSource)dataGridView1.DataSource).List;
+            bool atLeastOneDirty = false;
+            foreach (var md in mapDescriptors)
+            {
+                if (md.Dirty)
+                    atLeastOneDirty = true;
+            }
+            buttonSaveConfiguration.Enabled = atLeastOneDirty;
             var validation = MapDescriptor.getPracticeBoards(mapDescriptors, out _, out _);
             if (!validation.Passed)
             {
@@ -206,10 +213,8 @@ namespace CustomStreetManager
             Application.Exit();
         }
 
-        private void SaveFileDialog(object sender, EventArgs e) //set output location button
+        private void SaveFileDialog(object sender, EventArgs e)
         {
-            // Displays a SaveFileDialog so the user can save the Image
-            // assigned to Button2.
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs;*.ciso|Directory (do not pack ISO/WBFS)|*";
             saveFileDialog1.Title = "Where shall the output be saved?";
@@ -289,6 +294,8 @@ namespace CustomStreetManager
                     clearListButton.Enabled = true;
                     buttonAddMap.Enabled = true;
                     setOutputLocationButton.Enabled = true;
+                    buttonSaveConfiguration.Enabled = false;
+                    buttonLoadConfiguration.Enabled = true;
                     BindingSource bs = new BindingSource();
                     bs.DataSource = mapDescriptors;
                     dataGridView1.DataSource = bs;
@@ -339,6 +346,8 @@ namespace CustomStreetManager
                     buttonAddMap.Enabled = false;
                     buttonRemoveMap.Enabled = false;
                     setOutputLocationButton.Enabled = false;
+                    buttonSaveConfiguration.Enabled = false;
+                    buttonLoadConfiguration.Enabled = false;
                     progressBar.appendText(e.Message);
                     progressBar.appendText(Environment.NewLine + Environment.NewLine + e.ToString());
                     progressBar.EnableButton();
@@ -362,8 +371,6 @@ namespace CustomStreetManager
 
         private void OpenFileDialog(object sender, EventArgs e)
         {
-            // Displays a SaveFileDialog so the user can save the Image
-            // assigned to Button2.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "ISO/WBFS Image or main.dol of extracted image|*.iso;*.wbfs;*.ciso;main.dol";
             openFileDialog1.Title = "Which ISO image or WBFS image or extracted image folder should we use for patching?";
@@ -440,12 +447,26 @@ namespace CustomStreetManager
 
         private void ButtonSaveConfiguration_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "CSV file|*.csv";
+            saveFileDialog1.Title = "Where shall the configuration be saved?";
+            saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(setInputISOLocation.Text) + ".csv";
+            if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                var output = saveFileDialog1.FileName;
+            }
         }
 
         private void ButtonLoadConfiguration_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "CSV file|*.csv";
+            openFileDialog1.Title = "Which configuration shall be loaded?";
+            if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
+            {
+                var input = openFileDialog1.FileName;
+
+            }
         }
 
         private async void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
