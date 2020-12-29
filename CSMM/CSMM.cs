@@ -65,6 +65,11 @@ namespace CustomStreetManager
                 if (!editedMd.Equals(editMd))
                     editedMd.Dirty = true;
             }
+            BindingSource bs = dataGridView1.DataSource as BindingSource;
+            if (bs.Count > 42)
+                buttonRemoveMap.Enabled = true;
+            else
+                buttonRemoveMap.Enabled = false;
             clearValidationIssues();
             List<MapDescriptor> mapDescriptors = (List<MapDescriptor>)((BindingSource)dataGridView1.DataSource).List;
             bool atLeastOneDirty = false;
@@ -299,10 +304,7 @@ namespace CustomStreetManager
                     BindingSource bs = new BindingSource();
                     bs.DataSource = mapDescriptors;
                     dataGridView1.DataSource = bs;
-                    if (bs.Count > 42)
-                        buttonRemoveMap.Enabled = true;
-                    else
-                        buttonRemoveMap.Enabled = false;
+                    DataGridView1_CellEndEdit(null, null);
 
                     foreach (DataGridViewColumn column in this.dataGridView1.Columns)
                     {
@@ -313,6 +315,10 @@ namespace CustomStreetManager
                         //remove autosizing
                         column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                         //set width to calculated by autosize
+                        if (colw > 75 && column.Name.StartsWith("SwitchRotation"))
+                            colw = 75;
+                        if (colw > 100 && column.Name != "Name_En")
+                            colw = 100;
                         column.Width = colw;
 
                         column.Resizable = DataGridViewTriState.True;
@@ -425,8 +431,6 @@ namespace CustomStreetManager
         {
             importMd(null);
             BindingSource bs = dataGridView1.DataSource as BindingSource;
-            if (bs.Count > 42)
-                buttonRemoveMap.Enabled = true;
             DataGridView1_CellEndEdit(null, null);
         }
 
@@ -439,8 +443,6 @@ namespace CustomStreetManager
             {
                 BindingSource bs = dataGridView1.DataSource as BindingSource;
                 bs.RemoveAt(bs.Count - 1);
-                if (bs.Count <= 42)
-                    buttonRemoveMap.Enabled = false;
                 DataGridView1_CellEndEdit(null, null);
             }
         }
@@ -454,6 +456,31 @@ namespace CustomStreetManager
             if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 var output = saveFileDialog1.FileName;
+                using (var cancelTokenSource = new CancellationTokenSource())
+                using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
+                {
+                    CancellationToken ct = linkedTokenSource.Token;
+                    ProgressBar progressBar = new ProgressBar(verboseToolStripMenuItem.Checked);
+                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException) { } };
+                    progressBar.Show(this);
+                    var progress = new Progress<ProgressInfo>(progressInfo =>
+                    {
+                        progressBar.update(progressInfo);
+                        Debug.WriteLine(progressInfo.line);
+                    });
+
+                    try
+                    {
+                        Configuration.save(output, GetMapDescriptors(), progress, ct);
+                    }
+                    catch (Exception e2)
+                    {
+                        progressBar.appendText(e2.Message);
+                        progressBar.appendText(Environment.NewLine + Environment.NewLine + e2.ToString());
+                        progressBar.EnableButton();
+                        Debug.WriteLine(e2.ToString());
+                    }
+                }
             }
         }
 
@@ -465,7 +492,32 @@ namespace CustomStreetManager
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
                 var input = openFileDialog1.FileName;
+                using (var cancelTokenSource = new CancellationTokenSource())
+                using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(exitTokenSource.Token, cancelTokenSource.Token))
+                {
+                    CancellationToken ct = linkedTokenSource.Token;
+                    ProgressBar progressBar = new ProgressBar(verboseToolStripMenuItem.Checked);
+                    progressBar.callback = (b) => { try { cancelTokenSource?.Cancel(); } catch (ObjectDisposedException) { } };
+                    progressBar.Show(this);
+                    var progress = new Progress<ProgressInfo>(progressInfo =>
+                    {
+                        progressBar.update(progressInfo);
+                        Debug.WriteLine(progressInfo.line);
+                    });
 
+                    try
+                    {
+                        Configuration.load(input, GetMapDescriptors(), patchProcess, progress, ct);
+                        DataGridView1_CellEndEdit(null, null);
+                    }
+                    catch (Exception e2)
+                    {
+                        progressBar.appendText(e2.Message);
+                        progressBar.appendText(Environment.NewLine + Environment.NewLine + e2.ToString());
+                        progressBar.EnableButton();
+                        Debug.WriteLine(e2.ToString());
+                    }
+                }
             }
         }
 
