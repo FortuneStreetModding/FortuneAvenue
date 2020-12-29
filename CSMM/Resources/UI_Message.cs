@@ -59,8 +59,6 @@ namespace CustomStreetManager
 
         public void set(uint freeKey, string v)
         {
-            if (contains(freeKey))
-                throw new InvalidDataException("The ui_message." + locale + ".csv file already contains a text message for key " + freeKey);
             map[freeKey] = v;
         }
 
