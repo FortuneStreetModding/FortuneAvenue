@@ -201,6 +201,11 @@ namespace CustomStreetManager
             if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 var outputFile = saveFileDialog1.FileName;
+                if (saveFileDialog1.FilterIndex == 2)
+                {
+                    // remove the extension
+                    outputFile = Path.Combine(Directory.GetParent(outputFile).FullName, Path.GetFileNameWithoutExtension(outputFile));
+                }
                 if (patchProcess.isOutputImageFileExtension(outputFile))
                 {
                     bool overwrite = File.Exists(outputFile);
