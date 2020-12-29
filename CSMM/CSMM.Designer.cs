@@ -1,6 +1,7 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace CustomStreetManager
@@ -36,12 +37,16 @@ namespace CustomStreetManager
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.Lavender;
+            dataGridViewCellStyle1.FormatProvider = CultureInfo.InvariantCulture;
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            dataGridViewCellStyle2.FormatProvider = CultureInfo.InvariantCulture;
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
             DataGridViewCellStyle readOnlyColumnStyle = new DataGridViewCellStyle();
             readOnlyColumnStyle.ForeColor = System.Drawing.Color.DimGray;
+            readOnlyColumnStyle.FormatProvider = CultureInfo.InvariantCulture;
             DataGridViewCellStyle editColumnStyle = new DataGridViewCellStyle();
             editColumnStyle.ForeColor = System.Drawing.Color.MidnightBlue;
+            editColumnStyle.FormatProvider = CultureInfo.InvariantCulture;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSMM));
             this.clearListButton = new System.Windows.Forms.Button();
             this.addMapsDialog = new System.Windows.Forms.OpenFileDialog();

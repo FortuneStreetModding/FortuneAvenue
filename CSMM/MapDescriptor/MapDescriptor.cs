@@ -9,6 +9,7 @@ using System.ComponentModel;
 using MiscUtil.Conversion;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Globalization;
 
 namespace CustomStreetManager
 {
@@ -672,13 +673,13 @@ namespace CustomStreetManager
             switch (key)
             {
                 case "radius":
-                    LoopingModeRadius = Single.Parse(keyValuePair.Value);
+                    LoopingModeRadius = Single.Parse(keyValuePair.Value, CultureInfo.InvariantCulture);
                     break;
                 case "horizontalpadding":
-                    LoopingModeHorizontalPadding = Single.Parse(keyValuePair.Value);
+                    LoopingModeHorizontalPadding = Single.Parse(keyValuePair.Value, CultureInfo.InvariantCulture);
                     break;
                 case "verticalsquarecount":
-                    LoopingModeVerticalSquareCount = Single.Parse(keyValuePair.Value);
+                    LoopingModeVerticalSquareCount = Single.Parse(keyValuePair.Value, CultureInfo.InvariantCulture);
                     break;
                 case "tourbankruptcylimit":
                     TourBankruptcyLimit = UInt32.Parse(keyValuePair.Value);
@@ -769,7 +770,7 @@ namespace CustomStreetManager
             {
                 var number = Regex.Match(key, @"\d+").Value;
                 int i = Int32.Parse(number) - 1;
-                Single value = Single.Parse(keyValuePair.Value);
+                Single value = Single.Parse(keyValuePair.Value, CultureInfo.InvariantCulture);
                 if (!SwitchRotationOriginPoints.ContainsKey(i))
                 {
                     SwitchRotationOriginPoints[i] = new OriginPoint();

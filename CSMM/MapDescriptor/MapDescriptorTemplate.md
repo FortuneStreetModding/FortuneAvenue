@@ -2,6 +2,7 @@
 <#@ output encoding="utf-8"#>
 <#@ import namespace="CustomStreetManager" #>
 <#@ import namespace="FSEditor.FSData" #>
+<#@ import namespace="System.Globalization" #>
 
 # <#= md.Name[Locale.EN] #>
 
@@ -156,8 +157,8 @@
 | Switch Rotation Origin Points |           Value |
 | ----------------------------- | --------------- |
 <#     for(int i = 0; i < md.SwitchRotationOriginPoints.Count; i++) { 
-#><#=      String.Format("| {0,-29} | {1,15} |", "Rotation Origin Point "+ (i+1) +" X", md.SwitchRotationOriginPoints[i].X) #>
-<#=        String.Format("| {0,-29} | {1,15} |", "Rotation Origin Point "+ (i+1) +" Y", md.SwitchRotationOriginPoints[i].Y) #>
+#><#=      String.Format("| {0,-29} | {1,15} |", "Rotation Origin Point "+ (i+1) +" X", md.SwitchRotationOriginPoints[i].X.ToString(CultureInfo.InvariantCulture)) #>
+<#=        String.Format("| {0,-29} | {1,15} |", "Rotation Origin Point "+ (i+1) +" Y", md.SwitchRotationOriginPoints[i].Y.ToString(CultureInfo.InvariantCulture)) #>
 <#     } #>
 </details>
 <# } if(md.LoopingMode != LoopingMode.None) { #>
@@ -168,9 +169,9 @@
 
 | Looping Mode Configuration    |           Value |
 | ----------------------------- | --------------- |
-| Radius                        | <#= String.Format("{0,15}", md.LoopingModeRadius) #> |
-| Horizontal Padding            | <#= String.Format("{0,15}", md.LoopingModeHorizontalPadding) #> |
-| Vertical Square Count         | <#= String.Format("{0,15}", md.LoopingModeVerticalSquareCount) #> |
+| Radius                        | <#= String.Format("{0,15}", md.LoopingModeRadius.ToString(CultureInfo.InvariantCulture)) #> |
+| Horizontal Padding            | <#= String.Format("{0,15}", md.LoopingModeHorizontalPadding.ToString(CultureInfo.InvariantCulture)) #> |
+| Vertical Square Count         | <#= String.Format("{0,15}", md.LoopingModeVerticalSquareCount.ToString(CultureInfo.InvariantCulture)) #> |
 
 </details>
 <# } #>
