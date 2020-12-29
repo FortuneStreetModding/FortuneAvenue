@@ -1,4 +1,4 @@
-using FSEditor.FSData;
+﻿using FSEditor.FSData;
 using System;
 using System.Collections.Generic;
 using System.Linq;

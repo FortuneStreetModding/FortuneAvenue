@@ -74,6 +74,7 @@ namespace CustomStreetManager
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Export = new System.Windows.Forms.DataGridViewButtonColumn();
             this.ImportMd = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.VentureCards = new System.Windows.Forms.DataGridViewButtonColumn();
             this.mapDescriptorBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.Go = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
@@ -354,7 +355,7 @@ namespace CustomStreetManager
             // Export
             // 
             this.Export.HeaderText = "Export md";
-            this.Export.Name = "Export";
+            this.Export.Name = "ExportMd";
             this.Export.ReadOnly = true;
             this.Export.Text = "Export md";
             this.Export.UseColumnTextForButtonValue = true;
@@ -366,6 +367,14 @@ namespace CustomStreetManager
             this.ImportMd.ReadOnly = true;
             this.ImportMd.Text = "Import md";
             this.ImportMd.UseColumnTextForButtonValue = true;
+            // 
+            // View Venture Cards
+            // 
+            this.VentureCards.HeaderText = "Venture Cards";
+            this.VentureCards.Name = "VentureCards";
+            this.VentureCards.DataPropertyName = "VentureCardActiveCount";
+            this.VentureCards.ReadOnly = true;
+            this.VentureCards.UseColumnTextForButtonValue = false;
             // 
             // mapDescriptorBindingSource
             // 
@@ -437,6 +446,7 @@ namespace CustomStreetManager
         private System.Windows.Forms.Button Go;
         private System.Windows.Forms.DataGridViewButtonColumn Export;
         private System.Windows.Forms.DataGridViewButtonColumn ImportMd;
+        private System.Windows.Forms.DataGridViewButtonColumn VentureCards;
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem verboseToolStripMenuItem;

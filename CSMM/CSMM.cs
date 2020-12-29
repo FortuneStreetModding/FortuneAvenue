@@ -306,8 +306,21 @@ namespace CustomStreetManager
                     dataGridView1.DataSource = bs;
                     DataGridView1_CellEndEdit(null, null);
 
-                    foreach (DataGridViewColumn column in this.dataGridView1.Columns)
+                    for (int i = 0; i < this.dataGridView1.Columns.Count; i++)
                     {
+                        DataGridViewColumn column = dataGridView1.Columns[i];
+                        if (column.Name == "VentureCardActiveCount")
+                        {
+                            dataGridView1.Columns.RemoveAt(i);
+                            if (!dataGridView1.Columns.Contains(VentureCards))
+                                dataGridView1.Columns.Insert(i, VentureCards);
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < this.dataGridView1.Columns.Count; i++)
+                    {
+                        DataGridViewColumn column = this.dataGridView1.Columns[i];
                         // set autosizing
                         column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
                         //store autosized widths
@@ -322,7 +335,7 @@ namespace CustomStreetManager
                         column.Width = colw;
 
                         column.Resizable = DataGridViewTriState.True;
-                        if (column is DataGridViewButtonColumn)
+                        if (column.Name == "ExportMd" || column.Name == "ImportMd")
                         {
                             column.Frozen = true;
                             column.Resizable = DataGridViewTriState.False;
@@ -537,6 +550,10 @@ namespace CustomStreetManager
                 else if (senderGrid.Columns[e.ColumnIndex].Name.ToLower().Contains("import"))
                 {
                     importMd(mapDescriptor);
+                }
+                else if (senderGrid.Columns[e.ColumnIndex].Name.ToLower().Contains("venturecards"))
+                {
+                    new VentureCardBox(mapDescriptor.VentureCard).ShowDialog(this);
                 }
             }
         }
