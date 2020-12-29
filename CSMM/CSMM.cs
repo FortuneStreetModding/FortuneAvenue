@@ -265,11 +265,14 @@ namespace CustomStreetManager
                     Go.Enabled = true;
                     clearListButton.Enabled = true;
                     buttonAddMap.Enabled = true;
-                    buttonRemoveMap.Enabled = true;
                     setOutputLocationButton.Enabled = true;
                     BindingSource bs = new BindingSource();
                     bs.DataSource = mapDescriptors;
                     dataGridView1.DataSource = bs;
+                    if (bs.Count > 42)
+                        buttonRemoveMap.Enabled = true;
+                    else
+                        buttonRemoveMap.Enabled = false;
                 }
                 catch (Exception e)
                 {
