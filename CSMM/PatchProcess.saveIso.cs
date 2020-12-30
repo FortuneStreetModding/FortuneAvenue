@@ -1,10 +1,11 @@
-using FSEditor.Exceptions;
+﻿using FSEditor.Exceptions;
 using FSEditor.FSData;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,7 @@ namespace CustomStreetManager
             }
 
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
-            writeLocalizationFiles(mapDescriptors);
+            writeLocalizationFiles(mapDescriptors, patchWiimmfi && packIso);
 
             progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
             await patchMainDolAsync(mapDescriptors, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
@@ -39,7 +40,7 @@ namespace CustomStreetManager
             {
                 // start fake progress
                 progress.Report(new ProgressInfo(45, "Copying the modified files..."));
-                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, packIso ? 60 : 100), source.Token);
+                var fakeProgressTask = ProgressInfo.makeFakeProgress(ProgressInfo.makeSubProgress(progress, 45, packIso ? 60 : 99), source.Token);
 
                 if (packIso)
                 {
@@ -71,7 +72,13 @@ namespace CustomStreetManager
             if (packIso)
             {
                 progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
-                await ExeWrapper.packFullIso(packIsoInputPath, outputFile, patchWiimmfi, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
+                await ExeWrapper.packFullIso(packIsoInputPath, outputFile, patchWiimmfi, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(true);
+                if (patchWiimmfi)
+                {
+                    await Task.Delay(500);
+                    progress.Report("Applying Wiimmfi...");
+                    await ExeWrapper.applyWiimmfi(outputFile, ct, ProgressInfo.makeNoProgress(progress)).ConfigureAwait(false);
+                }
             }
             else if (patchWiimmfi)
             {
@@ -85,7 +92,7 @@ namespace CustomStreetManager
             return true;
         }
 
-        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors)
+        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors, bool patchWiimmfi)
         {
             // free up the used MSG IDs
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
@@ -136,6 +143,48 @@ namespace CustomStreetManager
                     else
                     {
                         ui_message.set(mapDescriptor.Desc_MSG_ID, mapDescriptor.Desc[locale]);
+                    }
+                }
+            }
+            // text replace Nintendo WFC -> Wiimmfi
+            if (patchWiimmfi)
+            {
+                foreach (var entry in ui_messages)
+                {
+                    var locale = entry.Key;
+                    var ui_message = entry.Value;
+                    var keys = ui_message.getMap().Keys.ToList();
+                    foreach (var id in keys)
+                    {
+                        var text = ui_message.get(id);
+
+                        if (locale == Locale.DE)
+                        {
+                            text = text.Replace("die Nintendo Wi-Fi Connection", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("der Nintendo Wi-Fi Connection", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("zur Nintendo Wi-Fi Connection", "zu Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                        }
+                        if (locale == Locale.FR)
+                        {
+                            text = text.Replace("Wi-Fi Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("CWF Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("Connexion Wi-Fi Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                        }
+                        if (locale == Locale.ES)
+                        {
+                            text = text.Replace("Conexión Wi-Fi de Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("CWF de Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("Conexión Wi-Fi de<n>Nintendo", "Wiimmfi<n>", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("Conexión<n>Wi-Fi de Nintendo", "Wiimmfi<n>", StringComparison.InvariantCultureIgnoreCase);
+                        }
+                        if (locale == Locale.JP)
+                        {
+                            text = text.Replace("Ｗｉ－Ｆｉ", "Ｗｉｉｍｍｆｉ", StringComparison.InvariantCultureIgnoreCase);
+                        }
+                        text = text.Replace("Nintendo Wi-Fi Connection", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                        text = text.Replace("Nintendo WFC", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                        text = text.Replace("support.nintendo.com", "https://wiimmfi.de", StringComparison.InvariantCultureIgnoreCase);
+                        ui_message.set(id, text);
                     }
                 }
             }

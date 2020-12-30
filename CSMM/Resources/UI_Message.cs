@@ -26,6 +26,11 @@ namespace CustomStreetManager
             this.locale = locale;
         }
 
+        public SortedDictionary<uint, string> getMap()
+        {
+            return map;
+        }
+
         public string get(uint key)
         {
             return map[key];

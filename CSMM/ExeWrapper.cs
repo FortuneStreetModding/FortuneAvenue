@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -229,10 +229,17 @@ namespace CustomStreetManager
         }
         public static async Task<string> packFullIso(string inputFile, string outputFile, bool patchWiimmfi, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string arguments = "COPY \"" + inputFile + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
+            string wiimmfiArgument = "";
             if (patchWiimmfi)
-                arguments += " --wiimmfi";
+                wiimmfiArgument = " --wiimmfi";
+            string arguments = "COPY \"" + inputFile + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress" + wiimmfiArgument + " -vv";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+        }
+
+        public static async Task<string> applyWiimmfi(string inputFile, CancellationToken ct, IProgress<ProgressInfo> progress)
+        {
+            string arguments = "EDIT \"" + inputFile + "\" --psel data --wiimmfi -vv";
+            return await callWit(arguments, ct, progress).ConfigureAwait(continueOnCapturedContext);
         }
 
         public static async Task<List<AddressSection>> readSections(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)

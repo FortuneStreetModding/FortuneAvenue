@@ -79,7 +79,7 @@ namespace CustomStreetManager
             {
                 try
                 {
-                    await Task.Delay(i * i / 8 + i / 2 + 15, ct).ConfigureAwait(false);
+                    await Task.Delay(i * i / 4 + i / 4 + 25, ct).ConfigureAwait(false);
                 }
                 catch (TaskCanceledException)
                 {
