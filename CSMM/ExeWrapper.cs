@@ -226,9 +226,11 @@ namespace CustomStreetManager
                 return await extractFiles(inputFile, outputDirectory, cancelToken, progress);
             }
         }
-        public static async Task<string> packFullIso(string inputFile, string outputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        public static async Task<string> packFullIso(string inputFile, string outputFile, bool patchWiimmfi, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "COPY \"" + inputFile + "\" \"" + outputFile + "\" -P --id .....2 --overwrite --progress";
+            if (patchWiimmfi)
+                arguments += " --wiimmfi";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
 

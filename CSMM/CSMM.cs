@@ -189,7 +189,7 @@ namespace CustomStreetManager
 
                 try
                 {
-                    await patchProcess.saveWbfsIso(outputFile, GetMapDescriptors(), progress, ct);
+                    await patchProcess.saveWbfsIso(outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
 
                     // TODO, better cleanup
                     Invoke((MethodInvoker)delegate

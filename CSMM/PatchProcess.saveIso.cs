@@ -15,7 +15,7 @@ namespace CustomStreetManager
 {
     public partial class PatchProcess
     {
-        public async Task<bool> saveWbfsIso(string outputFile, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<bool> saveWbfsIso(string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var packIso = true;
             if (!isOutputImageFileExtension(outputFile))
@@ -71,7 +71,11 @@ namespace CustomStreetManager
             if (packIso)
             {
                 progress.Report(new ProgressInfo(60, "Packing ISO/WBFS file..."));
-                await ExeWrapper.packFullIso(packIsoInputPath, outputFile, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
+                await ExeWrapper.packFullIso(packIsoInputPath, outputFile, patchWiimmfi, ct, ProgressInfo.makeSubProgress(progress, 60, 100)).ConfigureAwait(false);
+            }
+            else if (patchWiimmfi)
+            {
+                progress.Report("Warning: Wiimmfi is not applied as it can only be patched when packing into an iso/wbfs image.");
             }
 
             await Task.Delay(500);

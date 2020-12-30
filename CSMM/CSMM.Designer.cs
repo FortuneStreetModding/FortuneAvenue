@@ -55,6 +55,7 @@ namespace CustomStreetManager
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addRiivolutionPatchXML = new System.Windows.Forms.ToolStripMenuItem();
+            this.patchWiimmfi = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verboseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -136,11 +137,20 @@ namespace CustomStreetManager
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addRiivolutionPatchXML});
-            this.optionsToolStripMenuItem.Enabled = false;
+            this.patchWiimmfi});
+            this.optionsToolStripMenuItem.Enabled = true;
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.optionsToolStripMenuItem.Text = "Optional Patches";
+            // 
+            // patchWiimmfi
+            // 
+            this.patchWiimmfi.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.patchWiimmfi.Name = "patchWiimmfi";
+            this.patchWiimmfi.Size = new System.Drawing.Size(216, 22);
+            this.patchWiimmfi.Text = "Patch Wiimmfi";
+            this.patchWiimmfi.Checked = true;
+            this.patchWiimmfi.CheckOnClick = true;
             // 
             // addRiivolutionPatchXML
             // 
@@ -430,6 +440,7 @@ namespace CustomStreetManager
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRiivolutionPatchXML;
+        private System.Windows.Forms.ToolStripMenuItem patchWiimmfi;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
