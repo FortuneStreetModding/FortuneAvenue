@@ -221,7 +221,7 @@ namespace CustomStreetManager
         private void SaveFileDialog(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.Filter = "ISO/WBFS Image|*.iso;*.wbfs;*.ciso|Directory (do not pack ISO/WBFS)|*";
+            saveFileDialog1.Filter = "ISO/WBFS Image|*.wbfs;*.iso;*.ciso|Directory (do not pack ISO/WBFS)|*";
             saveFileDialog1.Title = "Where shall the output be saved?";
             saveFileDialog1.OverwritePrompt = false;
             saveFileDialog1.FileName = Path.GetFileName(setInputISOLocation.Text);
