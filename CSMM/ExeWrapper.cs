@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -131,6 +131,7 @@ namespace CustomStreetManager
 
         private static async Task<string> execute(ProcessStartInfo psi, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
+            progress?.Report(new ProgressInfo(Path.GetFileNameWithoutExtension(psi.FileName) + " " + psi.Arguments, true));
             var exitCode = 0;
             string output = "";
             string error = "";
