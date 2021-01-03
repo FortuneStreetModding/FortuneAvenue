@@ -407,7 +407,7 @@ namespace CustomStreetManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1800, 1040);
+            this.ClientSize = new System.Drawing.Size(1760, 1000);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
@@ -417,7 +417,7 @@ namespace CustomStreetManager
             this.MaximizeBox = false;
             this.Name = "CSMM";
             this.RightToLeftLayout = true;
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Custom Street Map Manager";
             this.menuStrip1.ResumeLayout(false);
