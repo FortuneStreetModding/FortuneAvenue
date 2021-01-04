@@ -86,6 +86,12 @@ namespace CustomStreetManager
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801edad4), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ee71f));
             // Unused menu class (SelectMapUI)
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x801fce28), addressMapper.toVersionAgnosticAddress((BSVAddr)0x801ff777));
+
+            // used additional address:
+            // 0x804363b4 (4 bytes):  force simulated button press
+            // 0x804363b8 (12 bytes): pointer to internal name table
+            // 0x804363c4 (4 bytes):  ForceVentureCardVariable
+
         }
 
 
@@ -134,6 +140,7 @@ namespace CustomStreetManager
             new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
             new BGSequenceTable().read(stream, addressMapper, mapDescriptors, null);
             new InternalNameTable().read(stream, addressMapper, mapDescriptors, null);
+            new ForceSimulatedButtonPress().read(stream, addressMapper, mapDescriptors, null);
 
             return mapDescriptors;
         }
@@ -161,6 +168,7 @@ namespace CustomStreetManager
             new InternalNameTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new PracticeBoard().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
             new MapSetZoneOrder().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            new ForceSimulatedButtonPress().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
