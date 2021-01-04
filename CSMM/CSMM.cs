@@ -348,7 +348,7 @@ namespace CustomStreetManager
                         {
                             column.DefaultCellStyle = editColumnStyle;
                             column.Frozen = true;
-                            column.Width += 15;
+                            column.Width += 25;
                         }
                         if (column.Name == "Name_EN")
                         {
