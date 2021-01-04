@@ -10,6 +10,7 @@ using MiscUtil.Conversion;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
+using System.Security.Cryptography;
 
 namespace CustomStreetManager
 {
@@ -1032,7 +1033,45 @@ namespace CustomStreetManager
 
         public override int GetHashCode()
         {
-            return InternalName.GetHashCode() ^ RuleSet.GetHashCode();
+                return InternalName.GetHashCode() ^ RuleSet.GetHashCode();
+        }
+
+        public byte[] GetSha1()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                var s = new EndianBinaryWriter(EndianBitConverter.Big, ms);
+                s.Write((UInt32)RuleSet);
+                s.Write(InitialCash);
+                s.Write(TargetAmount);
+                s.Write(BaseSalary);
+                s.Write(SalaryIncrement);
+                s.Write(MaxDiceRoll);
+                s.Write(VentureCard.Length);
+                for (int i = 0; i < VentureCard.Length; i++)
+                {
+                    s.Write(VentureCard[i]);
+                }
+                s.Write(MaxDiceRoll);
+                s.Write(FrbFile1);
+                s.Write(FrbFile2);
+                s.Write(FrbFile3);
+                s.Write(FrbFile4);
+                s.Write(SwitchRotationOriginPoints.Count);
+                for (int i = 0; i < SwitchRotationOriginPoints.Count; i++)
+                {
+                    s.Write(SwitchRotationOriginPoints[i].X);
+                    s.Write(SwitchRotationOriginPoints[i].Y);
+                }
+                s.Write((UInt32)Theme);
+                s.Write(Background);
+                s.Write((UInt16)LoopingMode);
+                s.Write(LoopingModeRadius);
+                s.Write(LoopingModeHorizontalPadding);
+                s.Write(LoopingModeVerticalSquareCount);
+                s.Write(TourBankruptcyLimit);
+                return SHA1.Create().ComputeHash(ms.ToArray());
+            }
         }
     }
 }
