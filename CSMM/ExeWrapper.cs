@@ -60,9 +60,10 @@ namespace CustomStreetManager
             File.Delete(zipFilePath);
             return true;
         }
-        private static async Task<bool> makeSureInstalled(string name, string[] requiredFiles, string host, string downloadUrl, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        private static async Task<bool> makeSureInstalled(string name, string[] requiredRunnables, string[] requiredFiles, string host, string downloadUrl, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            if (!requiredFilesExist(requiredFiles))
+            bool canRun = await canRunAsync(requiredRunnables, cancelToken, progress);
+            if (!canRun && !requiredFilesExist(requiredFiles))
             {
                 DialogResult dialogResult = MessageBox.Show("This application relies on " + name + " for patching. It is currently not residing next to this application. Do you want to automatically download " + name + " and extract the needed files next to this application from " + host + "?", "Install " + name, MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
@@ -88,6 +89,17 @@ namespace CustomStreetManager
             }
             return true;
         }
+
+        private static async Task<bool> canRunAsync(string[] requiredRunnables, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            foreach(var requiredRunnable in requiredRunnables)
+            {
+                var psi = preparePsi(requiredRunnable, "");
+                await execute(psi, cancelToken, ProgressInfo.makeNoProgress(progress));
+            }
+            return true;
+        }
+
         private static bool requiredFilesExist(string[] requiredFiles)
         {
             foreach (string requiredFile in requiredFiles)
@@ -101,18 +113,21 @@ namespace CustomStreetManager
         }
         public static async Task<bool> makeSureWitInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
+            string[] requiredRunnables = new string[] { "wit" };
             string[] requiredFilesWit = new string[] { "wit.exe", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
-            return await makeSureInstalled("Wiimms ISO Tools", requiredFilesWit, "https://wit.wiimm.de/", "https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+            return await makeSureInstalled("Wiimms ISO Tools", requiredRunnables, requiredFilesWit, "https://wit.wiimm.de/", "https://wit.wiimm.de/download/wit-v3.02a-r7679-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         public static async Task<bool> makeSureWszstInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
+            string[] requiredRunnables = new string[] { "wszst", "wimgt" };
             string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
-            return await makeSureInstalled("Wiimms SZS Toolset", requiredFilesWszst, "https://szs.wiimm.de", "https://szs.wiimm.de/download/szs-v2.19b-r8243-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+            return await makeSureInstalled("Wiimms SZS Toolset", requiredRunnables, requiredFilesWszst, "https://szs.wiimm.de", "https://szs.wiimm.de/download/szs-v2.19b-r8243-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         public static async Task<bool> makeSureBenzinInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
+            string[] requiredRunnables = new string[] { "benzin" };
             string[] requiredFilesBenzin = new string[] { "benzin.exe", "cygwin1.dll" };
-            return await makeSureInstalled("Benzin", requiredFilesBenzin, "https://github.com/Deflaktor/benzin", "https://github.com/Deflaktor/benzin/releases/download/2.1.11Beta/benzin-2.1.11BETA-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+            return await makeSureInstalled("Benzin", requiredRunnables, requiredFilesBenzin, "https://github.com/Deflaktor/benzin", "https://github.com/Deflaktor/benzin/releases/download/2.1.11Beta/benzin-2.1.11BETA-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         private static void parsePercentageValue(string line, IProgress<ProgressInfo> progress)
         {
@@ -187,25 +202,25 @@ namespace CustomStreetManager
         private static async Task<string> callWit(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureWitInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            var psi = preparePsi("wit.exe", arguments);
+            var psi = preparePsi("wit", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callWszst(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            var psi = preparePsi("wszst.exe", arguments);
+            var psi = preparePsi("wszst", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callWimgt(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            var psi = preparePsi("wimgt.exe", arguments);
+            var psi = preparePsi("wimgt", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callBenzin(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             await makeSureBenzinInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
-            var psi = preparePsi("benzin.exe", arguments);
+            var psi = preparePsi("benzin", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         public static async Task<string> extractFiles(string inputFile, string outputDirectory, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
