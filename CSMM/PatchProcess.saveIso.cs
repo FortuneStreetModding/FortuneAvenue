@@ -1,4 +1,4 @@
-﻿using FSEditor.Exceptions;
+using FSEditor.Exceptions;
 using FSEditor.FSData;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -158,32 +159,33 @@ namespace CustomStreetMapManager
                     {
                         var text = ui_message.get(id);
 
+                        // need to use Regex, because there are different types of whitespaces in the messages (some are U+0020 while others are U+00A0)
                         if (locale == Locale.DE)
                         {
-                            text = text.Replace("die Nintendo Wi-Fi Connection", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("der Nintendo Wi-Fi Connection", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("zur Nintendo Wi-Fi Connection", "zu Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = Regex.Replace(text, @"die\sNintendo\sWi-Fi\sConnection", "Wiimmfi", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"der\sNintendo\sWi-Fi\sConnection", "Wiimmfi", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"zur\sNintendo\sWi-Fi\sConnection", "Wiimmfi", RegexOptions.IgnoreCase);
                         }
                         if (locale == Locale.FR)
                         {
-                            text = text.Replace("Wi-Fi Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("CWF Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("Connexion Wi-Fi Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
+                            text = Regex.Replace(text, @"Wi-Fi\sNintendo", "Wiimmfi", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"CWF\sNintendo", "Wiimmfi", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"Connexion\sWi-Fi\sNintendo", "Wiimmfi", RegexOptions.IgnoreCase);
                         }
                         if (locale == Locale.ES)
                         {
-                            text = text.Replace("Conexión Wi-Fi de Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("CWF de Nintendo", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("Conexión Wi-Fi de<n>Nintendo", "Wiimmfi<n>", StringComparison.InvariantCultureIgnoreCase);
-                            text = text.Replace("Conexión<n>Wi-Fi de Nintendo", "Wiimmfi<n>", StringComparison.InvariantCultureIgnoreCase);
+                            text = Regex.Replace(text, @"Conexión\sWi-Fi\sde\sNintendo", "Wiimmfi", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"CWF\sde\sNintendo", "Wiimmfi", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"Conexión\sWi-Fi\sde<n>Nintendo", "Wiimmfi<n>", RegexOptions.IgnoreCase);
+                            text = Regex.Replace(text, @"Conexión<n>Wi-Fi\sde\sNintendo", "Wiimmfi<n>", RegexOptions.IgnoreCase);
                         }
                         if (locale == Locale.JP)
                         {
-                            text = text.Replace("Ｗｉ－Ｆｉ", "Ｗｉｉｍｍｆｉ", StringComparison.InvariantCultureIgnoreCase);
+                            text = text.Replace("Ｗｉ－Ｆｉ", "Ｗｉｉｍｍｆｉ", StringComparison.OrdinalIgnoreCase);
                         }
-                        text = text.Replace("Nintendo Wi-Fi Connection", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                        text = text.Replace("Nintendo WFC", "Wiimmfi", StringComparison.InvariantCultureIgnoreCase);
-                        text = text.Replace("support.nintendo.com", "https://wiimmfi.de", StringComparison.InvariantCultureIgnoreCase);
+                        text = Regex.Replace(text, @"Nintendo\sWi-Fi\sConnection", "Wiimmfi", RegexOptions.IgnoreCase);
+                        text = Regex.Replace(text, @"Nintendo\sWFC", "Wiimmfi", RegexOptions.IgnoreCase);
+                        text = text.Replace("support.nintendo.com", "https://wiimmfi.de", StringComparison.OrdinalIgnoreCase);
                         ui_message.set(id, text);
                     }
                 }
