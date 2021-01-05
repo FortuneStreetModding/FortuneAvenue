@@ -89,10 +89,18 @@ namespace CustomStreetMapManager
 
         private static async Task<bool> canRunAsync(string[] requiredRunnables, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            foreach (var requiredRunnable in requiredRunnables)
+            try
             {
-                var psi = ExeWrapper.preparePsi(requiredRunnable, "");
-                await ExeWrapper.execute(psi, cancelToken, ProgressInfo.makeNoProgress(progress));
+                foreach (var requiredRunnable in requiredRunnables)
+                {
+                    var psi = ExeWrapper.preparePsi(requiredRunnable, "");
+                    await ExeWrapper.execute(psi, cancelToken, ProgressInfo.makeNoProgress(progress));
+                }
+            }
+            catch (Exception e)
+            {
+                progress?.Report(new ProgressInfo(e.Message, true));
+                return false;
             }
             return true;
         }
@@ -116,9 +124,9 @@ namespace CustomStreetMapManager
         }
         public static async Task<bool> makeSureWszstInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            string[] requiredRunnables = new string[] { "wszst", "wimgt" };
-            string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll" };
-            return await makeSureInstalled("Wiimms SZS Toolset", requiredRunnables, requiredFilesWszst, "https://szs.wiimm.de", "https://szs.wiimm.de/download/szs-v2.19b-r8243-cygwin.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+            string[] requiredRunnables = new string[] { "wszst", "wimgt", "wstrt" };
+            string[] requiredFilesWszst = new string[] { "wszst.exe", "wimgt.exe", "wstrt.exe", "cygpng16-16.dll", "cyggcc_s-1.dll", "cygwin1.dll", "cygz.dll", "cygncursesw-10.dll", "cygcrypto-1.1.dll" };
+            return await makeSureInstalled("Wiimms SZS Toolset", requiredRunnables, requiredFilesWszst, "https://szs.wiimm.de", "https://szs.wiimm.de/download/szs-v2.22a-r8323-cygwin32.zip", cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
         public static async Task<bool> makeSureBenzinInstalled(CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -77,6 +77,8 @@ namespace CustomStreetMapManager
         public static ProcessStartInfo preparePsi(string executable, string arguments)
         {
             string executablePath = Path.Combine(Directory.GetCurrentDirectory(), executable);
+            if (!File.Exists(executablePath))
+                executablePath = executable;
             ProcessStartInfo psi = new ProcessStartInfo(executablePath, arguments);
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
@@ -90,25 +92,26 @@ namespace CustomStreetMapManager
 
         private static async Task<string> callWit(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            // await makeSureWitInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             var psi = preparePsi("wit", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callWszst(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            // await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             var psi = preparePsi("wszst", arguments);
+            return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
+        }
+        private static async Task<string> callWstrt(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            var psi = preparePsi("wstrt", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callWimgt(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            // await makeSureWszstInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             var psi = preparePsi("wimgt", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
         private static async Task<string> callBenzin(string arguments, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
-            // await makeSureBenzinInstalled(cancelToken, ProgressInfo.makeSubProgress(progress, 0, 10)).ConfigureAwait(continueOnCapturedContext);
             var psi = preparePsi("benzin", arguments);
             return await execute(psi, cancelToken, ProgressInfo.makeSubProgress(progress, 10, 100));
         }
@@ -144,6 +147,12 @@ namespace CustomStreetMapManager
         {
             string arguments = "EDIT \"" + inputFile + "\" --psel data --wiimmfi -vv";
             return await callWit(arguments, ct, progress).ConfigureAwait(continueOnCapturedContext);
+        }
+
+        public static async Task<string> applyWiimmfiDol(string dolFile, CancellationToken ct, IProgress<ProgressInfo> progress)
+        {
+            string arguments = "PATCH \"" + dolFile + "\" --wiimmfi -vv";
+            return await callWstrt(arguments, ct, progress).ConfigureAwait(continueOnCapturedContext);
         }
 
         public static async Task<List<AddressSection>> readSections(string inputFile, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
