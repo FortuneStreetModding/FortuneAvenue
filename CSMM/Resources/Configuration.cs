@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
-    class Configuration
+    public class Configuration
     {
         public static void save(string fileName, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
         {

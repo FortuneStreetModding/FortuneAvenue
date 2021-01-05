@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSMM\CustomStreetManager.csproj" />
     <ProjectReference Include="..\Lib\Lib.csproj" />
+    <ProjectReference Include="..\CSMMGUI\CustomStreetMapManagerGui.csproj" />
   </ItemGroup>
 
 </Project>

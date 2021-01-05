@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class MapDescriptorValidationMessage
     {

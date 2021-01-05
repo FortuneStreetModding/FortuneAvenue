@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class UI_Message
     {

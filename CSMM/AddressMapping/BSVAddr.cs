@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     /// <summary>
     /// Boom Street Virtual Address

@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
@@ -251,9 +251,6 @@ namespace CustomStreetManager
             {
                 return true;
             }
-
-            await ExeWrapper.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
-            await ExeWrapper.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(false);
 
             progress.Report("Extract game_sequence files...");
 

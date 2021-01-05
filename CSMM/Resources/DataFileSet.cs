@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class DataFileSet
     {

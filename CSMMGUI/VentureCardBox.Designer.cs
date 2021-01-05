@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     partial class VentureCardBox
     {
