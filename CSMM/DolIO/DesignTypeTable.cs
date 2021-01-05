@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class DesignTypeTable : DolIOTable
     {

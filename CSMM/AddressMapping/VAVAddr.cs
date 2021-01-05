@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     /// <summary>
     /// Version Agnostic Virtual Address

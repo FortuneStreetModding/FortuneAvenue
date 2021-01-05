@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {

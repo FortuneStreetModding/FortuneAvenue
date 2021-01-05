@@ -8,7 +8,7 @@ using MiscUtil.Conversion;
 using FSEditor.FSData;
 using System.Text.RegularExpressions;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class MainDol
     {

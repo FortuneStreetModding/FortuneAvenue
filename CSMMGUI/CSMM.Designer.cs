@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     partial class CSMM
     {
@@ -389,7 +389,7 @@ namespace CustomStreetManager
             // 
             // mapDescriptorBindingSource
             // 
-            this.mapDescriptorBindingSource.DataSource = typeof(CustomStreetManager.MapDescriptor);
+            this.mapDescriptorBindingSource.DataSource = typeof(MapDescriptor);
             // 
             // Go
             // 

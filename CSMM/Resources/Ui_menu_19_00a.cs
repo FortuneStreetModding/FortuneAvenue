@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class Ui_menu_19_00a
     {

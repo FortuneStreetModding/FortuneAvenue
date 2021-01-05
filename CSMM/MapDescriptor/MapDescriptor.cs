@@ -12,7 +12,7 @@ using System.Threading;
 using System.Globalization;
 using System.Security.Cryptography;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public class MapDescriptor
     {
@@ -974,7 +974,7 @@ namespace CustomStreetManager
         public string generateMapDescriptorFileContent()
         {
             MapDescriptorTemplate t = new MapDescriptorTemplate(this);
-            return t.TransformText().TrimStart();
+            return "";
         }
 
         public override bool Equals(object x)

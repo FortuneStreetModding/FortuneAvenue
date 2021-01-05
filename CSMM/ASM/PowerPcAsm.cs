@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     /**
      * Some info taken from:

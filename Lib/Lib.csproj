@@ -3,8 +3,8 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	<RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
-    <UseWPF>true</UseWPF>
+	  <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <UseWPF>false</UseWPF>
     <RootNamespace>Lib</RootNamespace>
     <AssemblyName>Lib</AssemblyName>
     <DefineConstants>NETCORE</DefineConstants>

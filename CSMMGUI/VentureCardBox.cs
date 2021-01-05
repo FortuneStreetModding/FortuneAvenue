@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
-namespace CustomStreetManager
+namespace CustomStreetMapManager
 {
     public partial class VentureCardBox : Form
     {
