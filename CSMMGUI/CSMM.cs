@@ -190,8 +190,8 @@ namespace CustomStreetMapManager
                 try
                 {
 
-                    await ExeChecker.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
-                    await ExeChecker.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(false);
+                    await ExeChecker.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(true);
+                    await ExeChecker.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(true);
 
                     await patchProcess.saveWbfsIso(outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
 
@@ -297,7 +297,7 @@ namespace CustomStreetMapManager
                 patchProcess = new PatchProcess();
                 try
                 {
-                    await ExeChecker.makeSureWitInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(false);
+                    await ExeChecker.makeSureWitInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(true);
                     var mapDescriptors = await patchProcess.loadWbfsIsoFile(inputWbfsIso, progress, ct);
 
                     Go.Enabled = true;
