@@ -10,6 +10,7 @@
     <AssemblyName>CustomStreetMapManagerGui</AssemblyName>
     <DefineConstants>NETCORE</DefineConstants>
     <ApplicationIcon>cube.ico</ApplicationIcon>
+    <StartupObject>CustomStreetMapManager.Program</StartupObject>
   </PropertyGroup>
   
   <ItemGroup>
