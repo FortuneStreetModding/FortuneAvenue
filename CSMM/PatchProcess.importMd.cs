@@ -101,7 +101,7 @@ namespace CustomStreetMapManager
                 // we have a map icon for the tutorial map ready, we can use it
                 if (mapIcon == "p_bg_901")
                 {
-                    WriteResourceToFile("CustomStreetManager.Images.p_bg_901.png", destFile);
+                    WriteResourceToFile("CustomStreetMapManager.Images.p_bg_901.png", destFile);
                 }
                 else
                 {

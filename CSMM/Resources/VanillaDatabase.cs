@@ -316,7 +316,7 @@ namespace CustomStreetMapManager
             table.Rows.Add( "bg103"  , "The Colossus"      ,  4 , "p_bg_103" , "ui_menu007_bg103.tpl" );
             table.Rows.Add( "bg103_e", "The Colossus Easy" ,  4 , "p_bg_103" , "ui_menu007_bg103.tpl" );
             table.Rows.Add( "bg108"  , "Alltrades Abbey"   , 19 , "p_bg_108" , "ui_menu007_bg108.tpl" );
-            table.Rows.Add( "bg901"  , "Practice Board"    , 22 );
+            table.Rows.Add( "bg901"  , "Practice Board"    , 22 , "p_bg_901");
             return table;
         }
         public static DataTable getMapIconTable()
@@ -325,7 +325,7 @@ namespace CustomStreetMapManager
             for (int i = table.Rows.Count - 1; i >= 0; i--)
             {
                 DataRow dr = table.Rows[i];
-                if (dr["Background"] == "bg103_e")
+                if ((string)dr["Background"] == "bg103_e")
                     dr.Delete();
             }
             table.AcceptChanges();
@@ -417,7 +417,7 @@ namespace CustomStreetMapManager
                 var result = from row in VanillaDatabase.getMapTable().AsEnumerable()
                              where row.Field<string>("Map Icon") == mapIcon
                              select row.Field<string>("Map Tpl");
-                if (result.Any())
+                if (result.Any() && result.Distinct().Single() != null)
                     return Optional<string>.Create(result.Distinct().Single());
             }
             catch (IndexOutOfRangeException e) { }

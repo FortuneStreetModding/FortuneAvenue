@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Images\p_bg_901.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Lib\Lib.csproj" />
     <EmbeddedResource Include="Images\p_bg_901.png" />
   </ItemGroup>
