@@ -154,6 +154,7 @@ namespace CustomStreetMapManager
         // --- Looping Mode ---
         // --------------------
         [ReadOnly(true)]
+        [JsonConverter(typeof(LoopingModeConverter))]
         public LoopingMode LoopingMode { get; set; }
         [ReadOnly(true)]
         public Single LoopingModeRadius { get; set; }
