@@ -48,6 +48,7 @@ namespace CustomStreetMapManager
             private set { }
         }
         [ReadOnly(true)]
+        [JsonConverter(typeof(RuleSetConverter))]
         public RuleSet RuleSet { get; set; }
 
         [ReadOnly(true)]
