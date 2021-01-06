@@ -167,10 +167,13 @@ namespace CustomStreetMapManager
         [ReadOnly(true)]
         public UInt32 TourInitialCash { get; set; }
         [ReadOnly(true)]
+        [JsonConverter(typeof(CharacterConverter))]
         public Character TourOpponent1 { get; set; } = Character.Mario;
         [ReadOnly(true)]
+        [JsonConverter(typeof(CharacterConverter))]
         public Character TourOpponent2 { get; set; } = Character.Luigi;
         [ReadOnly(true)]
+        [JsonConverter(typeof(CharacterConverter))]
         public Character TourOpponent3 { get; set; } = Character.Peach;
         [ReadOnly(true)]
         public UInt32 TourClearRank { get; set; } = 2;
