@@ -11,12 +11,14 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Text.Json.Serialization;
 
 namespace CustomStreetMapManager
 {
     public class MapDescriptor
     {
         [Browsable(false)]
+        [JsonIgnore]
         public bool Dirty { get; set; }
         // --------------------------------------
         // --- MapSet Zone Order and Practice ---
@@ -36,6 +38,7 @@ namespace CustomStreetMapManager
         // --- Basic Info ---
         // ------------------
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Name_EN
         {
             get
@@ -60,6 +63,7 @@ namespace CustomStreetMapManager
         [Browsable(false)]
         public byte[] VentureCard { get; set; }
         [ReadOnly(true)]
+        [JsonIgnore]
         public int VentureCardActiveCount
         {
             get
@@ -80,6 +84,7 @@ namespace CustomStreetMapManager
         // --- Frb Files and Switch Configuration ---
         // ------------------------------------------
         [ReadOnly(true)]
+        [JsonIgnore]
         public string FrbFiles
         {
             get
@@ -105,6 +110,7 @@ namespace CustomStreetMapManager
         public string FrbFile4 { get; set; }
         [ReadOnly(true)]
         [DisplayName("SwitchRotationOriginPoints")]
+        [JsonIgnore]
         public string SwitchRotationOriginPoints_
         {
             get
@@ -177,34 +183,46 @@ namespace CustomStreetMapManager
         [Browsable(false)]
         public Dictionary<string, string> Name { get; private set; }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Name_DE { get { return Name.GetValueOrDefault(Locale.DE, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Name_FR { get { return Name.GetValueOrDefault(Locale.FR, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Name_IT { get { return Name.GetValueOrDefault(Locale.IT, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Name_JP { get { return Name.GetValueOrDefault(Locale.JP, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Name_ES { get { return Name.GetValueOrDefault(Locale.ES, ""); } private set { } }
         [ReadOnly(true)]
         public UInt32 Desc_MSG_ID { get; set; }
         [Browsable(false)]
         public Dictionary<string, string> Desc { get; private set; }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Desc_EN { get { return Desc.GetValueOrDefault(Locale.EN, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Desc_DE { get { return Desc.GetValueOrDefault(Locale.DE, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Desc_FR { get { return Desc.GetValueOrDefault(Locale.FR, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Desc_IT { get { return Desc.GetValueOrDefault(Locale.IT, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Desc_JP { get { return Desc.GetValueOrDefault(Locale.JP, ""); } private set { } }
         [ReadOnly(true)]
+        [JsonIgnore]
         public string Desc_ES { get { return Desc.GetValueOrDefault(Locale.ES, ""); } private set { } }
         [ReadOnly(true)]
         public string InternalName { get; set; }
         [Browsable(false)]
+        [JsonIgnore]
         public string MapDescriptorFilePath { get; private set; }
 
         public MapDescriptor()
