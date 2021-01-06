@@ -61,6 +61,7 @@ namespace CustomStreetMapManager
         [ReadOnly(true)]
         public UInt32 MaxDiceRoll { get; set; }
         [Browsable(false)]
+        [JsonConverter(typeof(VentureCardConverter))]
         public byte[] VentureCard { get; set; }
         [ReadOnly(true)]
         [JsonIgnore]
