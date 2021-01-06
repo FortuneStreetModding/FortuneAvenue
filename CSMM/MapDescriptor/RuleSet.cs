@@ -5,9 +5,9 @@ using System.Text;
 
 namespace CustomStreetMapManager
 {
-	public enum RuleSet : UInt32
-	{
-		Standard = 0,
-		Easy = 1
-	}
+    public enum RuleSet : UInt32
+    {
+        Standard = 0,
+        Easy = 1
+    }
 }
