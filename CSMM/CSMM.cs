@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,13 +19,13 @@ namespace CustomStreetMapManager
                     // prevent terminating the application instantly if user requests it -> only once user requests twice
                     if (!cancellationTokenSource.IsCancellationRequested)
                     {
-                        Console.Write("Aborting process...");
+                        Console.WriteLine("Aborting process...");
                         e.Cancel = true;
                         cancellationTokenSource.Cancel();
                     }
                     else
                     {
-                        Console.Write("Killing process without cleanup...");
+                        Console.WriteLine("Killing process without cleanup...");
                     }
                 };
                 if (args.Length == 0)
@@ -54,7 +55,7 @@ namespace CustomStreetMapManager
                         input = args[i];
                     }
                 }
-                using (ConsoleProgress progress = new ConsoleProgress(options.ContainsKey("v")))
+                using (ConsoleProgress progress = new ConsoleProgress(options.ContainsKey("v"), options.ContainsKey("q")))
                 {
                     if (args[0].ToLower() == "read")
                     {
@@ -92,8 +93,12 @@ namespace CustomStreetMapManager
      *                                                           *     
      *************************************************************     
 
-cssm export|import
+csmm read [options] [input] 
 
+options:
+    -v          verbose
+    -q          quiet
+    -d path     destination
 ");
 
         }
@@ -106,10 +111,13 @@ cssm export|import
         {
             PatchProcess patchProcess = new PatchProcess();
             var mapDescriptors = await patchProcess.loadWbfsIsoFile(input, progress, ct);
-            foreach (var mapDescriptor in mapDescriptors)
+            var options = new JsonSerializerOptions
             {
-                Console.WriteLine(mapDescriptor.ToMD());
-            }
+                WriteIndented = true
+                
+            };
+            var json = JsonSerializer.Serialize(mapDescriptors, options);
+            Console.WriteLine(json);
         }
 
     }

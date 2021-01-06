@@ -8,20 +8,27 @@ namespace CustomStreetMapManager
     {
         private ASCIIProgressBar asciiProgressBar;
         private bool verbose;
+        private bool silent;
 
-        public ConsoleProgress(bool verbose)
+        public ConsoleProgress(bool verbose, bool silent)
         {
-            asciiProgressBar = new ASCIIProgressBar();
             this.verbose = verbose;
+            this.silent = silent;
+            if(!silent)
+            {
+                asciiProgressBar = new ASCIIProgressBar();
+            }
         }
 
         public void Dispose()
         {
-            asciiProgressBar.Dispose();
+            asciiProgressBar?.Dispose();
         }
 
         public void Report(ProgressInfo progressInfo)
         {
+            if (silent)
+                return;
             if (!string.IsNullOrEmpty(progressInfo.line))
             {
                 if (!progressInfo.verbose || verbose)
