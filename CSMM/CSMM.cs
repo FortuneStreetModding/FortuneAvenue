@@ -67,19 +67,6 @@ namespace CustomStreetMapManager
             }
         }
 
-        private IProgress<ProgressInfo> setupProgressReport(ASCIIProgressBar asciiprogress, bool verbose)
-        {
-            return new Progress<ProgressInfo>(progressInfo =>
-            {
-                if (!string.IsNullOrEmpty(progressInfo.line))
-                {
-                    if (!progressInfo.verbose || verbose)
-                        Console.WriteLine(progressInfo.line);
-                }
-                asciiprogress?.Report(progressInfo.progress / 100.0);
-            });
-        }
-
         private static bool hasParameter(string option)
         {
             if (option.ToLower() == "d")
@@ -89,7 +76,26 @@ namespace CustomStreetMapManager
 
         private static void printHelp()
         {
-            Console.WriteLine("Help");
+            Console.WriteLine(@"
+     *************************************************************     
+     *                                                           *     
+     *          .-------.   _____  _____ __  __ __  __           *     
+     *         /   o   /|  / ____|/ ____|  \/  |  \/  |          *     
+     *        /_______/o| | |    | (___ | \  / | \  / |          *     
+     *        | o   o | | | |     \___ \| |\/| | |\/| |          *     
+     *        |   o   |o/ | |____ ____) | |  | | |  | |          *     
+     *        | o   o |/   \_____|_____/|_|  |_|_|  |_|          *     
+     *        '-------'                                          *     
+     *                    Custom Street Map Manager              *     
+     *                                                           *     
+     *                    github.com/FortuneStreetModding        *     
+     *                                                           *     
+     *************************************************************     
+
+cssm export|import
+
+");
+
         }
 
         private static void printReadHelp()
@@ -102,7 +108,7 @@ namespace CustomStreetMapManager
             var mapDescriptors = await patchProcess.loadWbfsIsoFile(input, progress, ct);
             foreach (var mapDescriptor in mapDescriptors)
             {
-                mapDescriptor.ToMD();
+                Console.WriteLine(mapDescriptor.ToMD());
             }
         }
 
