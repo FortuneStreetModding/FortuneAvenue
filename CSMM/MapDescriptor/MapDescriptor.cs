@@ -132,6 +132,7 @@ namespace CustomStreetMapManager
         // --- Background ---
         // ------------------
         [ReadOnly(true)]
+        [JsonConverter(typeof(BoardThemeConverter))]
         public BoardTheme Theme { get; set; }
         [ReadOnly(true)]
         public string Background { get; set; }
