@@ -94,7 +94,7 @@ namespace CustomStreetMapManager
             string extractedFiles = "";
             using (FileStream fs = File.Create(fileNameMd))
             {
-                byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.generateMapDescriptorFileContent());
+                byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.ToMD());
                 await fs.WriteAsync(content, 0, content.Length).ConfigureAwait(false);
             }
             extractedFiles += fileNameMd + Environment.NewLine;

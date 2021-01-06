@@ -319,6 +319,18 @@ namespace CustomStreetMapManager
             table.Rows.Add( "bg901"  , "Practice Board"    , 22 );
             return table;
         }
+        public static DataTable getMapIconTable()
+        {
+            var table = getMapTable().Copy();
+            for (int i = table.Rows.Count - 1; i >= 0; i--)
+            {
+                DataRow dr = table.Rows[i];
+                if (dr["Background"] == "bg103_e")
+                    dr.Delete();
+            }
+            table.AcceptChanges();
+            return table.DefaultView.ToTable(true, "Map Icon", "Description");
+        }
         public static DataTable getBgmTable()
         {
             DataTable table = new DataTable();
@@ -422,5 +434,6 @@ namespace CustomStreetMapManager
             }
             return dict;
         }
+
     }
 }

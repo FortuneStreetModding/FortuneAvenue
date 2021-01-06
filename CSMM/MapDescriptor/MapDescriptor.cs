@@ -1,4 +1,4 @@
-﻿using FSEditor.FSData;
+using FSEditor.FSData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -971,10 +971,10 @@ namespace CustomStreetMapManager
             MapDescriptorFilePath = mapDescriptor.MapDescriptorFilePath;
         }
 
-        public string generateMapDescriptorFileContent()
+        public string ToMD()
         {
             MapDescriptorTemplate t = new MapDescriptorTemplate(this);
-            return "";
+            return t.ToString();
         }
 
         public override bool Equals(object x)
@@ -1033,7 +1033,7 @@ namespace CustomStreetMapManager
 
         public override int GetHashCode()
         {
-                return InternalName.GetHashCode() ^ RuleSet.GetHashCode();
+            return InternalName.GetHashCode() ^ RuleSet.GetHashCode();
         }
 
         public byte[] GetSha1()
