@@ -21,7 +21,8 @@ namespace CustomStreetMapManager
             if (string.IsNullOrEmpty(Path.GetExtension(destination)))
                 destination = Path.Combine(destination, mapDescriptor.InternalName + ".md");
             var directory = Path.GetDirectoryName(destination);
-            Directory.CreateDirectory(directory);
+            if (!string.IsNullOrWhiteSpace(directory))
+                Directory.CreateDirectory(directory);
             string fileNameMd = destination;
             string fileNameFrb1 = Path.Combine(directory, mapDescriptor.FrbFile1 + ".frb");
             string fileNameFrb2 = null;
