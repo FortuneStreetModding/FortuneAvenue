@@ -23,7 +23,6 @@ namespace CustomStreetMapManager
 {
     public partial class CSMM : Form
     {
-        PatchProcess patchProcess;
         readonly CancellationTokenSource exitTokenSource;
         readonly Dictionary<string, ToolStripMenuItem> xmlFileToToolStripMenuItemDict = new Dictionary<string, ToolStripMenuItem>();
         private MapDescriptor editMd = new MapDescriptor();
@@ -193,7 +192,7 @@ namespace CustomStreetMapManager
                     await ExeChecker.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(true);
                     await ExeChecker.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(true);
 
-                    await patchProcess.saveWbfsIso(inputFile, outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
+                    await PatchProcess.Save(inputFile, outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
 
 
                     // TODO, better cleanup
@@ -204,10 +203,10 @@ namespace CustomStreetMapManager
                         {
                             if (c)
                             {
-                                patchProcess.CleanCache(inputFile);
-                                patchProcess.CleanRiivolution();
+                                PatchProcess.CleanCache(inputFile);
+                                PatchProcess.CleanRiivolution();
                             }
-                            patchProcess.CleanTemp();
+                            PatchProcess.CleanTemp();
                         };
                     });
                 }
@@ -247,7 +246,7 @@ namespace CustomStreetMapManager
                     // remove the extension
                     outputFile = Path.Combine(Directory.GetParent(outputFile).FullName, Path.GetFileNameWithoutExtension(outputFile));
                 }
-                if (patchProcess.IsImageFileExtension(outputFile))
+                if (PatchProcess.IsImageFileExtension(outputFile))
                 {
                     bool overwrite = File.Exists(outputFile);
                     if (overwrite)
@@ -266,7 +265,7 @@ namespace CustomStreetMapManager
                 else
                 {
                     bool overwrite;
-                    outputFile = patchProcess.DoPathCorrections(outputFile, true, out overwrite);
+                    outputFile = PatchProcess.DoPathCorrections(outputFile, true, out overwrite);
                     if (overwrite)
                     {
                         DialogResult dialogResult = MessageBox.Show("An extracted iso/wbfs directory already exists at " + Environment.NewLine + outputFile + Environment.NewLine + Environment.NewLine + "Do you want to patch this location? Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
@@ -303,11 +302,10 @@ namespace CustomStreetMapManager
                 });
 
                 var inputWbfsIso = setInputISOLocation.Text;
-                patchProcess = new PatchProcess();
                 try
                 {
                     await ExeChecker.makeSureWitInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(true);
-                    var mapDescriptors = await patchProcess.loadWbfsIsoFile(inputWbfsIso, progress, ct);
+                    var mapDescriptors = await PatchProcess.Load(inputWbfsIso, progress, ct);
 
                     Go.Enabled = true;
                     clearListButton.Enabled = true;
@@ -372,7 +370,6 @@ namespace CustomStreetMapManager
                 }
                 catch (Exception e)
                 {
-                    patchProcess = null;
                     setInputISOLocation.Text = "None";
                     Go.Enabled = false;
                     clearListButton.Enabled = false;
@@ -412,8 +409,7 @@ namespace CustomStreetMapManager
             {
                 var input = openFileDialog1.FileName;
 
-                PatchProcess patchProcess = new PatchProcess();
-                input = patchProcess.DoPathCorrections(input, false);
+                input = PatchProcess.DoPathCorrections(input, false);
 
                 setInputISOLocation.Text = input;
                 reloadWbfsIsoFile();
@@ -533,7 +529,7 @@ namespace CustomStreetMapManager
 
                     try
                     {
-                        Configuration.load(input, GetMapDescriptors(), patchProcess, progress, ct);
+                        Configuration.Load(input, GetMapDescriptors(), progress, ct);
                         var bs = (BindingSource)dataGridView1.DataSource;
                         bs.ResetBindings(true);
                         DataGridView1_CellEndEdit(null, null);
@@ -610,10 +606,8 @@ namespace CustomStreetMapManager
                     try
                     {
                         var input = setInputISOLocation.Text;
-                        input = patchProcess.DoPathCorrections(input, false);
-                        var cacheFileSet = new DataFileSet(patchProcess.GetCachePath(input));
 
-                        string extractedFiles = await patchProcess.exportMd(saveFileDialog1.FileName, mapDescriptor, overwrite, cacheFileSet, progress, ct);
+                        string extractedFiles = await PatchProcess.ExportMd(saveFileDialog1.FileName, input, mapDescriptor, overwrite, progress, ct);
                         progressBar.appendText(extractedFiles);
                     }
                     catch (FileAlreadyExistException e1)
@@ -659,7 +653,7 @@ namespace CustomStreetMapManager
 
                     try
                     {
-                        var importedMapDescriptor = patchProcess.importMd(openFileDialog1.FileName, progress, ct);
+                        var importedMapDescriptor = PatchProcess.ImportMd(openFileDialog1.FileName, progress, ct);
                         if (mapDescriptor != null)
                         {
                             mapDescriptor.setFromImport(importedMapDescriptor);

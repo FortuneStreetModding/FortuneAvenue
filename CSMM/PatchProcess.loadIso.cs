@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace CustomStreetMapManager
 {
-    public partial class PatchProcess
+    public abstract partial class PatchProcess
     {
-        public async Task<List<MapDescriptor>> loadWbfsIsoFile(string input, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static async Task<List<MapDescriptor>> Load(string input, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             progress?.Report(0);
 
@@ -47,7 +47,7 @@ namespace CustomStreetMapManager
 
                 progress?.Report(97);
                 progress?.Report("Read localization files...");
-                loadUIMessages(mapDescriptors, cacheFileSet, ProgressInfo.makeSubProgress(progress, 20, 60), ct);
+                LoadUIMessages(mapDescriptors, cacheFileSet, ProgressInfo.makeSubProgress(progress, 20, 60), ct);
             }
 
             progress?.Report(100);
@@ -57,7 +57,7 @@ namespace CustomStreetMapManager
 
             return mapDescriptors;
         }
-        private void loadUIMessages(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private static void LoadUIMessages(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             // Key = locale, Value = file contents
             var ui_messages = new Dictionary<string, UI_Message>();

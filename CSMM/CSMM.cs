@@ -128,8 +128,7 @@ options:
         }
         private static async Task read(string input, ConsoleProgress progress, CancellationToken ct)
         {
-            PatchProcess patchProcess = new PatchProcess();
-            var mapDescriptors = await patchProcess.loadWbfsIsoFile(input, progress, ct);
+            var mapDescriptors = await PatchProcess.Load(input, progress, ct);
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true

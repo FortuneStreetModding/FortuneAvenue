@@ -13,12 +13,15 @@ using System.Threading.Tasks;
 
 namespace CustomStreetMapManager
 {
-    public partial class PatchProcess
+    public abstract partial class PatchProcess
     {
-        public async Task<string> exportMd(string selectedFile, MapDescriptor mapDescriptor, bool overwrite, DataFileSet cacheFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static async Task<string> ExportMd(string mdFileName, string input, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            var directory = Path.GetDirectoryName(selectedFile);
-            string fileNameMd = selectedFile;
+            input = DoPathCorrections(input, false);
+            var cacheFileSet = new DataFileSet(GetCachePath(input));
+
+            var directory = Path.GetDirectoryName(mdFileName);
+            string fileNameMd = mdFileName;
             string fileNameFrb1 = Path.Combine(directory, mapDescriptor.FrbFile1 + ".frb");
             string fileNameFrb2 = null;
             string fileNameFrb3 = null;

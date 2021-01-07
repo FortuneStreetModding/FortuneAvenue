@@ -13,15 +13,14 @@ using System.Threading.Tasks;
 
 namespace CustomStreetMapManager
 {
-    public partial class PatchProcess
+    public abstract partial class PatchProcess
     {
-
-        public string GetDefaultTmpPath()
+        private static string GetDefaultTmpPath()
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "tmp");
         }
 
-        public string GetDefaultRiivPath()
+        private static string GetDefaultRiivPath()
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "fortunestreet");
         }
@@ -29,7 +28,7 @@ namespace CustomStreetMapManager
         /// The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
         /// to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
         /// </summary>
-        public string GetCachePath(string input)
+        private static string GetCachePath(string input)
         {
             if (IsImageFileExtension(input))
             {
@@ -44,7 +43,7 @@ namespace CustomStreetMapManager
         /// <summary>
         /// Cleans all temporary files which are generated during the patch proccess which do not belong in the iso
         /// </summary>
-        public void CleanTemp(DataFileSet tmpFileSet = null)
+        public static void CleanTemp(DataFileSet tmpFileSet = null)
         {
             if (tmpFileSet == null)
             {
@@ -59,7 +58,7 @@ namespace CustomStreetMapManager
         /// <summary>
         /// Cleans the folder which was extracted from the wbfs/iso for caching purposes.
         /// </summary>
-        public void CleanCache(string input)
+        public static void CleanCache(string input)
         {
             if (!ShouldKeepCache(input))
             {
@@ -74,7 +73,7 @@ namespace CustomStreetMapManager
         /// <summary>
         /// Cleans all files which are needed for the iso
         /// </summary>
-        public void CleanRiivolution(DataFileSet riivFileSet = null)
+        public static void CleanRiivolution(DataFileSet riivFileSet = null)
         {
             if (riivFileSet == null)
             {
@@ -86,7 +85,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        private bool ShouldKeepCache(string input)
+        private static bool ShouldKeepCache(string input)
         {
             if (IsImageFileExtension(input))
             {
@@ -98,13 +97,13 @@ namespace CustomStreetMapManager
             }
         }
 
-        public bool IsDirectoryEmpty(string path)
+        private static bool IsDirectoryEmpty(string path)
         {
             return !Directory.EnumerateFileSystemEntries(path).Any();
         }
 
         // From: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
-        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             // Get the subdirectories for the specified directory.
             DirectoryInfo dir = new DirectoryInfo(sourceDirName);
@@ -146,7 +145,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        public bool IsImageFileExtension(string path)
+        public static bool IsImageFileExtension(string path)
         {
             var extension = Path.GetExtension(path);
             return extension.ToLower() == ".wbfs" ||
@@ -159,12 +158,12 @@ namespace CustomStreetMapManager
                 extension.ToLower() == ".wbi";
         }
 
-        public string DoPathCorrections(string file, bool output)
+        public static string DoPathCorrections(string file, bool output)
         {
             return DoPathCorrections(file, output, out _);
         }
 
-        private string GetExtractedIsoDir(string dir)
+        private static string GetExtractedIsoDir(string dir)
         {
             if (File.Exists(Path.Combine(dir, "sys", "main.dol")) &&
                 Directory.Exists(Path.Combine(dir, "files", "bg")) &&
@@ -193,7 +192,7 @@ namespace CustomStreetMapManager
             return null;
         }
 
-        public string DoPathCorrections(string file, bool output, out bool alreadyExists)
+        public static string DoPathCorrections(string file, bool output, out bool alreadyExists)
         {
             if (IsImageFileExtension(file))
             {

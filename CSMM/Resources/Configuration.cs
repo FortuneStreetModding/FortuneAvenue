@@ -33,7 +33,7 @@ namespace CustomStreetMapManager
             progress?.Report("Saved configuration at " + fileName);
         }
 
-        public static void load(string fileName, List<MapDescriptor> mapDescriptors, PatchProcess patchProcess, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static void Load(string fileName, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var dir = Directory.GetParent(fileName).FullName;
 
@@ -75,7 +75,7 @@ namespace CustomStreetMapManager
                 if (!string.IsNullOrEmpty(mapDescriptorFilePath))
                 {
                     mapDescriptorFilePath = Path.Combine(dir, mapDescriptorFilePath);
-                    var importMd = patchProcess.importMd(mapDescriptorFilePath, ProgressInfo.makeNoProgress(progress), ct);
+                    var importMd = PatchProcess.ImportMd(mapDescriptorFilePath, ProgressInfo.makeNoProgress(progress), ct);
                     tempMapDescriptors[i].setFromImport(importMd);
                 }
                 progress?.Report(100 * p / lines.Count());
