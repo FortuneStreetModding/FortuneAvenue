@@ -26,14 +26,12 @@ namespace CustomStreetMapManager
 
             if (File.Exists(Path.Combine(input, "sys", "main.dol")))
             {
-                keepCache = true;
                 string extractDir = input;
                 cacheFileSet = new DataFileSet(extractDir);
             }
             else
             {
                 progress?.Report("Extract iso/wbfs...");
-                keepCache = false;
                 string extractDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
                 await ExeWrapper.extractFullIsoAsync(input, extractDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
                 cacheFileSet = new DataFileSet(extractDir);

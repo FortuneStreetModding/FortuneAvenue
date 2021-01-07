@@ -17,7 +17,7 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        public async Task<bool> saveWbfsIso(string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var packIso = true;
             if (!isOutputImageFileExtension(outputFile))
@@ -45,7 +45,7 @@ namespace CustomStreetMapManager
 
                 if (packIso)
                 {
-                    if (keepCache)
+                    if (ShouldKeepCache(inputFile))
                     {
                         packIsoInputPath = Path.Combine(tmpFileSet.rootDir, Path.GetFileNameWithoutExtension("pack_" + outputFile));
                         DirectoryCopy(cacheFileSet.rootDir, packIsoInputPath, true, true, ProgressInfo.makeNoProgress(progress), ct);

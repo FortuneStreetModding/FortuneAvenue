@@ -163,10 +163,10 @@ namespace CustomStreetMapManager
         private async void Go_Click(object sender, EventArgs e)
         {
             var outputFile = setOutputPathLabel.Text;
+            var inputFile = setInputISOLocation.Text;
 
             if (String.IsNullOrWhiteSpace(outputFile) || outputFile.ToLower() == "none")
             {
-                var inputFile = setInputISOLocation.Text;
                 DialogResult dialogResult = MessageBox.Show("Do you want to patch the existing location?" + Environment.NewLine + inputFile + Environment.NewLine + Environment.NewLine + "Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                     outputFile = inputFile;
@@ -193,13 +193,25 @@ namespace CustomStreetMapManager
                     await ExeChecker.makeSureWszstInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(true);
                     await ExeChecker.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(true);
 
-                    await patchProcess.saveWbfsIso(outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
+                    await patchProcess.saveWbfsIso(inputFile, outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
+                    
 
                     // TODO, better cleanup
                     Invoke((MethodInvoker)delegate
                     {
                         progressBar.ShowCheckbox("Cleanup temporary files.", false);
-                        progressBar.callback = (c) => { if (c) patchProcess.cleanFull(); else patchProcess.cleanTemp(); };
+                        progressBar.callback = (c) =>
+                        {
+                            if (c)
+                            {
+                                if (!patchProcess.ShouldKeepCache(inputFile))
+                                {
+                                    patchProcess.cleanCache();
+                                }
+                                patchProcess.cleanRiivolution();
+                            }
+                            patchProcess.cleanTemp();
+                        };
                     });
                 }
                 catch (Exception e2)

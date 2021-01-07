@@ -18,10 +18,6 @@ namespace CustomStreetMapManager
         private MainDol mainDol;
         // Key = locale, Value = file contents
         private Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
-        /// <summary>
-        /// This only affects how the cleanup shall be handled at the end. If a dol has been loaded that means the input is an extracted directory. We do not want to clean the input.
-        /// </summary>
-        private bool keepCache = false;
         // The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
         // to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
         // The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.
@@ -46,7 +42,7 @@ namespace CustomStreetMapManager
         /// </summary>
         public void cleanCache()
         {
-            if (Directory.Exists(cacheFileSet.rootDir) && !keepCache)
+            if (Directory.Exists(cacheFileSet.rootDir))
             {
                 Directory.Delete(cacheFileSet.rootDir, true);
             }
@@ -63,11 +59,16 @@ namespace CustomStreetMapManager
             }
         }
 
-        public void cleanFull()
+        public bool ShouldKeepCache(string input)
         {
-            cleanTemp();
-            cleanCache();
-            cleanRiivolution();
+            if (File.Exists(Path.Combine(input, "sys", "main.dol")))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool IsDirectoryEmpty(string path)
