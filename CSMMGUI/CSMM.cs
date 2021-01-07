@@ -609,8 +609,7 @@ namespace CustomStreetMapManager
                         
                         input = PatchProcess.DoPathCorrections(input, false);
                         input = PatchProcess.GetCachePath(input);
-                        string extractedFiles = PatchProcess.ExportMd(saveFileDialog1.FileName, input, mapDescriptor, overwrite, progress, ct);
-                        progressBar.appendText(extractedFiles);
+                        PatchProcess.ExportMd(saveFileDialog1.FileName, input, mapDescriptor, overwrite, progress, ct);
                     }
                     catch (FileAlreadyExistException e1)
                     {

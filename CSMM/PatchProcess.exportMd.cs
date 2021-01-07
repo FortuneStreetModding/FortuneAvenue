@@ -15,7 +15,7 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        public static string ExportMd(string destination, string cachePath, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static void ExportMd(string destination, string cachePath, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var cacheFileSet = new DataFileSet(cachePath);
             if (string.IsNullOrEmpty(Path.GetExtension(destination)))
@@ -93,37 +93,30 @@ namespace CustomStreetMapManager
                 }
             }
 
-            progress?.Report(new ProgressInfo(0, "Generating Map Descriptor File..."));
-
-            string extractedFiles = "";
             using (FileStream fs = File.Create(fileNameMd))
             {
                 byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.ToMD());
                 fs.Write(content, 0, content.Length);
             }
-            extractedFiles += fileNameMd + Environment.NewLine;
-
-            progress?.Report(new ProgressInfo(50, "Copying frb files..."));
-
+            progress?.Report(new ProgressInfo(50, "Generated " + fileNameMd));
             File.Copy(Path.Combine(cacheFileSet.param_folder, mapDescriptor.FrbFile1 + ".frb"), fileNameFrb1);
-            extractedFiles += fileNameFrb1 + Environment.NewLine;
+            progress?.Report("Extracted " + fileNameFrb1);
             if (fileNameFrb2 != null)
             {
                 File.Copy(Path.Combine(cacheFileSet.param_folder, mapDescriptor.FrbFile2 + ".frb"), fileNameFrb2);
-                extractedFiles += fileNameFrb2 + Environment.NewLine;
+                progress?.Report("Extracted " + fileNameFrb2);
             }
             if (fileNameFrb3 != null)
             {
                 File.Copy(Path.Combine(cacheFileSet.param_folder, mapDescriptor.FrbFile3 + ".frb"), fileNameFrb3);
-                extractedFiles += fileNameFrb3 + Environment.NewLine;
+                progress?.Report("Extracted " + fileNameFrb3);
             }
             if (fileNameFrb4 != null)
             {
                 File.Copy(Path.Combine(cacheFileSet.param_folder, mapDescriptor.FrbFile4 + ".frb"), fileNameFrb4);
-                extractedFiles += fileNameFrb4 + Environment.NewLine;
+                progress?.Report("Extracted " + fileNameFrb4);
             }
-            progress?.Report(new ProgressInfo(100, "Done. Generated md file and extracted frb file(s):"));
-            return extractedFiles;
+            progress?.Report(100);
         }
     }
 }
