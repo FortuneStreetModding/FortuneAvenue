@@ -46,7 +46,7 @@ namespace CustomStreetMapManager
             using (var stream = File.OpenRead(cacheFileSet.main_dol))
             {
                 EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
-                mainDol = new MainDol();
+                var mainDol = new MainDol();
                 mapDescriptors = mainDol.readMainDol(binReader, sections, progress);
 
                 progress?.Report(97);

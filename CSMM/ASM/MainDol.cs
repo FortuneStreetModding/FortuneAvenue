@@ -15,16 +15,6 @@ namespace CustomStreetMapManager
         public FreeSpaceManager freeSpaceManager;
         public AddressMapper addressMapper;
 
-        private string resolveAddressToString(VAVAddr virtualAddress, EndianBinaryReader stream)
-        {
-            if (virtualAddress == VAVAddr.NullAddress)
-                return null;
-            int fileAddress = addressMapper.toFileAddress(virtualAddress);
-            stream.Seek(fileAddress, SeekOrigin.Begin);
-            byte[] buff = stream.ReadBytes(64);
-            return HexUtil.byteArrayToString(buff);
-        }
-
         public void setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
         {
             addressMapper = new AddressMapper(fileMappingSections);

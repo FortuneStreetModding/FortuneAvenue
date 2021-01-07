@@ -215,6 +215,7 @@ namespace CustomStreetMapManager
 
             using (Stream baseStream = File.Open(riivFileSet.main_dol, FileMode.Open))
             {
+                var mainDol = new MainDol();
                 try
                 {
                     EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
