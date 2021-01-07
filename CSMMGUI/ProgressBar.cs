@@ -26,7 +26,8 @@ namespace CustomStreetMapManager
             if (IsDisposed)
                 return;
             mapReplaceProgressBar.Value = num;
-            cancelButton.Enabled = true;
+            if (num == 100)
+                cancelButton.Enabled = true;
         }
 
         public void EnableButton()
