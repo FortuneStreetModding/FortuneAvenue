@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -77,30 +77,49 @@ namespace CustomStreetMapManager
 
         private static void printHelp()
         {
+            _ = @"
+--------------------------------------------------------------------------------
+";
             Console.WriteLine(@"
-     *************************************************************     
-     *                                                           *     
-     *          .-------.   _____  _____ __  __ __  __           *     
-     *         /   o   /|  / ____|/ ____|  \/  |  \/  |          *     
-     *        /_______/o| | |    | (___ | \  / | \  / |          *     
-     *        | o   o | | | |     \___ \| |\/| | |\/| |          *     
-     *        |   o   |o/ | |____ ____) | |  | | |  | |          *     
-     *        | o   o |/   \_____|_____/|_|  |_|_|  |_|          *     
-     *        '-------'                                          *     
-     *                    Custom Street Map Manager              *     
-     *                                                           *     
-     *                    github.com/FortuneStreetModding        *     
-     *                                                           *     
-     *************************************************************     
+        ****************************************************************          
+        *                                                              *     
+        *           .-------.   _____  _____ __  __ __  __             *     
+        *          /   o   /|  / ____|/ ____|  \/  |  \/  |            *     
+        *         /_______/o| | |    | (___ | \  / | \  / |            *     
+        *         | o   o | | | |     \___ \| |\/| | |\/| |            *     
+        *         |   o   |o/ | |____ ____) | |  | | |  | |            *     
+        *         | o   o |/   \_____|_____/|_|  |_|_|  |_|            *     
+        *         '-------'                                            *     
+        *                     Custom Street Map Manager                *     
+        *                                                              *     
+        *                     github.com/FortuneStreetModding          *     
+        *                                                              *     
+        ****************************************************************     
 
-csmm read [options] [input] 
+usage: csmm <command> [options] <input>
+
+commands:
+   export          export one or several map descriptor files from an image or 
+                     file system
+   import          import one or several map descriptor files from an image or 
+                     file system
+   read            output the whole data from an image or file system in json
+   write           input a json file to write to an image or file system
+
+Use 'csmm <command>' to read about a specific command.
 
 options:
-    -v          verbose
-    -q          quiet
-    -d path     destination
+   clone
+   -v              verbose
+   -q              quiet
+   -d path         destination
+   -c              cleanup
+   --wiimmfi       patch wiimmfi (default)
+   --no-wiimmfi    do not patch wiimmfi
 ");
-
+            _ = @"
+--------------------------------------------------------------------------------
+";
         }
 
         private static void printReadHelp()
@@ -114,7 +133,6 @@ options:
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
-                
             };
             var json = JsonSerializer.Serialize(mapDescriptors, options);
             Console.WriteLine(json);
