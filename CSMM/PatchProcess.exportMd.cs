@@ -15,11 +15,14 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        public static async Task<string> ExportMd(string mdFileName, string cachePath, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static string ExportMd(string destination, string cachePath, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var cacheFileSet = new DataFileSet(cachePath);
-            var directory = Path.GetDirectoryName(mdFileName);
-            string fileNameMd = mdFileName;
+            if (string.IsNullOrEmpty(Path.GetExtension(destination)))
+                destination = Path.Combine(destination, mapDescriptor.InternalName + ".md");
+            var directory = Path.GetDirectoryName(destination);
+            Directory.CreateDirectory(directory);
+            string fileNameMd = destination;
             string fileNameFrb1 = Path.Combine(directory, mapDescriptor.FrbFile1 + ".frb");
             string fileNameFrb2 = null;
             string fileNameFrb3 = null;
@@ -96,7 +99,7 @@ namespace CustomStreetMapManager
             using (FileStream fs = File.Create(fileNameMd))
             {
                 byte[] content = Encoding.UTF8.GetBytes(mapDescriptor.ToMD());
-                await fs.WriteAsync(content, 0, content.Length).ConfigureAwait(false);
+                fs.Write(content, 0, content.Length);
             }
             extractedFiles += fileNameMd + Environment.NewLine;
 
