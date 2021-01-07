@@ -28,14 +28,9 @@ namespace CustomStreetMapManager
                 riivFileSet = new DataFileSet(GetDefaultRiivPath());
             }
 
-            var packIso = true;
-            if (!IsImageFileExtension(outputFile))
-            {
-                packIso = false;
-                outputFile = DoDirectoryPathCorrections(outputFile, true);
-            }
-
-            inputFile = DoDirectoryPathCorrections(inputFile, false);
+            var packIso = IsImageFileExtension(outputFile);
+            outputFile = DoPathCorrections(outputFile, true);
+            inputFile = DoPathCorrections(inputFile, false);
             var cacheFileSet = new DataFileSet(GetCachePath(inputFile));
 
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));

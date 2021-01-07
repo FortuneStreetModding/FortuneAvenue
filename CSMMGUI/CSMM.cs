@@ -204,10 +204,7 @@ namespace CustomStreetMapManager
                         {
                             if (c)
                             {
-                                if (!patchProcess.ShouldKeepCache(inputFile))
-                                {
-                                    patchProcess.CleanCache(inputFile);
-                                }
+                                patchProcess.CleanCache(inputFile);
                                 patchProcess.CleanRiivolution();
                             }
                             patchProcess.CleanTemp();
@@ -269,7 +266,7 @@ namespace CustomStreetMapManager
                 else
                 {
                     bool overwrite;
-                    outputFile = patchProcess.DoDirectoryPathCorrections(outputFile, true, out overwrite);
+                    outputFile = patchProcess.DoPathCorrections(outputFile, true, out overwrite);
                     if (overwrite)
                     {
                         DialogResult dialogResult = MessageBox.Show("An extracted iso/wbfs directory already exists at " + Environment.NewLine + outputFile + Environment.NewLine + Environment.NewLine + "Do you want to patch this location? Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
@@ -416,8 +413,7 @@ namespace CustomStreetMapManager
                 var input = openFileDialog1.FileName;
 
                 PatchProcess patchProcess = new PatchProcess();
-                if (!patchProcess.IsImageFileExtension(input))
-                    input = patchProcess.DoDirectoryPathCorrections(input, false);
+                input = patchProcess.DoPathCorrections(input, false);
 
                 setInputISOLocation.Text = input;
                 reloadWbfsIsoFile();
@@ -614,7 +610,7 @@ namespace CustomStreetMapManager
                     try
                     {
                         var input = setInputISOLocation.Text;
-                        input = patchProcess.DoDirectoryPathCorrections(input, false);
+                        input = patchProcess.DoPathCorrections(input, false);
                         var cacheFileSet = new DataFileSet(patchProcess.GetCachePath(input));
 
                         string extractedFiles = await patchProcess.exportMd(saveFileDialog1.FileName, mapDescriptor, overwrite, cacheFileSet, progress, ct);

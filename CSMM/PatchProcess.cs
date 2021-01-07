@@ -31,14 +31,13 @@ namespace CustomStreetMapManager
         /// </summary>
         public string GetCachePath(string input)
         {
-            input = DoDirectoryPathCorrections(input, false);
-            if (!IsImageFileExtension(input))
+            if (IsImageFileExtension(input))
             {
-                return input;
+                return Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
             }
             else
             {
-                return Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
+                return input;
             }
         }
 
@@ -89,7 +88,6 @@ namespace CustomStreetMapManager
 
         private bool ShouldKeepCache(string input)
         {
-            input = DoDirectoryPathCorrections(input, false);
             if (IsImageFileExtension(input))
             {
                 return false;
@@ -161,9 +159,9 @@ namespace CustomStreetMapManager
                 extension.ToLower() == ".wbi";
         }
 
-        public string DoDirectoryPathCorrections(string file, bool output)
+        public string DoPathCorrections(string file, bool output)
         {
-            return DoDirectoryPathCorrections(file, output, out _);
+            return DoPathCorrections(file, output, out _);
         }
 
         private string GetExtractedIsoDir(string dir)
@@ -195,8 +193,14 @@ namespace CustomStreetMapManager
             return null;
         }
 
-        public string DoDirectoryPathCorrections(string file, bool output, out bool alreadyExists)
+        public string DoPathCorrections(string file, bool output, out bool alreadyExists)
         {
+            if (IsImageFileExtension(file))
+            {
+                alreadyExists = File.Exists(file);
+                return file;
+            }
+
             ApplicationException exception;
             if (output)
             {

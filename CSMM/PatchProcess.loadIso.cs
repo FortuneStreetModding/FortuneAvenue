@@ -1,4 +1,4 @@
-using FSEditor.Exceptions;
+﻿using FSEditor.Exceptions;
 using FSEditor.FSData;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
@@ -24,7 +24,7 @@ namespace CustomStreetMapManager
                 throw new ArgumentNullException("Can't load wbfs or iso file as the input file name is not set.");
             }
 
-            input = DoDirectoryPathCorrections(input, false);
+            input = DoPathCorrections(input, false);
             var cacheFileSet = new DataFileSet(GetCachePath(input));
 
             if (IsImageFileExtension(input))
