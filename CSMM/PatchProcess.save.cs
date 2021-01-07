@@ -17,21 +17,14 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        public static async Task<bool> Save(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct, DataFileSet tmpFileSet = null, DataFileSet riivFileSet = null)
+        public static async Task<bool> Save(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct, string cachePath = null, string riivPath = null, string tmpPath = null)
         {
-            if (tmpFileSet == null)
-            {
-                tmpFileSet = new DataFileSet(GetDefaultTmpPath());
-            }
-            if (riivFileSet == null)
-            {
-                riivFileSet = new DataFileSet(GetDefaultRiivPath());
-            }
-
             var packIso = IsImageFileExtension(outputFile);
             outputFile = DoPathCorrections(outputFile, true);
             inputFile = DoPathCorrections(inputFile, false);
-            var cacheFileSet = new DataFileSet(GetCachePath(inputFile));
+            var cacheFileSet = new DataFileSet(GetCachePath(inputFile, cachePath));
+            var riivFileSet = new DataFileSet(GetDefaultRiivPath(riivPath));
+            var tmpFileSet = new DataFileSet(GetDefaultTmpPath(tmpPath));
 
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
             WriteLocalizationFiles(mapDescriptors, cacheFileSet, riivFileSet, patchWiimmfi && packIso);

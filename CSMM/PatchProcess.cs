@@ -15,21 +15,32 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        private static string GetDefaultTmpPath()
+        /// <summary>
+        /// The directory to store intermediate files which are created and deleted again during the patch process
+        /// </summary>
+        private static string GetDefaultTmpPath(string tmpPath = null)
         {
+            if (tmpPath != null)
+                return tmpPath;
             return Path.Combine(Directory.GetCurrentDirectory(), "tmp");
         }
-
-        private static string GetDefaultRiivPath()
+        /// <summary>
+        /// The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.
+        /// </summary>
+        private static string GetDefaultRiivPath(string riivPath = null)
         {
+            if (riivPath != null)
+                return riivPath;
             return Path.Combine(Directory.GetCurrentDirectory(), "fortunestreet");
         }
         /// <summary>
         /// The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
         /// to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
         /// </summary>
-        private static string GetCachePath(string input)
+        public static string GetCachePath(string input, string cachePath = null)
         {
+            if (cachePath != null)
+                return cachePath;
             if (IsImageFileExtension(input))
             {
                 return Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
@@ -58,11 +69,11 @@ namespace CustomStreetMapManager
         /// <summary>
         /// Cleans the folder which was extracted from the wbfs/iso for caching purposes.
         /// </summary>
-        public static void CleanCache(string input)
+        public static void CleanCache(string input, string cachePath = null)
         {
             if (!ShouldKeepCache(input))
             {
-                input = GetCachePath(input);
+                input = GetCachePath(input, cachePath);
                 if (Directory.Exists(input))
                 {
                     Directory.Delete(input, true);

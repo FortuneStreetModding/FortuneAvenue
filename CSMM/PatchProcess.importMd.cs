@@ -16,25 +16,10 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="selectedFile"></param>
-        /// <param name="progress"></param>
-        /// <param name="ct"></param>
-        /// <param name="tmpFileSet">The directory to store intermediate files which are created and deleted again during the patch process</param>
-        /// <param name="riivFileSet">The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.</param>
-        /// <returns></returns>
-        public static MapDescriptor ImportMd(string selectedFile, IProgress<ProgressInfo> progress, CancellationToken ct, DataFileSet tmpFileSet = null, DataFileSet riivFileSet = null)
+        public static MapDescriptor ImportMd(string selectedFile, IProgress<ProgressInfo> progress, CancellationToken ct, string riivPath = null, string tmpPath = null)
         {
-            if (tmpFileSet == null)
-            {
-                tmpFileSet = new DataFileSet(GetDefaultTmpPath());
-            }
-            if (riivFileSet == null)
-            {
-                riivFileSet = new DataFileSet(GetDefaultRiivPath());
-            }
+            var riivFileSet = new DataFileSet(GetDefaultRiivPath(riivPath));
+            var tmpFileSet = new DataFileSet(GetDefaultTmpPath(tmpPath));
 
             MapDescriptor mapDescriptorImport = new MapDescriptor();
 

@@ -15,7 +15,7 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        public static async Task<List<MapDescriptor>> Load(string input, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static async Task<List<MapDescriptor>> Load(string input, IProgress<ProgressInfo> progress, CancellationToken ct, string cachePath = null)
         {
             progress?.Report(0);
 
@@ -25,7 +25,7 @@ namespace CustomStreetMapManager
             }
 
             input = DoPathCorrections(input, false);
-            var cacheFileSet = new DataFileSet(GetCachePath(input));
+            var cacheFileSet = new DataFileSet(GetCachePath(input, cachePath));
 
             if (IsImageFileExtension(input))
             {

@@ -15,11 +15,9 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        public static async Task<string> ExportMd(string mdFileName, string input, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static async Task<string> ExportMd(string mdFileName, string cachePath, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
-            input = DoPathCorrections(input, false);
-            var cacheFileSet = new DataFileSet(GetCachePath(input));
-
+            var cacheFileSet = new DataFileSet(cachePath);
             var directory = Path.GetDirectoryName(mdFileName);
             string fileNameMd = mdFileName;
             string fileNameFrb1 = Path.Combine(directory, mapDescriptor.FrbFile1 + ".frb");
