@@ -18,6 +18,7 @@ namespace CustomStreetMapManager
 
         private double currentProgress = 0;
         private string currentText = string.Empty;
+        private string message = string.Empty;
         private bool disposed = false;
         private int animationIndex = 0;
 
@@ -41,6 +42,11 @@ namespace CustomStreetMapManager
             Interlocked.Exchange(ref currentProgress, value);
         }
 
+        public void Report(string text)
+        {
+            Interlocked.Exchange(ref message, text);
+        }
+
         private void TimerHandler(object state)
         {
             lock (timer)
@@ -49,10 +55,11 @@ namespace CustomStreetMapManager
 
                 int progressBlockCount = (int)(currentProgress * blockCount);
                 int percent = (int)(currentProgress * 100);
-                string text = string.Format("[{0}{1}] {2,3}% {3}",
+                string text = string.Format("[{0}{1}] {2,3}% {3} {4}",
                     new string('#', progressBlockCount), new string('-', blockCount - progressBlockCount),
                     percent,
-                    animation[animationIndex++ % animation.Length]);
+                    animation[animationIndex++ % animation.Length],
+                    message);
                 UpdateText(text);
 
                 ResetTimer();

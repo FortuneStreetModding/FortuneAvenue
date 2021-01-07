@@ -14,7 +14,7 @@ namespace CustomStreetMapManager
         {
             this.verbose = verbose;
             this.silent = silent;
-            if(!silent)
+            if (!silent && !verbose)
             {
                 asciiProgressBar = new ASCIIProgressBar();
             }
@@ -32,7 +32,16 @@ namespace CustomStreetMapManager
             if (!string.IsNullOrEmpty(progressInfo.line))
             {
                 if (!progressInfo.verbose || verbose)
-                    Console.WriteLine(progressInfo.line);
+                {
+                    if (asciiProgressBar != null)
+                    {
+                        asciiProgressBar.Report(progressInfo.line);
+                    }
+                    else
+                    {
+                        Console.WriteLine(progressInfo.line);
+                    }
+                }
             }
             asciiProgressBar?.Report(progressInfo.progress / 100.0);
         }
