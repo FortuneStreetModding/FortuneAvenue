@@ -27,7 +27,7 @@ namespace CustomStreetMapManager
             }
 
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
-            writeLocalizationFiles(mapDescriptors, patchWiimmfi && packIso);
+            writeLocalizationFiles(mapDescriptors, cacheFileSet, patchWiimmfi && packIso);
 
             progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
             await patchMainDolAsync(mapDescriptors, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
@@ -93,8 +93,14 @@ namespace CustomStreetMapManager
             return true;
         }
 
-        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors, bool patchWiimmfi)
+        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, bool patchWiimmfi)
         {
+            // Key = locale, Value = file contents
+            var ui_messages = new Dictionary<string, UI_Message>();
+            foreach (string locale in Locale.ALL)
+            {
+                ui_messages[locale] = new UI_Message(fileSet.ui_message_csv[locale], locale);
+            }
             // free up the used MSG IDs
             foreach (MapDescriptor mapDescriptor in mapDescriptors)
             {

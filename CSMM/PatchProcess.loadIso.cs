@@ -63,6 +63,8 @@ namespace CustomStreetMapManager
         }
         private void loadUIMessages(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
+            // Key = locale, Value = file contents
+            var ui_messages = new Dictionary<string, UI_Message>();
             foreach (string locale in Locale.ALL)
             {
                 ui_messages[locale] = new UI_Message(fileSet.ui_message_csv[locale], locale);

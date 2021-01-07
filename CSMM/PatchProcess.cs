@@ -15,8 +15,6 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        // Key = locale, Value = file contents
-        private Dictionary<string, UI_Message> ui_messages = new Dictionary<string, UI_Message>();
         // The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
         // to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
         // The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.
