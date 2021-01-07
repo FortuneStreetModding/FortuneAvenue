@@ -15,7 +15,7 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        public async Task<string> exportMd(string selectedFile, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<string> exportMd(string selectedFile, MapDescriptor mapDescriptor, bool overwrite, DataFileSet cacheFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var directory = Path.GetDirectoryName(selectedFile);
             string fileNameMd = selectedFile;

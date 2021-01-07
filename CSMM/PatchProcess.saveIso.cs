@@ -29,20 +29,23 @@ namespace CustomStreetMapManager
             }
 
             var packIso = true;
-            if (!isOutputImageFileExtension(outputFile))
+            if (!IsImageFileExtension(outputFile))
             {
                 packIso = false;
-                outputFile = doOutputDirectoryPathCorrections(outputFile);
+                outputFile = DoDirectoryPathCorrections(outputFile, true);
             }
+
+            inputFile = DoDirectoryPathCorrections(inputFile, false);
+            var cacheFileSet = new DataFileSet(GetCachePath(inputFile));
 
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
             writeLocalizationFiles(mapDescriptors, cacheFileSet, riivFileSet, patchWiimmfi && packIso);
 
             progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
-            await patchMainDolAsync(mapDescriptors, riivFileSet, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
+            await patchMainDolAsync(mapDescriptors, cacheFileSet, riivFileSet, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
-            await injectMapIcons(mapDescriptors, tmpFileSet, riivFileSet, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
+            await injectMapIcons(mapDescriptors, cacheFileSet, tmpFileSet, riivFileSet, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
             await Task.Delay(500);
 
             var packIsoInputPath = cacheFileSet.rootDir;
@@ -215,7 +218,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        private async Task patchMainDolAsync(List<MapDescriptor> mapDescriptors, DataFileSet riivFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task patchMainDolAsync(List<MapDescriptor> mapDescriptors, DataFileSet cacheFileSet, DataFileSet riivFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(riivFileSet.main_dol));
             File.Copy(cacheFileSet.main_dol, riivFileSet.main_dol, true);
@@ -250,7 +253,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, DataFileSet tmpFileSet, DataFileSet riivFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, DataFileSet cacheFileSet, DataFileSet tmpFileSet, DataFileSet riivFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             // first check if we need to inject any map icons in the first place. We do not need to if only vanilla map icons are used.
             bool allMapIconsVanilla = true;

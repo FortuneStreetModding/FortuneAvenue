@@ -24,17 +24,13 @@ namespace CustomStreetMapManager
                 throw new ArgumentNullException("Can't load wbfs or iso file as the input file name is not set.");
             }
 
-            if (File.Exists(Path.Combine(input, "sys", "main.dol")))
-            {
-                string extractDir = input;
-                cacheFileSet = new DataFileSet(extractDir);
-            }
-            else
+            input = DoDirectoryPathCorrections(input, false);
+            var cacheFileSet = new DataFileSet(GetCachePath(input));
+
+            if (IsImageFileExtension(input))
             {
                 progress?.Report("Extract iso/wbfs...");
-                string extractDir = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
-                await ExeWrapper.extractFullIsoAsync(input, extractDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
-                cacheFileSet = new DataFileSet(extractDir);
+                await ExeWrapper.extractFullIsoAsync(input, cacheFileSet.rootDir, ct, ProgressInfo.makeSubProgress(progress, 0, 90)).ConfigureAwait(false);
             }
 
             progress?.Report("Detect the sections in main.dol file...");
@@ -56,8 +52,8 @@ namespace CustomStreetMapManager
 
             progress?.Report(100);
             progress?.Report("Loaded successfully.");
-            cleanTemp();
-            cleanRiivolution();
+            CleanTemp();
+            CleanRiivolution();
 
             return mapDescriptors;
         }

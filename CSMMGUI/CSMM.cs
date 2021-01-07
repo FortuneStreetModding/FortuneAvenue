@@ -194,7 +194,7 @@ namespace CustomStreetMapManager
                     await ExeChecker.makeSureBenzinInstalled(ct, ProgressInfo.makeSubProgress(progress, 1, 2)).ConfigureAwait(true);
 
                     await patchProcess.saveWbfsIso(inputFile, outputFile, GetMapDescriptors(), this.patchWiimmfi.Checked, progress, ct);
-                    
+
 
                     // TODO, better cleanup
                     Invoke((MethodInvoker)delegate
@@ -206,11 +206,11 @@ namespace CustomStreetMapManager
                             {
                                 if (!patchProcess.ShouldKeepCache(inputFile))
                                 {
-                                    patchProcess.cleanCache();
+                                    patchProcess.CleanCache(inputFile);
                                 }
-                                patchProcess.cleanRiivolution();
+                                patchProcess.CleanRiivolution();
                             }
-                            patchProcess.cleanTemp();
+                            patchProcess.CleanTemp();
                         };
                     });
                 }
@@ -250,7 +250,7 @@ namespace CustomStreetMapManager
                     // remove the extension
                     outputFile = Path.Combine(Directory.GetParent(outputFile).FullName, Path.GetFileNameWithoutExtension(outputFile));
                 }
-                if (patchProcess.isOutputImageFileExtension(outputFile))
+                if (patchProcess.IsImageFileExtension(outputFile))
                 {
                     bool overwrite = File.Exists(outputFile);
                     if (overwrite)
@@ -269,7 +269,7 @@ namespace CustomStreetMapManager
                 else
                 {
                     bool overwrite;
-                    outputFile = patchProcess.doOutputDirectoryPathCorrections(outputFile, out overwrite);
+                    outputFile = patchProcess.DoDirectoryPathCorrections(outputFile, true, out overwrite);
                     if (overwrite)
                     {
                         DialogResult dialogResult = MessageBox.Show("An extracted iso/wbfs directory already exists at " + Environment.NewLine + outputFile + Environment.NewLine + Environment.NewLine + "Do you want to patch this location? Make sure you have a backup.", "Files already exist", MessageBoxButtons.YesNo);
@@ -414,11 +414,11 @@ namespace CustomStreetMapManager
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog1.FileName))
             {
                 var input = openFileDialog1.FileName;
-                if (Path.GetFileName(input).ToLower() == "main.dol")
-                {
-                    input = Directory.GetParent(input).FullName;
-                    input = Directory.GetParent(input).FullName;
-                }
+
+                PatchProcess patchProcess = new PatchProcess();
+                if (!patchProcess.IsImageFileExtension(input))
+                    input = patchProcess.DoDirectoryPathCorrections(input, false);
+
                 setInputISOLocation.Text = input;
                 reloadWbfsIsoFile();
             }
@@ -613,7 +613,11 @@ namespace CustomStreetMapManager
                 tryExportMd:
                     try
                     {
-                        string extractedFiles = await patchProcess.exportMd(saveFileDialog1.FileName, mapDescriptor, overwrite, progress, ct);
+                        var input = setInputISOLocation.Text;
+                        input = patchProcess.DoDirectoryPathCorrections(input, false);
+                        var cacheFileSet = new DataFileSet(patchProcess.GetCachePath(input));
+
+                        string extractedFiles = await patchProcess.exportMd(saveFileDialog1.FileName, mapDescriptor, overwrite, cacheFileSet, progress, ct);
                         progressBar.appendText(extractedFiles);
                     }
                     catch (FileAlreadyExistException e1)

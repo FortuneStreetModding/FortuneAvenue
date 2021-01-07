@@ -15,7 +15,6 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        private DataFileSet cacheFileSet;
 
         public string GetDefaultTmpPath()
         {
@@ -26,13 +25,29 @@ namespace CustomStreetMapManager
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "fortunestreet");
         }
+        /// <summary>
+        /// The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
+        /// to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
+        /// </summary>
+        public string GetCachePath(string input)
+        {
+            input = DoDirectoryPathCorrections(input, false);
+            if (!IsImageFileExtension(input))
+            {
+                return input;
+            }
+            else
+            {
+                return Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
+            }
+        }
 
         /// <summary>
         /// Cleans all temporary files which are generated during the patch proccess which do not belong in the iso
         /// </summary>
-        public void cleanTemp(DataFileSet tmpFileSet = null)
+        public void CleanTemp(DataFileSet tmpFileSet = null)
         {
-            if(tmpFileSet == null)
+            if (tmpFileSet == null)
             {
                 tmpFileSet = new DataFileSet(GetDefaultTmpPath());
             }
@@ -45,18 +60,22 @@ namespace CustomStreetMapManager
         /// <summary>
         /// Cleans the folder which was extracted from the wbfs/iso for caching purposes.
         /// </summary>
-        public void cleanCache()
+        public void CleanCache(string input)
         {
-            if (Directory.Exists(cacheFileSet.rootDir))
+            if (!ShouldKeepCache(input))
             {
-                Directory.Delete(cacheFileSet.rootDir, true);
+                input = GetCachePath(input);
+                if (Directory.Exists(input))
+                {
+                    Directory.Delete(input, true);
+                }
             }
         }
 
         /// <summary>
         /// Cleans all files which are needed for the iso
         /// </summary>
-        public void cleanRiivolution(DataFileSet riivFileSet = null)
+        public void CleanRiivolution(DataFileSet riivFileSet = null)
         {
             if (riivFileSet == null)
             {
@@ -68,15 +87,16 @@ namespace CustomStreetMapManager
             }
         }
 
-        public bool ShouldKeepCache(string input)
+        private bool ShouldKeepCache(string input)
         {
-            if (File.Exists(Path.Combine(input, "sys", "main.dol")))
+            input = DoDirectoryPathCorrections(input, false);
+            if (IsImageFileExtension(input))
             {
-                return true;
+                return false;
             }
             else
             {
-                return false;
+                return true;
             }
         }
 
@@ -128,7 +148,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        public bool isOutputImageFileExtension(string path)
+        public bool IsImageFileExtension(string path)
         {
             var extension = Path.GetExtension(path);
             return extension.ToLower() == ".wbfs" ||
@@ -141,12 +161,12 @@ namespace CustomStreetMapManager
                 extension.ToLower() == ".wbi";
         }
 
-        public string doOutputDirectoryPathCorrections(string outputFile)
+        public string DoDirectoryPathCorrections(string file, bool output)
         {
-            return doOutputDirectoryPathCorrections(outputFile, out _);
+            return DoDirectoryPathCorrections(file, output, out _);
         }
 
-        public string getExtractedIsoDir(string dir)
+        private string GetExtractedIsoDir(string dir)
         {
             if (File.Exists(Path.Combine(dir, "sys", "main.dol")) &&
                 Directory.Exists(Path.Combine(dir, "files", "bg")) &&
@@ -175,40 +195,49 @@ namespace CustomStreetMapManager
             return null;
         }
 
-        public string doOutputDirectoryPathCorrections(string outputFile, out bool alreadyExists)
+        public string DoDirectoryPathCorrections(string file, bool output, out bool alreadyExists)
         {
+            ApplicationException exception;
+            if (output)
+            {
+                exception = new ApplicationException("The path " + file + " cannot be used as output since the target directory must be empty");
+            }
+            else
+            {
+                exception = new ApplicationException("The path " + file + " is not a valid fortune street directory");
+            }
             // do file path corrections
-            if (File.Exists(outputFile))
+            if (File.Exists(file))
             {
                 // get the directory of the selected file
-                var directory = Directory.GetParent(outputFile).FullName;
-                if (getExtractedIsoDir(directory) != null)
+                var directory = Directory.GetParent(file).FullName;
+                if (GetExtractedIsoDir(directory) != null)
                 {
                     alreadyExists = true;
-                    return getExtractedIsoDir(directory);
+                    return GetExtractedIsoDir(directory);
                 }
                 else
-                    throw new ApplicationException("The path " + outputFile + " cannot be used as output since the target directory must be empty");
+                    throw exception;
             }
             else
             {
                 // get the directory of the selected file
-                var directory = Directory.GetParent(outputFile).FullName;
+                var directory = Directory.GetParent(file).FullName;
                 if (IsDirectoryEmpty(directory))
                 {
                     // the directory is empty -> use it as the output directory
                     alreadyExists = false;
                     return directory;
                 }
-                else if (getExtractedIsoDir(directory) != null)
+                else if (GetExtractedIsoDir(directory) != null)
                 {
                     alreadyExists = true;
-                    return getExtractedIsoDir(directory);
+                    return GetExtractedIsoDir(directory);
                 }
                 else
                 {
                     // turn the filename into a directory
-                    directory = Path.Combine(directory, Path.GetFileNameWithoutExtension(outputFile));
+                    directory = Path.Combine(directory, Path.GetFileNameWithoutExtension(file));
                     if (Directory.Exists(directory))
                     {
                         if (IsDirectoryEmpty(directory))
@@ -219,13 +248,13 @@ namespace CustomStreetMapManager
                         }
                         else
                         {
-                            if (getExtractedIsoDir(directory) != null)
+                            if (GetExtractedIsoDir(directory) != null)
                             {
                                 alreadyExists = true;
-                                return getExtractedIsoDir(directory);
+                                return GetExtractedIsoDir(directory);
                             }
                             else
-                                throw new ApplicationException("The path " + directory + " cannot be used as output since the target directory must be empty");
+                                throw exception;
                         }
                     }
                     else
