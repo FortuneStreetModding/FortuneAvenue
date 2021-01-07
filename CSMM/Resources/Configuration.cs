@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiscUtil.Conversion;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,6 +32,41 @@ namespace CustomStreetMapManager
             }
             progress?.Report(100);
             progress?.Report("Saved configuration at " + fileName);
+        }
+
+        public static void Add(string fileName, string mapDescriptorFile, Optional<int> mapId, Optional<sbyte> mapSet, Optional<sbyte> zone, Optional<sbyte> order, Optional<bool> tutorial, IProgress<ProgressInfo> progress, CancellationToken ct)
+        {
+            var dir = Directory.GetParent(fileName).FullName;
+            var lines = File.ReadAllLines(fileName).ToList();
+            var mapDescriptorRelativePath = Path.GetRelativePath(dir, mapDescriptorFile);
+
+            if (!mapId.Any())
+            {
+                var highestMapId = 0;
+                foreach (var line in lines)
+                {
+                    string[] columns = line.Split(new[] { ',' }, 6);
+                    var mapIdConfig = int.Parse(columns[0].Trim());
+                    if (mapIdConfig > highestMapId)
+                        highestMapId = mapIdConfig;
+                }
+                lines.Add(String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId, mapSet.OrElse(-1), zone.OrElse(-1), order.OrElse(-1), tutorial.OrElse(false), mapDescriptorRelativePath));
+                File.WriteAllLines(fileName, lines);
+            }
+            else
+            {
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    string[] columns = lines[i].Split(new[] { ',' }, 6);
+                    var mapIdConfig = int.Parse(columns[0].Trim());
+                    var mapSetConfig = mapSet.OrElse(sbyte.Parse(columns[1].Trim()));
+                    var zoneConfig = zone.OrElse(sbyte.Parse(columns[2].Trim()));
+                    var orderConfig = order.OrElse(sbyte.Parse(columns[3].Trim()));
+                    var isPracticeBoardConfig = tutorial.OrElse(bool.Parse(columns[4].Trim()));
+                    if (mapIdConfig == mapId.Single())
+                        lines[i] = String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", mapId.Single(), mapSetConfig, zoneConfig, orderConfig, isPracticeBoardConfig, mapDescriptorRelativePath);
+                }
+            }
         }
 
         public static void Load(string fileName, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)

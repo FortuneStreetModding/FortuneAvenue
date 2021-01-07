@@ -33,13 +33,13 @@ namespace CustomStreetMapManager
 usage: csmm <command> [options] <input>
 
 commands:
-   extract         extracts the data of a Fortune Street game disc image to a 
+   extract         extract the data of a Fortune Street game disc image to a
                      directory
    export          export one or several map descriptor files (*.md) from a 
                      Fortune Street game disc directory
-   import          import one or several map descriptor files (*.md) into a 
-                     Fortune Street game disc directory
-   pack            pack a Fortune Street game disc directory into an image file
+   add             add a map descriptor file (.md) to a configuration file
+   save            pack a Fortune Street game disc directory into an image file
+                     using a configuration file
    json            output the whole data from a Fortune Street game disc 
                      directory to json
 
@@ -55,8 +55,9 @@ options:
    -n <name>       name
    -o <order>      order
    -q              quiet (overrides verbose)
-   -t              tutorial map
+   -t <true,false> tutorial map
    -v              verbose
+   -w <true,false> patch wiimmfi (default: true)
    -z <zone>       zone
 ");
             _ = @"
@@ -114,10 +115,11 @@ options:
                 var quiet = options.ContainsKey("q");
                 var verbose = options.ContainsKey("v");
                 var commands = new List<CliCommand>();
-                commands.Add(new CliExport());
-                commands.Add(new CliJson());
                 commands.Add(new CliExtract());
-                commands.Add(new CliImport());
+                commands.Add(new CliExport());
+                commands.Add(new CliAdd());
+                commands.Add(new CliSave());
+                commands.Add(new CliJson());
                 using (ConsoleProgress progress = new ConsoleProgress(verbose, quiet))
                 {
                     try
@@ -160,6 +162,9 @@ options:
                 case "n":
                 case "o":
                 case "z":
+                case "c":
+                case "t":
+                case "w":
                     return true;
             }
             return false;
