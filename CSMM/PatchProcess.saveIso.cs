@@ -17,11 +17,15 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct, DataFileSet tmpFileSet = null)
+        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct, DataFileSet tmpFileSet = null, DataFileSet riivFileSet = null)
         {
             if (tmpFileSet == null)
             {
                 tmpFileSet = new DataFileSet(GetDefaultTmpPath());
+            }
+            if (riivFileSet == null)
+            {
+                riivFileSet = new DataFileSet(GetDefaultRiivPath());
             }
 
             var packIso = true;
@@ -32,13 +36,13 @@ namespace CustomStreetMapManager
             }
 
             progress?.Report(new ProgressInfo(0, "Writing localization files..."));
-            writeLocalizationFiles(mapDescriptors, cacheFileSet, patchWiimmfi && packIso);
+            writeLocalizationFiles(mapDescriptors, cacheFileSet, riivFileSet, patchWiimmfi && packIso);
 
             progress?.Report(new ProgressInfo(5, "Writing main.dol..."));
-            await patchMainDolAsync(mapDescriptors, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
+            await patchMainDolAsync(mapDescriptors, riivFileSet, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
-            await injectMapIcons(mapDescriptors, tmpFileSet, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
+            await injectMapIcons(mapDescriptors, tmpFileSet, riivFileSet, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
             await Task.Delay(500);
 
             var packIsoInputPath = cacheFileSet.rootDir;
@@ -98,7 +102,7 @@ namespace CustomStreetMapManager
             return true;
         }
 
-        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, bool patchWiimmfi)
+        private void writeLocalizationFiles(List<MapDescriptor> mapDescriptors, DataFileSet fileSet, DataFileSet riivFileSet, bool patchWiimmfi)
         {
             // Key = locale, Value = file contents
             var ui_messages = new Dictionary<string, UI_Message>();
@@ -211,7 +215,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        private async Task patchMainDolAsync(List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task patchMainDolAsync(List<MapDescriptor> mapDescriptors, DataFileSet riivFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(riivFileSet.main_dol));
             File.Copy(cacheFileSet.main_dol, riivFileSet.main_dol, true);
@@ -246,7 +250,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, DataFileSet tmpFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, DataFileSet tmpFileSet, DataFileSet riivFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             // first check if we need to inject any map icons in the first place. We do not need to if only vanilla map icons are used.
             bool allMapIconsVanilla = true;

@@ -1,4 +1,4 @@
-using FSEditor.Exceptions;
+﻿using FSEditor.Exceptions;
 using FSEditor.FSData;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
@@ -15,15 +15,16 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        // The cache directory is the directory for the extraced wbfs/iso file. It should not be modified and can be reused later 
-        // to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
-        // The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.
-        private readonly DataFileSet riivFileSet = new DataFileSet(Path.Combine(Directory.GetCurrentDirectory(), "fortunestreet"));
         private DataFileSet cacheFileSet;
 
         public string GetDefaultTmpPath()
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "tmp");
+        }
+
+        public string GetDefaultRiivPath()
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), "fortunestreet");
         }
 
         /// <summary>
@@ -55,8 +56,12 @@ namespace CustomStreetMapManager
         /// <summary>
         /// Cleans all files which are needed for the iso
         /// </summary>
-        public void cleanRiivolution()
+        public void cleanRiivolution(DataFileSet riivFileSet = null)
         {
+            if (riivFileSet == null)
+            {
+                riivFileSet = new DataFileSet(GetDefaultRiivPath());
+            }
             if (Directory.Exists(riivFileSet.rootDir))
             {
                 Directory.Delete(riivFileSet.rootDir, true);
