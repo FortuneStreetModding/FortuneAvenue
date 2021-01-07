@@ -9,7 +9,7 @@ namespace CustomStreetMapManager
 {
     public class Configuration
     {
-        public static void save(string fileName, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static void Save(string fileName, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var dir = Directory.GetParent(fileName).FullName;
             var p = 0;

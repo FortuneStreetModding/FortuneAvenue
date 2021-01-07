@@ -493,7 +493,7 @@ namespace CustomStreetMapManager
 
                     try
                     {
-                        Configuration.save(output, GetMapDescriptors(), progress, ct);
+                        Configuration.Save(output, GetMapDescriptors(), progress, ct);
                     }
                     catch (Exception e2)
                     {

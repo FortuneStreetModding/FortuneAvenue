@@ -16,7 +16,7 @@ namespace CustomStreetMapManager
 {
     public abstract partial class PatchProcess
     {
-        public static MapDescriptor ImportMd(string selectedFile, IProgress<ProgressInfo> progress, CancellationToken ct, string riivPath = null, string tmpPath = null)
+        public static MapDescriptor ImportMd(string mapDescriptorImportFile, IProgress<ProgressInfo> progress, CancellationToken ct, string riivPath = null, string tmpPath = null)
         {
             var riivFileSet = new DataFileSet(GetDefaultRiivPath(riivPath));
             var tmpFileSet = new DataFileSet(GetDefaultTmpPath(tmpPath));
@@ -25,8 +25,7 @@ namespace CustomStreetMapManager
 
             progress.Report(new ProgressInfo(0, "Parse Map Descriptor File..."));
 
-            var mapDescriptorImportFile = selectedFile;
-            var dir = Path.GetDirectoryName(selectedFile);
+            var dir = Path.GetDirectoryName(mapDescriptorImportFile);
 
             var internalName = Path.GetFileNameWithoutExtension(mapDescriptorImportFile);
             if (internalName.ToLower() == "readme")
