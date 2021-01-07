@@ -46,8 +46,18 @@ commands:
 Use 'csmm <command>' to read about a specific command.
 
 options:
-   -v              verbose
+   -a              all
+   -c <config>     configuration
+   -d <path>       destination
+   -f              force
+   -i <id>         id
+   -m <mapset>     mapset
+   -n <name>       name
+   -o <order>      order
    -q              quiet (overrides verbose)
+   -t              tutorial map
+   -v              verbose
+   -z <zone>       zone
 ");
             _ = @"
 --------------------------------------------------------------------------------
@@ -55,7 +65,7 @@ options:
         }
         static async Task Main(string[] args)
         {
-            //args = new string[] { "export", "Test", "-d", "MD", "-i", "0", "-v", "-o" };
+            // args = new string[] { "import", "t.md", "-d", "Test", "-i", "0", "-m", "0", "-z", "2", "-o", "6", "-v" };
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
@@ -107,6 +117,7 @@ options:
                 commands.Add(new CliExport());
                 commands.Add(new CliJson());
                 commands.Add(new CliExtract());
+                commands.Add(new CliImport());
                 using (ConsoleProgress progress = new ConsoleProgress(verbose, quiet))
                 {
                     try
@@ -145,10 +156,14 @@ options:
             {
                 case "d":
                 case "i":
+                case "m":
                 case "n":
+                case "o":
+                case "z":
                     return true;
             }
             return false;
         }
+
     }
 }

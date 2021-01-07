@@ -22,7 +22,7 @@ namespace CustomStreetMapManager
             var packIso = IsImageFileExtension(outputFile);
             outputFile = DoPathCorrections(outputFile, true);
             inputFile = DoPathCorrections(inputFile, false);
-            var cacheFileSet = new DataFileSet(GetCachePath(inputFile, cachePath));
+            var cacheFileSet = new DataFileSet(Path.GetFullPath(GetCachePath(inputFile, cachePath)));
             var riivFileSet = new DataFileSet(GetDefaultRiivPath(riivPath));
             var tmpFileSet = new DataFileSet(GetDefaultTmpPath(tmpPath));
 

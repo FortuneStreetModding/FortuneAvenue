@@ -21,12 +21,13 @@ options:
    -v              verbose
    -q              quiet (overrides verbose)
 
-   -d path         destination
+   -d <path>       destination
 ";
         }
         public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
-            await Extract(input, options.GetValueOrDefault("d", null), progress, ct);
+            var destination = options.GetValueOrDefault("d", null);
+            await Extract(input, destination, progress, ct);
         }
         public async Task Extract(string input, string destination, ConsoleProgress progress, CancellationToken ct)
         {
