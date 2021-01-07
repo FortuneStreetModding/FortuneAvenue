@@ -1,4 +1,4 @@
-﻿using FSEditor.Exceptions;
+using FSEditor.Exceptions;
 using FSEditor.FSData;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
@@ -42,8 +42,8 @@ namespace CustomStreetMapManager
             using (var stream = File.OpenRead(cacheFileSet.main_dol))
             {
                 EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
-                var mainDol = new MainDol();
-                mapDescriptors = mainDol.readMainDol(binReader, sections, progress);
+                var mainDol = new MainDol(binReader, sections, progress);
+                mapDescriptors = mainDol.readMainDol(binReader, progress);
 
                 progress?.Report(97);
                 progress?.Report("Read localization files...");

@@ -12,12 +12,18 @@ namespace CustomStreetMapManager
 {
     public class MainDol
     {
-        public FreeSpaceManager freeSpaceManager;
-        public AddressMapper addressMapper;
+        public readonly AddressMapper addressMapper;
+        public readonly FreeSpaceManager freeSpaceManager;
 
-        public void setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
+        public MainDol(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
         {
-            addressMapper = new AddressMapper(fileMappingSections);
+            this.addressMapper = setupAddressMapper(stream, fileMappingSections, progress);
+            this.freeSpaceManager = setupFreeSpaceManager(addressMapper);
+        }
+
+        private AddressMapper setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
+        {
+            var addressMapper = new AddressMapper(fileMappingSections);
             // find out the version we are dealing with
 
             // Boom Street: 8007a314: lwz r0,-0x547c(r13)
@@ -55,7 +61,12 @@ namespace CustomStreetMapManager
                     throw new ApplicationException("Only Boom Street (ST7P01) and Fortune Street (ST7E01) are supported.");
                 }
             }
-            freeSpaceManager = new FreeSpaceManager();
+            return addressMapper;
+        }
+
+        private FreeSpaceManager setupFreeSpaceManager(AddressMapper addressMapper)
+        {
+            var freeSpaceManager = new FreeSpaceManager();
             // Venture Card Table
             freeSpaceManager.addFreeSpace(addressMapper.toVersionAgnosticAddress((BSVAddr)0x80410648), addressMapper.toVersionAgnosticAddress((BSVAddr)0x80411b9b));
             // Map Data String Table and Map Data Table
@@ -81,56 +92,52 @@ namespace CustomStreetMapManager
             // 0x804363b4 (4 bytes):  force simulated button press
             // 0x804363b8 (12 bytes): pointer to internal name table
             // 0x804363c4 (4 bytes):  ForceVentureCardVariable
-
+            return freeSpaceManager;
         }
 
-
-
-        public List<MapDescriptor> readMainDol(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
+        public List<MapDescriptor> readMainDol(EndianBinaryReader stream, IProgress<ProgressInfo> progress)
         {
-            setupAddressMapper(stream, fileMappingSections, progress);
-
             // GetMapCount
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801cca30), SeekOrigin.Begin);
             UInt32 opcode = stream.ReadUInt32();
             var count = (Int16)(PowerPcAsm.getOpcodeParameter(opcode));
 
             List<MapDescriptor> mapDescriptors = new List<MapDescriptor>();
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 MapDescriptor mapDescriptor = new MapDescriptor();
                 mapDescriptors.Add(mapDescriptor);
             }
 
-            new MapOriginTable().read(stream, addressMapper, mapDescriptors, null);
+            new MapOriginTable().read(stream, addressMapper, mapDescriptors, progress);
             // map description table must be after map origin table
-            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, null);
-            new BackgroundTable().read(stream, addressMapper, mapDescriptors, null);
+            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, progress);
+            new BackgroundTable().read(stream, addressMapper, mapDescriptors, progress);
             // map icon table must be after the map background table and map origin table
-            new MapIconTable().read(stream, addressMapper, mapDescriptors, null);
+            new MapIconTable().read(stream, addressMapper, mapDescriptors, progress);
 
-            new MapSetZoneOrder().read(stream, addressMapper, mapDescriptors, null);
+            new MapSetZoneOrder().read(stream, addressMapper, mapDescriptors, progress);
             // practice board comes after category zone order
-            new PracticeBoard().read(stream, addressMapper, mapDescriptors, null);
+            new PracticeBoard().read(stream, addressMapper, mapDescriptors, progress);
 
             // the rest does not have any dependencies
-            new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, null);
-            new VentureCardTable().read(stream, addressMapper, mapDescriptors, null);
-            new EventSquare().read(stream, addressMapper, mapDescriptors, null);
-            new RuleSetTable().read(stream, addressMapper, mapDescriptors, null);
-            new TourBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, null);
-            new TourInitialCashTable().read(stream, addressMapper, mapDescriptors, null);
-            new TourOpponentsTable().read(stream, addressMapper, mapDescriptors, null);
-            new TourClearRankTable().read(stream, addressMapper, mapDescriptors, null);
-            new StageNameIDTable().read(stream, addressMapper, mapDescriptors, null);
-            new BGMIDTable().read(stream, addressMapper, mapDescriptors, null);
-            new DesignTypeTable().read(stream, addressMapper, mapDescriptors, null);
-            new FrbMapTable().read(stream, addressMapper, mapDescriptors, null);
-            new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, null);
-            new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, null);
-            new BGSequenceTable().read(stream, addressMapper, mapDescriptors, null);
-            new InternalNameTable().read(stream, addressMapper, mapDescriptors, null);
-            new ForceSimulatedButtonPress().read(stream, addressMapper, mapDescriptors, null);
+            new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, progress);
+            new VentureCardTable().read(stream, addressMapper, mapDescriptors, progress);
+            new EventSquare().read(stream, addressMapper, mapDescriptors, progress);
+            new RuleSetTable().read(stream, addressMapper, mapDescriptors, progress);
+            new TourBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, progress);
+            new TourInitialCashTable().read(stream, addressMapper, mapDescriptors, progress);
+            new TourOpponentsTable().read(stream, addressMapper, mapDescriptors, progress);
+            new TourClearRankTable().read(stream, addressMapper, mapDescriptors, progress);
+            new StageNameIDTable().read(stream, addressMapper, mapDescriptors, progress);
+            new BGMIDTable().read(stream, addressMapper, mapDescriptors, progress);
+            new DesignTypeTable().read(stream, addressMapper, mapDescriptors, progress);
+            new FrbMapTable().read(stream, addressMapper, mapDescriptors, progress);
+            new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, progress);
+            new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, progress);
+            new BGSequenceTable().read(stream, addressMapper, mapDescriptors, progress);
+            new InternalNameTable().read(stream, addressMapper, mapDescriptors, progress);
+            new ForceSimulatedButtonPress().read(stream, addressMapper, mapDescriptors, progress);
 
             return mapDescriptors;
         }
@@ -164,7 +171,7 @@ namespace CustomStreetMapManager
 
             // Write the Map Count
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x801cca30), SeekOrigin.Begin);
-            stream.Write(PowerPcAsm.li(3, (short) mapDescriptors.Count));
+            stream.Write(PowerPcAsm.li(3, (short)mapDescriptors.Count));
 
             return mapDescriptors;
         }

@@ -231,9 +231,17 @@ namespace CustomStreetMapManager
             //    mainDol.setSections(await ExeWrapper.readSections(riivFileSet.main_dol, ct, progress));
             //}
 
+            progress?.Report("Detect the sections in main.dol file...");
+            List<AddressSection> sections = await ExeWrapper.readSections(riivFileSet.main_dol, ct, ProgressInfo.makeNoProgress(progress)).ConfigureAwait(false);
+            MainDol mainDol;
+            using (var stream = File.OpenRead(riivFileSet.main_dol))
+            {
+                EndianBinaryReader binReader = new EndianBinaryReader(EndianBitConverter.Big, stream);
+                mainDol = new MainDol(binReader, sections, progress);
+            }
+
             using (Stream baseStream = File.Open(riivFileSet.main_dol, FileMode.Open))
             {
-                var mainDol = new MainDol();
                 try
                 {
                     EndianBinaryWriter stream = new EndianBinaryWriter(EndianBitConverter.Big, baseStream);
