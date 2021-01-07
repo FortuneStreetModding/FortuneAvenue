@@ -35,27 +35,27 @@ namespace CustomStreetMapManager
             var filesToBeReplaced = new List<string>();
             if (File.Exists(fileNameMd))
             {
-                filesToBeReplacedMsg += fileNameMd + Environment.NewLine;
+                filesToBeReplacedMsg += fileNameMd + "\n";
                 filesToBeReplaced.Add(fileNameMd);
             }
             if (File.Exists(fileNameFrb1))
             {
-                filesToBeReplacedMsg += fileNameFrb1 + Environment.NewLine;
+                filesToBeReplacedMsg += fileNameFrb1 + "\n";
                 filesToBeReplaced.Add(fileNameFrb1);
             }
             if (fileNameFrb2 != null && File.Exists(fileNameFrb2))
             {
-                filesToBeReplacedMsg += fileNameFrb2 + Environment.NewLine;
+                filesToBeReplacedMsg += fileNameFrb2 + "\n";
                 filesToBeReplaced.Add(fileNameFrb2);
             }
             if (fileNameFrb3 != null && File.Exists(fileNameFrb3))
             {
-                filesToBeReplacedMsg += fileNameFrb3 + Environment.NewLine;
+                filesToBeReplacedMsg += fileNameFrb3 + "\n";
                 filesToBeReplaced.Add(fileNameFrb3);
             }
             if (fileNameFrb4 != null && File.Exists(fileNameFrb4))
             {
-                filesToBeReplacedMsg += fileNameFrb4 + Environment.NewLine;
+                filesToBeReplacedMsg += fileNameFrb4 + "\n";
                 filesToBeReplaced.Add(fileNameFrb4);
             }
 
@@ -86,7 +86,7 @@ namespace CustomStreetMapManager
                 }
                 else
                 {
-                    throw new FileAlreadyExistException("The following files already exist and will be overwritten:" + Environment.NewLine + filesToBeReplacedMsg, filesToBeReplaced.ToArray());
+                    throw new FileAlreadyExistException("The following files already exist:\n" + filesToBeReplacedMsg, filesToBeReplaced.ToArray());
                 }
             }
 

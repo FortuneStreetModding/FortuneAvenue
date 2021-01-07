@@ -614,7 +614,7 @@ namespace CustomStreetMapManager
                     }
                     catch (FileAlreadyExistException e1)
                     {
-                        DialogResult dialogResult = MessageBox.Show(e1.Message, "Files already exist", MessageBoxButtons.OKCancel);
+                        DialogResult dialogResult = MessageBox.Show(e1.Message.Replace("\n", Environment.NewLine) + Environment.NewLine + "Do you want to overwrite these files?", "Files already exist", MessageBoxButtons.OKCancel);
                         if (dialogResult == DialogResult.OK)
                         {
                             overwrite = true;
