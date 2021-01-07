@@ -17,8 +17,13 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public async Task<bool> saveWbfsIso(string inputFile, string outputFile, List<MapDescriptor> mapDescriptors, bool patchWiimmfi, IProgress<ProgressInfo> progress, CancellationToken ct, DataFileSet tmpFileSet = null)
         {
+            if (tmpFileSet == null)
+            {
+                tmpFileSet = new DataFileSet(GetDefaultTmpPath());
+            }
+
             var packIso = true;
             if (!isOutputImageFileExtension(outputFile))
             {
@@ -33,7 +38,7 @@ namespace CustomStreetMapManager
             await patchMainDolAsync(mapDescriptors, ProgressInfo.makeSubProgress(progress, 0, 6), ct);
 
             // lets get to the map icons
-            await injectMapIcons(mapDescriptors, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
+            await injectMapIcons(mapDescriptors, tmpFileSet, ProgressInfo.makeSubProgress(progress, 7, 40), ct).ConfigureAwait(false);
             await Task.Delay(500);
 
             var packIsoInputPath = cacheFileSet.rootDir;
@@ -241,7 +246,7 @@ namespace CustomStreetMapManager
             }
         }
 
-        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress, CancellationToken ct)
+        private async Task<bool> injectMapIcons(List<MapDescriptor> mapDescriptors, DataFileSet tmpFileSet, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             // first check if we need to inject any map icons in the first place. We do not need to if only vanilla map icons are used.
             bool allMapIconsVanilla = true;

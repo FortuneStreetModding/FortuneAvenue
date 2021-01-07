@@ -1,4 +1,4 @@
-﻿using FSEditor.Exceptions;
+using FSEditor.Exceptions;
 using FSEditor.FSData;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
@@ -19,15 +19,22 @@ namespace CustomStreetMapManager
         // to speed up the next patch process. Or if the user wishes to, can also be cleaned up at the end of the patch process. 
         // The directory which contains the final patched and new content to be inserted into the wbfs/iso. It contains only the delta to the cache directory.
         private readonly DataFileSet riivFileSet = new DataFileSet(Path.Combine(Directory.GetCurrentDirectory(), "fortunestreet"));
-        // The directory to store intermediate files which are created and deleted again during the path process
-        private readonly DataFileSet tmpFileSet = new DataFileSet(Path.Combine(Directory.GetCurrentDirectory(), "tmp"));
         private DataFileSet cacheFileSet;
+
+        public string GetDefaultTmpPath()
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), "tmp");
+        }
 
         /// <summary>
         /// Cleans all temporary files which are generated during the patch proccess which do not belong in the iso
         /// </summary>
-        public void cleanTemp()
+        public void cleanTemp(DataFileSet tmpFileSet = null)
         {
+            if(tmpFileSet == null)
+            {
+                tmpFileSet = new DataFileSet(GetDefaultTmpPath());
+            }
             if (Directory.Exists(tmpFileSet.rootDir))
             {
                 Directory.Delete(tmpFileSet.rootDir, true);

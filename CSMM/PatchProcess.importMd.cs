@@ -16,8 +16,21 @@ namespace CustomStreetMapManager
 {
     public partial class PatchProcess
     {
-        public MapDescriptor importMd(string selectedFile, IProgress<ProgressInfo> progress, CancellationToken ct)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selectedFile"></param>
+        /// <param name="progress"></param>
+        /// <param name="ct"></param>
+        /// <param name="tmpFileSet">The directory to store intermediate files which are created and deleted again during the patch process</param>
+        /// <returns></returns>
+        public MapDescriptor importMd(string selectedFile, IProgress<ProgressInfo> progress, CancellationToken ct, DataFileSet tmpFileSet = null)
         {
+            if (tmpFileSet == null)
+            {
+                tmpFileSet = new DataFileSet(GetDefaultTmpPath());
+            }
+
             MapDescriptor mapDescriptorImport = new MapDescriptor();
 
             progress.Report(new ProgressInfo(0, "Parse Map Descriptor File..."));
