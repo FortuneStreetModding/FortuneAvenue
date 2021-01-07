@@ -14,11 +14,13 @@ namespace CustomStreetMapManager
     {
         public readonly AddressMapper addressMapper;
         public readonly FreeSpaceManager freeSpaceManager;
+        public readonly List<DolIO> patches;
 
         public MainDol(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
         {
             this.addressMapper = setupAddressMapper(stream, fileMappingSections, progress);
             this.freeSpaceManager = setupFreeSpaceManager(addressMapper);
+            this.patches = setupPatches();
         }
 
         private AddressMapper setupAddressMapper(EndianBinaryReader stream, List<AddressSection> fileMappingSections, IProgress<ProgressInfo> progress)
@@ -95,6 +97,41 @@ namespace CustomStreetMapManager
             return freeSpaceManager;
         }
 
+        private List<DolIO> setupPatches()
+        {
+            var patches = new List<DolIO>();
+            patches.Add(new MapOriginTable());
+            // map description table must be after map origin table
+            patches.Add(new MapDescriptionTable());
+            patches.Add(new BackgroundTable());
+            // map icon table must be after the map background table and map origin table
+            patches.Add(new MapIconTable());
+
+            patches.Add(new MapSetZoneOrder());
+            // practice board comes after category zone order
+            patches.Add(new PracticeBoard());
+
+            // the rest does not have any dependencies
+            patches.Add(new DefaultTargetAmountTable());
+            patches.Add(new VentureCardTable());
+            patches.Add(new EventSquare());
+            patches.Add(new RuleSetTable());
+            patches.Add(new TourBankruptcyLimitTable());
+            patches.Add(new TourInitialCashTable());
+            patches.Add(new TourOpponentsTable());
+            patches.Add(new TourClearRankTable());
+            patches.Add(new StageNameIDTable());
+            patches.Add(new BGMIDTable());
+            patches.Add(new DesignTypeTable());
+            patches.Add(new FrbMapTable());
+            patches.Add(new MapSwitchParamTable());
+            patches.Add(new MapGalaxyParamTable());
+            patches.Add(new BGSequenceTable());
+            patches.Add(new InternalNameTable());
+            patches.Add(new ForceSimulatedButtonPress());
+            return patches;
+        }
+
         public List<MapDescriptor> readMainDol(EndianBinaryReader stream, IProgress<ProgressInfo> progress)
         {
             // GetMapCount
@@ -109,63 +146,19 @@ namespace CustomStreetMapManager
                 mapDescriptors.Add(mapDescriptor);
             }
 
-            new MapOriginTable().read(stream, addressMapper, mapDescriptors, progress);
-            // map description table must be after map origin table
-            new MapDescriptionTable().read(stream, addressMapper, mapDescriptors, progress);
-            new BackgroundTable().read(stream, addressMapper, mapDescriptors, progress);
-            // map icon table must be after the map background table and map origin table
-            new MapIconTable().read(stream, addressMapper, mapDescriptors, progress);
-
-            new MapSetZoneOrder().read(stream, addressMapper, mapDescriptors, progress);
-            // practice board comes after category zone order
-            new PracticeBoard().read(stream, addressMapper, mapDescriptors, progress);
-
-            // the rest does not have any dependencies
-            new DefaultTargetAmountTable().read(stream, addressMapper, mapDescriptors, progress);
-            new VentureCardTable().read(stream, addressMapper, mapDescriptors, progress);
-            new EventSquare().read(stream, addressMapper, mapDescriptors, progress);
-            new RuleSetTable().read(stream, addressMapper, mapDescriptors, progress);
-            new TourBankruptcyLimitTable().read(stream, addressMapper, mapDescriptors, progress);
-            new TourInitialCashTable().read(stream, addressMapper, mapDescriptors, progress);
-            new TourOpponentsTable().read(stream, addressMapper, mapDescriptors, progress);
-            new TourClearRankTable().read(stream, addressMapper, mapDescriptors, progress);
-            new StageNameIDTable().read(stream, addressMapper, mapDescriptors, progress);
-            new BGMIDTable().read(stream, addressMapper, mapDescriptors, progress);
-            new DesignTypeTable().read(stream, addressMapper, mapDescriptors, progress);
-            new FrbMapTable().read(stream, addressMapper, mapDescriptors, progress);
-            new MapSwitchParamTable().read(stream, addressMapper, mapDescriptors, progress);
-            new MapGalaxyParamTable().read(stream, addressMapper, mapDescriptors, progress);
-            new BGSequenceTable().read(stream, addressMapper, mapDescriptors, progress);
-            new InternalNameTable().read(stream, addressMapper, mapDescriptors, progress);
-            new ForceSimulatedButtonPress().read(stream, addressMapper, mapDescriptors, progress);
+            foreach (var patch in patches)
+            {
+                patch.read(stream, addressMapper, mapDescriptors, progress);
+            }
 
             return mapDescriptors;
         }
         public List<MapDescriptor> writeMainDol(EndianBinaryWriter stream, List<MapDescriptor> mapDescriptors, IProgress<ProgressInfo> progress)
         {
-            new DefaultTargetAmountTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new TourBankruptcyLimitTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new TourInitialCashTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new MapDescriptionTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new MapIconTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new VentureCardTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new EventSquare().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new RuleSetTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new TourOpponentsTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new TourClearRankTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new StageNameIDTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new BGMIDTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new BackgroundTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new DesignTypeTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new FrbMapTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new MapSwitchParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new MapGalaxyParamTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new MapOriginTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new BGSequenceTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new InternalNameTable().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new PracticeBoard().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new MapSetZoneOrder().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
-            new ForceSimulatedButtonPress().write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            foreach (var patch in patches)
+            {
+                patch.write(stream, addressMapper, mapDescriptors, freeSpaceManager, progress);
+            }
 
             freeSpaceManager.nullTheFreeSpace(stream, addressMapper);
 
