@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace CustomStreetMapManager
 {
-    class CliAdd : CliCommand
+    class CliImport : CliCommand
     {
-        public CliAdd() : base("add") { }
+        public CliImport() : base("import") { }
         public override string GetHelp()
         {
             _ = @"
 --------------------------------------------------------------------------------
 ";
             return @"
-usage: csmm add [options] <input>
+usage: csmm import [options] <input>
 
 options:
    -v              verbose
@@ -34,9 +34,9 @@ options:
         public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
             var configuration = options.GetValueOrDefault("c", Path.Combine(Directory.GetCurrentDirectory(), "config.csv"));
-            await Add(input, configuration, GetIntParameter(options, "i"), GetSbyteParameter(options, "m"), GetSbyteParameter(options, "z"), GetSbyteParameter(options, "o"), GetBoolParameter(options, "t"), progress, ct);
+            await Import(input, configuration, GetIntParameter(options, "i"), GetSbyteParameter(options, "m"), GetSbyteParameter(options, "z"), GetSbyteParameter(options, "o"), GetBoolParameter(options, "t"), progress, ct);
         }
-        private async Task Add(string inputMd, string configuration, Optional<int> mapId, Optional<sbyte> mapSet, Optional<sbyte> zone, Optional<sbyte> order, Optional<bool> tutorial, ConsoleProgress progress, CancellationToken ct)
+        private async Task Import(string inputMd, string configuration, Optional<int> mapId, Optional<sbyte> mapSet, Optional<sbyte> zone, Optional<sbyte> order, Optional<bool> tutorial, ConsoleProgress progress, CancellationToken ct)
         {
             Configuration.Add(configuration, inputMd, mapId, mapSet, zone, order, tutorial, progress, ct);
             await Task.Delay(500);

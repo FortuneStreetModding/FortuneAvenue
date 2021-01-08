@@ -17,13 +17,13 @@ namespace CustomStreetMapManager
 --------------------------------------------------------------------------------
 ";
             return @"
-usage: csmm pack [options] <input>
+usage: csmm save [options] <input>
 
 options:
    -v              verbose
    -q              quiet (overrides verbose)
 
-   -d <path>       extracted fortune street game directory
+   -d <path>       destination directory or image file
    -c <config>     configuration file
    -w <true,false> patch wiimmfi (default: true)
 ";

@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace CustomStreetMapManager
 {
-    class CliExtract : CliCommand
+    class CliLoad : CliCommand
     {
-        public CliExtract() : base("extract") { }
+        public CliLoad() : base("load") { }
         public override string GetHelp()
         {
             _ = @"
 --------------------------------------------------------------------------------
 ";
             return @"
-usage: csmm extract [options] <input>
+usage: csmm load [options] <input>
 
 options:
    -v              verbose
@@ -29,9 +29,9 @@ options:
         {
             var destination = options.GetValueOrDefault("d", null);
             var configuration = options.GetValueOrDefault("c", Path.Combine(Directory.GetCurrentDirectory(), "config.csv"));
-            await Extract(input, destination, configuration, progress, ct);
+            await Load(input, destination, configuration, progress, ct);
         }
-        public async Task Extract(string input, string destination, string configuration, ConsoleProgress progress, CancellationToken ct)
+        public async Task Load(string input, string destination, string configuration, ConsoleProgress progress, CancellationToken ct)
         {
             if (string.IsNullOrEmpty(destination))
                 throw new ArgumentException("Destination not set");

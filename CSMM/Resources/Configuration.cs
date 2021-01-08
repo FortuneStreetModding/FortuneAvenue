@@ -50,7 +50,7 @@ namespace CustomStreetMapManager
                     if (mapIdConfig > highestMapId)
                         highestMapId = mapIdConfig;
                 }
-                lines.Add(String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId, mapSet.OrElse(-1), zone.OrElse(-1), order.OrElse(-1), tutorial.OrElse(false), mapDescriptorRelativePath));
+                lines.Add(String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId + 1, mapSet.OrElse(-1), zone.OrElse(-1), order.OrElse(-1), tutorial.OrElse(false), mapDescriptorRelativePath));
                 File.WriteAllLines(fileName, lines);
             }
             else

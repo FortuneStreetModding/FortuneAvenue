@@ -33,21 +33,24 @@ namespace CustomStreetMapManager
 usage: csmm <command> [options] <input>
 
 commands:
-   extract         extract the data of a Fortune Street game disc image to a
-                     directory
-   export          export one or several map descriptor files (*.md) from a 
-                     Fortune Street game disc directory
-   add             add a map descriptor file (.md) to a configuration file
-   save            pack a Fortune Street game disc directory into an image file
-                     using a configuration file
-   json            output the whole data from a Fortune Street game disc 
-                     directory to json
+   load            extract the data of a Fortune Street game disc image to a
+                     directory. Creates a configuration file to be used for 
+                     further operations.
+   export          export one or several map descriptor files (*.md) from an 
+                     extracted Fortune Street game disc directory
+   import          import a map descriptor file (*.md) to an existing 
+                     configuration file
+   save            save the changes to a Fortune Street game disc directory or
+                     to an image file
+   json            output an overview of the viewable data from a 
+                     Fortune Street game disc directory to json
+   help            to output a step by step guide how to use CSMM CLI
 
 Use 'csmm <command>' to read about a specific command.
 
 options:
    -a              all
-   -c <config>     configuration
+   -c <config>     configuration file
    -d <path>       destination
    -f              force
    -i <id>         id
@@ -66,8 +69,6 @@ options:
         }
         static async Task Main(string[] args)
         {
-            // args = new string[] { "import", "t.md", "-d", "Test", "-i", "0", "-m", "0", "-z", "2", "-o", "6", "-v" };
-
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
                 var ct = cancellationTokenSource.Token;
@@ -115,24 +116,31 @@ options:
                 var quiet = options.ContainsKey("q");
                 var verbose = options.ContainsKey("v");
                 var commands = new List<CliCommand>();
-                commands.Add(new CliExtract());
+                commands.Add(new CliLoad());
                 commands.Add(new CliExport());
-                commands.Add(new CliAdd());
+                commands.Add(new CliImport());
                 commands.Add(new CliSave());
                 commands.Add(new CliJson());
+                commands.Add(new CliHelp());
                 using (ConsoleProgress progress = new ConsoleProgress(verbose, quiet))
                 {
                     try
                     {
+                        bool commandGiven = false;
                         foreach (var command in commands)
                         {
                             if (args[0].ToLower() == command.Name)
                             {
+                                commandGiven = true;
                                 if (string.IsNullOrEmpty(input))
                                     Console.WriteLine(command.GetHelp());
                                 else
                                     await command.Run(input, options, progress, ct);
                             }
+                        }
+                        if (!commandGiven)
+                        {
+                            PrintHelp();
                         }
                     }
                     catch (Exception e)
