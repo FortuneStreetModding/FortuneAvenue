@@ -23,7 +23,7 @@ options:
    -v              verbose
    -q              quiet (overrides verbose)
 
-   -c <path>       configuration file
+   -c <path>       configuration file (default: config.csv)
    -i <0,...>      map id
    -m <0,1>        mapset
    -z <0,1,2>      zone

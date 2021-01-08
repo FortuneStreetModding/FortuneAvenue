@@ -22,7 +22,10 @@ namespace CustomStreetMapManager
             var packIso = IsImageFileExtension(outputFile);
             outputFile = DoPathCorrections(outputFile, true);
             inputFile = DoPathCorrections(inputFile, false);
-            var cacheFileSet = new DataFileSet(Path.GetFullPath(GetCachePath(inputFile, cachePath)));
+            cachePath = Path.GetFullPath(GetCachePath(inputFile, cachePath));
+            if (IsImageFileExtension(cachePath))
+                throw new ArgumentException("cachePath must be a valid extracted fortune street game disc directory");
+            var cacheFileSet = new DataFileSet(cachePath);
             var riivFileSet = new DataFileSet(GetDefaultRiivPath(riivPath));
             var tmpFileSet = new DataFileSet(GetDefaultTmpPath(tmpPath));
 

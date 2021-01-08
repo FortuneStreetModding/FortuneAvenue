@@ -50,7 +50,7 @@ Use 'csmm <command>' to read about a specific command.
 
 options:
    -a              all
-   -c <config>     configuration file
+   -c <config>     configuration file (default: config.csv)
    -d <path>       destination
    -f              force
    -i <id>         id

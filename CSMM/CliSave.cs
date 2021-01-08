@@ -24,13 +24,13 @@ options:
    -q              quiet (overrides verbose)
 
    -d <path>       destination directory or image file
-   -c <config>     configuration file
+   -c <config>     configuration file (default: config.csv)
    -w <true,false> patch wiimmfi (default: true)
 ";
         }
         public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
-            var destination = options.GetValueOrDefault("d", null);
+            var destination = options.GetValueOrDefault("d", input);
             var configuration = options.GetValueOrDefault("c", Path.Combine(Directory.GetCurrentDirectory(), "config.csv"));
             var patchWiimmfi = GetBoolParameter(options, "w");
             await Save(input, destination, configuration, patchWiimmfi, progress, ct);

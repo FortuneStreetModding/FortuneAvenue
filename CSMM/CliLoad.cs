@@ -22,7 +22,7 @@ options:
    -q              quiet (overrides verbose)
 
    -d <path>       destination
-   -c <path>       configuration file
+   -c <path>       configuration file (default: config.csv)
 ";
         }
         public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
