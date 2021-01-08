@@ -43,6 +43,9 @@ namespace CustomStreetMapManager
             if (!mapId.Any())
             {
                 var highestMapId = 0;
+                sbyte highestMapSet = 0;
+                sbyte highestZone = 0;
+                sbyte highestOrder = 0;
                 foreach (var line in lines)
                 {
                     string[] columns = line.Split(new[] { ',' }, 6);
@@ -50,7 +53,40 @@ namespace CustomStreetMapManager
                     if (mapIdConfig > highestMapId)
                         highestMapId = mapIdConfig;
                 }
-                lines.Add(String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId + 1, mapSet.OrElse(-1), zone.OrElse(-1), order.OrElse(-1), tutorial.OrElse(false), mapDescriptorRelativePath));
+                foreach (var line in lines)
+                {
+                    string[] columns = line.Split(new[] { ',' }, 6);
+                    var mapSetConfig = sbyte.Parse(columns[1].Trim());
+                    if (mapSetConfig > highestMapSet)
+                        highestMapSet = mapSetConfig;
+                }
+                foreach (var line in lines)
+                {
+                    string[] columns = line.Split(new[] { ',' }, 6);
+                    var mapSetConfig = sbyte.Parse(columns[1].Trim());
+                    if (mapSetConfig == highestMapSet)
+                    {
+                        var zoneConfig = sbyte.Parse(columns[2].Trim());
+                        if (zoneConfig > highestZone)
+                            highestZone = zoneConfig;
+                    }
+                }
+                foreach (var line in lines)
+                {
+                    string[] columns = line.Split(new[] { ',' }, 6);
+                    var mapSetConfig = sbyte.Parse(columns[1].Trim());
+                    if (mapSetConfig == highestMapSet)
+                    {
+                        var zoneConfig = sbyte.Parse(columns[2].Trim());
+                        if (zoneConfig == highestZone)
+                        {
+                            var orderConfig = sbyte.Parse(columns[3].Trim());
+                            if (orderConfig > highestOrder)
+                                highestOrder = orderConfig;
+                        }
+                    }
+                }
+                lines.Add(String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId + 1, mapSet.OrElse(highestMapSet), zone.OrElse(highestZone), order.OrElse((sbyte)(highestOrder + 1)), tutorial.OrElse(false), mapDescriptorRelativePath));
                 File.WriteAllLines(fileName, lines);
             }
             else
