@@ -62,6 +62,9 @@ options:
    -v              verbose
    -w <true,false> patch wiimmfi (default: true)
    -z <zone>       zone
+
+attention: csmm requires that Wiimms Iso Toolset, Wiimms Szs Toolset and Benzin 
+   are either installed or the binaries located in the working directory
 ");
             _ = @"
 --------------------------------------------------------------------------------
