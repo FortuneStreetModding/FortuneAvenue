@@ -305,7 +305,7 @@ namespace CustomStreetMapManager
                 try
                 {
                     await ExeChecker.makeSureWitInstalled(ct, ProgressInfo.makeSubProgress(progress, 0, 1)).ConfigureAwait(true);
-                    var mapDescriptors = await PatchProcess.Load(inputWbfsIso, progress, ct);
+                    var mapDescriptors = await PatchProcess.Open(inputWbfsIso, progress, ct);
 
                     Go.Enabled = true;
                     clearListButton.Enabled = true;

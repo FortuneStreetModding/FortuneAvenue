@@ -36,7 +36,7 @@ options:
         }
         private async Task Json(string input, string destination, bool print, ConsoleProgress progress, CancellationToken ct)
         {
-            var mapDescriptors = await PatchProcess.Load(input, progress, ct);
+            var mapDescriptors = await PatchProcess.Open(input, progress, ct);
             await Task.Delay(500);
             var options = new JsonSerializerOptions
             {

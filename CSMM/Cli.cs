@@ -33,7 +33,7 @@ namespace CustomStreetMapManager
 usage: csmm <command> [options] <input>
 
 commands:
-   load            extract the data of a Fortune Street game disc image to a
+   open            extract the data of a Fortune Street game disc image to a
                      directory. Creates a configuration file to be used for 
                      further operations.
    export          export one or several map descriptor files (*.md) from an 
@@ -119,7 +119,7 @@ attention: csmm requires that Wiimms Iso Toolset, Wiimms Szs Toolset and Benzin
                 var quiet = options.ContainsKey("q");
                 var verbose = options.ContainsKey("v");
                 var commands = new List<CliCommand>();
-                commands.Add(new CliLoad());
+                commands.Add(new CliOpen());
                 commands.Add(new CliExport());
                 commands.Add(new CliImport());
                 commands.Add(new CliSave());

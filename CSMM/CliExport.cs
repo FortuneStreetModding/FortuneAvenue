@@ -48,7 +48,7 @@ options:
         }
         private async Task Export(string input, string destination, List<string> ids, bool all, List<string> internalNames, bool overwrite, ConsoleProgress progress, CancellationToken ct)
         {
-            var mapDescriptors = await PatchProcess.Load(input, progress, ct, input);
+            var mapDescriptors = await PatchProcess.Open(input, progress, ct, input);
             await Task.Delay(500);
 
             var mapDescriptorsToExport = new List<MapDescriptor>();

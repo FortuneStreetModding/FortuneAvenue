@@ -37,7 +37,7 @@ options:
         }
         private async Task Save(string input, string destination, string config, Optional<bool> wiimmfi, ConsoleProgress progress, CancellationToken ct)
         {
-            var mapDescriptors = await PatchProcess.Load(input, progress, ct, input);
+            var mapDescriptors = await PatchProcess.Open(input, progress, ct, input);
 
             await Task.Delay(500);
 
