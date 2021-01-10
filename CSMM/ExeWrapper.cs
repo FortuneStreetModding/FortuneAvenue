@@ -206,6 +206,28 @@ namespace CustomStreetMapManager
             string arguments = "DOLPATCH \"" + mainDolFile + "\" xml=\"" + xmlPatchFile + "\"";
             return await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
         }
+        public static async Task<List<string>> findCandidates(string path, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
+        {
+            string arguments = "FILETYPE \"" + path + "\" --no-header --include ST7+";
+            var result = await callWit(arguments, cancelToken, progress).ConfigureAwait(continueOnCapturedContext);
+
+            List<string> candidates = new List<string>();
+
+            using (StringReader reader = new StringReader(result))
+            {
+                string line;
+                EndianBitConverter endianBitConverter = EndianBitConverter.Big;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] columns = line.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if (columns.Length == 2)
+                    {
+                        candidates.Add(columns[1].Substring(2));
+                    }
+                }
+            }
+            return candidates;
+        }
         public static async Task<string> extractArcFile(string arcFile, string dFolder, CancellationToken cancelToken, IProgress<ProgressInfo> progress)
         {
             string arguments = "EXTRACT --verbose \"" + arcFile + "\" --dest \"" + dFolder + "\"";

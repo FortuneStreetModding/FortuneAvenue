@@ -16,7 +16,7 @@ namespace CustomStreetMapManager
             this.silent = silent;
             if (!silent && !verbose)
             {
-                asciiProgressBar = new ASCIIProgressBar();
+               // asciiProgressBar = new ASCIIProgressBar();
             }
         }
 

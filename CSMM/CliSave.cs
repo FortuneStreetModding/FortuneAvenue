@@ -10,42 +10,40 @@ namespace CustomStreetMapManager
 {
     class CliSave : CliCommand
     {
-        public CliSave() : base("save") { }
+        public CliSave() : base("save", d, c, s, w, f) { }
         public override string GetHelp()
         {
             _ = @"
 --------------------------------------------------------------------------------
 ";
-            return @"
-usage: csmm save [options] <input>
+            return $@"
+usage: csmm save {s.ToShortString()} [options]
 
 options:
-   -v              verbose
-   -q              quiet (overrides verbose)
-
-   -d <path>       destination directory or image file
-   -c <config>     configuration file (default: config.csv)
-   -w <true,false> patch wiimmfi (default: true)
-";
+{GetOptionsHelp()}";
         }
-        public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
+        public override async Task Run(string subCommand, string fortuneStreetPath, string configPath, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
-            var destination = options.GetValueOrDefault("d", input);
-            var configuration = options.GetValueOrDefault("c", Path.Combine(Directory.GetCurrentDirectory(), "config.csv"));
+            string destination = options.GetValueOrDefault("d", PatchProcess.GetCachePath(fortuneStreetPath));
+            if (Path.GetFullPath(destination) == Path.GetFullPath(fortuneStreetPath) && !options.ContainsKey("f"))
+            {
+                throw new ArgumentException("This operation would overwrite the existing game disc directory at " + destination + ". Provide the switch -f to overwrite.");
+            }
             var patchWiimmfi = GetBoolParameter(options, "w");
-            await Save(input, destination, configuration, patchWiimmfi, progress, ct);
+            await Save(fortuneStreetPath, destination, configPath, patchWiimmfi, progress, ct);
         }
-        private async Task Save(string input, string destination, string config, Optional<bool> wiimmfi, ConsoleProgress progress, CancellationToken ct)
+        private async Task Save(string fortuneStreetPath, string destination, string config, Optional<bool> wiimmfi, ConsoleProgress progress, CancellationToken ct)
         {
-            var mapDescriptors = await PatchProcess.Open(input, progress, ct, input);
+            progress.Report("Saving at " + Path.GetFullPath(destination));
+            var mapDescriptors = await PatchProcess.Open(fortuneStreetPath, progress, ct);
 
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
 
             Configuration.Load(config, mapDescriptors, progress, ct);
 
-            await PatchProcess.Save(input, destination, mapDescriptors, wiimmfi.OrElse(true), progress, ct, input);
+            await PatchProcess.Save(fortuneStreetPath, destination, mapDescriptors, wiimmfi.OrElse(true), progress, ct);
 
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
         }
     }
 }

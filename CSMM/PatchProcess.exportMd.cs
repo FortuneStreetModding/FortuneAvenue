@@ -18,7 +18,7 @@ namespace CustomStreetMapManager
         public static void ExportMd(string destination, string cachePath, MapDescriptor mapDescriptor, bool overwrite, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var cacheFileSet = new DataFileSet(cachePath);
-            if (string.IsNullOrEmpty(Path.GetExtension(destination)))
+            if (Directory.Exists(destination) || string.IsNullOrEmpty(Path.GetExtension(destination)))
                 destination = Path.Combine(destination, mapDescriptor.InternalName + ".md");
             var directory = Path.GetDirectoryName(destination);
             if (!string.IsNullOrWhiteSpace(directory))

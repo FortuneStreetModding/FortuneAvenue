@@ -8,38 +8,35 @@ namespace CustomStreetMapManager
 {
     class CliOpen : CliCommand
     {
-        public CliOpen() : base("open") { }
+        public CliOpen() : base("open", c, s, f) { }
         public override string GetHelp()
         {
             _ = @"
 --------------------------------------------------------------------------------
 ";
-            return @"
-usage: csmm open [options] <input>
+            return $@"
+usage: csmm open {s.ToShortString()} [options]
+
+This command does three things:
+(1) If the source is a game disc image (*.iso,*.wbfs,*.ciso,...) it will
+     be extracted first.
+(2) The extracted game disc directory is read
+(3) A config.csv file is created in the root of the extracted directory which 
+     contains information about the current map configuration. This file will be
+     used by further commands.
 
 options:
-   -v              verbose
-   -q              quiet (overrides verbose)
-
-   -d <path>       destination
-   -c <path>       configuration file (default: config.csv)
-";
+{GetOptionsHelp()}";
         }
-        public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
+        public override async Task Run(string subCommand, string fortuneStreetPath, string configPath, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
-            var destination = options.GetValueOrDefault("d", null);
-            var configuration = options.GetValueOrDefault("c", Path.Combine(Directory.GetCurrentDirectory(), "config.csv"));
-            await Open(input, destination, configuration, progress, ct);
-        }
-        public async Task Open(string input, string destination, string configuration, ConsoleProgress progress, CancellationToken ct)
-        {
-            if (string.IsNullOrEmpty(destination))
-                throw new ArgumentException("Destination not set");
-            if (File.Exists(destination))
-                throw new ArgumentException("Destination must be a directory");
-            var mapDescriptors = await PatchProcess.Open(input, progress, ct, destination);
-            Configuration.Save(configuration, mapDescriptors, progress, ct);
-            await Task.Delay(500);
+            if (File.Exists(configPath) && !options.ContainsKey("f"))
+            {
+                throw new ArgumentException("The source " + fortuneStreetPath + " is already open. Use the switch -f to close and reopen it losing pending changes.");
+            }
+            var mapDescriptors = await PatchProcess.Open(fortuneStreetPath, progress, ct);
+            Configuration.Save(configPath, mapDescriptors, progress, ct);
+            progress?.Report("Opened " + fortuneStreetPath);
         }
     }
 }

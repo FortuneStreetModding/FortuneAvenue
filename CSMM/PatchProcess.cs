@@ -43,7 +43,7 @@ namespace CustomStreetMapManager
                 return cachePath;
             if (IsImageFileExtension(input))
             {
-                return Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileNameWithoutExtension(input));
+                return Path.ChangeExtension(input, null);
             }
             else
             {

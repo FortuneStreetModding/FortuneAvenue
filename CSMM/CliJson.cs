@@ -9,41 +9,33 @@ namespace CustomStreetMapManager
 {
     class CliJson : CliCommand
     {
-        public CliJson() : base("json") { }
+        public CliJson() : base("json", d, s) { }
         public override string GetHelp()
         {
             _ = @"
 --------------------------------------------------------------------------------
 ";
-            return @"
-usage: csmm json [options] <input>
+            return $@"
+usage: csmm json {s.ToShortString()} [options]
 
 options:
-   -v              verbose
-   -q              quiet (overrides verbose)
-
-   -d path         destination file
-   -p              print to console
-";
+{GetOptionsHelp()}";
         }
-        public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
+        public override async Task Run(string subCommand, string fortuneStreetPath, string configPath, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
-            var print = options.ContainsKey("p");
             var destination = options.GetValueOrDefault("d", null);
-            if (!print && string.IsNullOrEmpty(destination))
-                throw new ArgumentException("Neither destination nor print is set. Nothing to do.");
-            await Json(input, destination, print, progress, ct);
+            await Json(fortuneStreetPath, configPath, destination, progress, ct);
         }
-        private async Task Json(string input, string destination, bool print, ConsoleProgress progress, CancellationToken ct)
+        private async Task Json(string fortuneStreetPath, string configPath, string destination, ConsoleProgress progress, CancellationToken ct)
         {
-            var mapDescriptors = await PatchProcess.Open(input, progress, ct);
-            await Task.Delay(500);
+            var mapDescriptors = await PatchProcess.Open(fortuneStreetPath, progress, ct);
+            await Task.Delay(500, ct);
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
             };
-            if (print)
-                Console.WriteLine(JsonSerializer.Serialize(mapDescriptors, options));
+            // Configuration.Load(configPath, mapDescriptors, progress, ct);
+            progress?.Report(JsonSerializer.Serialize(mapDescriptors, options));
             if (!string.IsNullOrEmpty(destination))
                 File.WriteAllBytes(destination, JsonSerializer.SerializeToUtf8Bytes(mapDescriptors, options));
         }

@@ -34,7 +34,7 @@ namespace CustomStreetMapManager
             progress?.Report("Saved configuration at " + fileName);
         }
 
-        public static void Add(string fileName, string mapDescriptorFile, Optional<int> mapId, Optional<sbyte> mapSet, Optional<sbyte> zone, Optional<sbyte> order, Optional<bool> tutorial, IProgress<ProgressInfo> progress, CancellationToken ct)
+        public static string Import(string fileName, string mapDescriptorFile, Optional<int> mapId, Optional<sbyte> mapSet, Optional<sbyte> zone, Optional<sbyte> order, Optional<bool> tutorial, IProgress<ProgressInfo> progress, CancellationToken ct)
         {
             var dir = Directory.GetParent(fileName).FullName;
             var lines = File.ReadAllLines(fileName).ToList();
@@ -86,8 +86,11 @@ namespace CustomStreetMapManager
                         }
                     }
                 }
-                lines.Add(String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId + 1, mapSet.OrElse(highestMapSet), zone.OrElse(highestZone), order.OrElse((sbyte)(highestOrder + 1)), tutorial.OrElse(false), mapDescriptorRelativePath));
+                var newLine = String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", highestMapId + 1, mapSet.OrElse(highestMapSet), zone.OrElse(highestZone), order.OrElse((sbyte)(highestOrder + 1)), tutorial.OrElse(false), mapDescriptorRelativePath);
+                lines.Add(newLine);
                 File.WriteAllLines(fileName, lines);
+                progress?.Report("Added new map: " + newLine);
+                return newLine;
             }
             else
             {
@@ -100,8 +103,14 @@ namespace CustomStreetMapManager
                     var orderConfig = order.OrElse(sbyte.Parse(columns[3].Trim()));
                     var isPracticeBoardConfig = tutorial.OrElse(bool.Parse(columns[4].Trim()));
                     if (mapIdConfig == mapId.Single())
-                        lines[i] = String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", mapId.Single(), mapSetConfig, zoneConfig, orderConfig, isPracticeBoardConfig, mapDescriptorRelativePath);
+                    {
+                        var newLine = String.Format("{0,2},{1,2},{2,2},{3,2},{4,5},{5}", mapId.Single(), mapSetConfig, zoneConfig, orderConfig, isPracticeBoardConfig, mapDescriptorRelativePath);
+                        lines[i] = newLine;
+                        progress?.Report("Replaced map: " + newLine);
+                        return newLine;
+                    }
                 }
+                throw new ArgumentException("Could not find map with id " + mapId.Single());
             }
         }
 

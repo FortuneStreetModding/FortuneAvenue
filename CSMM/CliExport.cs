@@ -1,3 +1,4 @@
+using FSEditor.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,29 +10,23 @@ namespace CustomStreetMapManager
 {
     class CliExport : CliCommand
     {
-        public CliExport() : base("export") { }
+        public CliExport() : base("export", s, d, a, i, n, f, c) { }
         public override string GetHelp()
         {
             _ = @"
 --------------------------------------------------------------------------------
 ";
-            return @"
-usage: csmm export [options] <input>
+            return $@"
+usage: csmm export {s.ToShortString()} [options] 
+
+provide -i with a comma separated list of map ids to export multiple maps at once
 
 options:
-   -v              verbose
-   -q              quiet (overrides verbose)
-
-   -d <path>       destination directory
-   -a              export all maps
-   -i <id1,...>    comma seperated list of ids of the maps to export
-   -n <name1,...>  comma seperated list of internal names of the maps to export
-   -f              force overwrite existing files
-";
+{GetOptionsHelp()}";
         }
-        public override async Task Run(string input, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
+        public override async Task Run(string subCommand, string fortuneStreetPath, string configPath, Dictionary<string, string> options, ConsoleProgress progress, CancellationToken ct)
         {
-            var destination = options.GetValueOrDefault("d", null);
+            var destination = options.GetValueOrDefault("d", Directory.GetCurrentDirectory());
             var idList = options.GetValueOrDefault("i", null);
             var all = options.ContainsKey("a");
             var internalNameList = options.GetValueOrDefault("n", null);
@@ -44,12 +39,12 @@ options:
             List<string> internalNames = new List<string>();
             if (!string.IsNullOrEmpty(internalNameList))
                 internalNames = new List<string>(internalNameList.Split(','));
-            await Export(input, destination, ids, all, internalNames, overwrite, progress, ct);
+            await Export(fortuneStreetPath, destination, ids, all, internalNames, overwrite, progress, ct);
         }
-        private async Task Export(string input, string destination, List<string> ids, bool all, List<string> internalNames, bool overwrite, ConsoleProgress progress, CancellationToken ct)
+        private async Task Export(string fortuneStreetPath, string destination, List<string> ids, bool all, List<string> internalNames, bool overwrite, ConsoleProgress progress, CancellationToken ct)
         {
-            var mapDescriptors = await PatchProcess.Open(input, progress, ct, input);
-            await Task.Delay(500);
+            var mapDescriptors = await PatchProcess.Open(fortuneStreetPath, progress, ct);
+            await Task.Delay(500, ct);
 
             var mapDescriptorsToExport = new List<MapDescriptor>();
             for (int i = 0; i < mapDescriptors.Count; i++)
@@ -64,15 +59,23 @@ options:
                 if (export)
                     mapDescriptorsToExport.Add(mapDescriptors[i]);
             }
-            if (mapDescriptorsToExport.Count > 1 && !string.IsNullOrEmpty(Path.GetExtension(destination)))
+            if (mapDescriptorsToExport.Count > 1 && !Directory.Exists(destination) && !string.IsNullOrEmpty(Path.GetExtension(destination)))
             {
                 throw new ArgumentException("Multiple map descriptors are to be exported, however the given destination is a filename. Use a directory instead.");
             }
             foreach (var mapDescriptor in mapDescriptorsToExport)
             {
-                PatchProcess.ExportMd(destination, input, mapDescriptor, overwrite, progress, ct);
+                try
+                {
+                    PatchProcess.ExportMd(destination, PatchProcess.GetCachePath(fortuneStreetPath), mapDescriptor, overwrite, progress, ct);
+                }
+                catch (FileAlreadyExistException)
+                {
+                    progress.Report("Use the switch -f to overwrite already existing files.");
+                    throw;
+                }
             }
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
         }
     }
 }
