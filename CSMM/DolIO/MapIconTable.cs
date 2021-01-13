@@ -165,6 +165,16 @@ namespace CustomStreetMapManager
             // lwz r0,0x184(r3)                                      ->  b subroutineMakeNoneMapIconsInvisible
             stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineMakeNoneMapIconsInvisible));
 
+            // -- if the map id is -1, do not check if it has been unlocked or not ---
+            hijackAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e570);
+            returnContinueAddr = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e574);
+            var returnSkipMapUnlockedCheck = addressMapper.toVersionAgnosticAddress((BSVAddr)0x8021e5a8);
+            var subroutineWriteSubroutineSkipMapUnlockCheck = allocate(writeSubroutineSkipMapUnlockCheck(addressMapper, VAVAddr.NullAddress, returnContinueAddr, returnSkipMapUnlockedCheck), "SubroutineWriteSubroutineSkipMapUnlockCheck");
+            stream.Seek(addressMapper.toFileAddress(subroutineWriteSubroutineSkipMapUnlockCheck), SeekOrigin.Begin);
+            stream.Write(writeSubroutineSkipMapUnlockCheck(addressMapper, subroutineWriteSubroutineSkipMapUnlockCheck, returnContinueAddr, returnSkipMapUnlockedCheck)); // re-write the routine again since now we know where it is located in the main dol
+            // or r3,r26,r26                                      ->  b subroutineWriteSubroutineSkipMapUnlockCheck
+            stream.Seek(addressMapper.toFileAddress(hijackAddr), SeekOrigin.Begin); stream.Write(PowerPcAsm.b(hijackAddr, subroutineWriteSubroutineSkipMapUnlockCheck));
+
             // --- Various Map UI Fixes ---
             // -- if the map index is over the map array size, do not loop around to the first map index again --
             // ble 0x80187e1c                                        ->  b 0x80187e1c
@@ -172,11 +182,19 @@ namespace CustomStreetMapManager
             // -- fix map selection going out of bounds in tour mode --
             // bne 0x80188258                                        ->  nop
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80188230), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
-            // -- fix out of array bounds error when opening tour mode and viewing the zones and having more than 6 maps in a zone ---
-            // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021f880), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
-            // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
-            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021ff4c), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
+        }
+
+        private List<UInt32> writeSubroutineSkipMapUnlockCheck(AddressMapper addressMapper, VAVAddr entryAddr, VAVAddr returnContinueAddr, VAVAddr returnSkipMapUnlockedCheck)
+        {
+            // precondition:  r26  is mapid
+            //                 r3  is unused
+            // postcondition:  r3  is mapid
+            var asm = new List<UInt32>();
+            asm.Add(PowerPcAsm.or(3, 26, 26));                                         // r3 <- mapid
+            asm.Add(PowerPcAsm.cmpwi(3, -1));                                          // mapid == -1 ?
+            asm.Add(PowerPcAsm.beq(entryAddr, asm.Count, returnSkipMapUnlockedCheck)); //   goto skipMapUnlockedCheck
+            asm.Add(PowerPcAsm.b(entryAddr, asm.Count, returnContinueAddr));           // else goto returnContinueAddr
+            return asm;
         }
 
         private List<UInt32> writeSubroutineInitMapIdsForMapIcons(AddressMapper addressMapper, VAVAddr entryAddr)

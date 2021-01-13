@@ -302,6 +302,10 @@ namespace CustomStreetMapManager
         {
             return (uint)(blt_opcode + ((4 * (targetPos - currentPos)) & 0x0000FFFF));
         }
+        public static UInt32 beq(VAVAddr startPos, int offset, VAVAddr targetPos)
+        {
+            return beq((uint)(startPos + offset * 4), (uint)targetPos);
+        }
         public static uint beq(uint currentPos, uint targetPos)
         {
             return beq_opcode + ((targetPos - currentPos) & 0x0000FFFF);

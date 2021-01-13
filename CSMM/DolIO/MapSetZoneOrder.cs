@@ -57,6 +57,45 @@ namespace CustomStreetMapManager
             stream.Write((short)0);
             stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8020F45E), SeekOrigin.Begin);
             stream.Write((short)mapDescriptors.Count);
+
+            // --- Fix Wifi Map Selection ---
+            // bl GameSequenceDataAdapter::GetMapOrigin(r3)                               -> nop
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80185ac4), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
+            // or r31,r3,r3                                                               -> or r31,r4,r4
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80185ac8), SeekOrigin.Begin); stream.Write(PowerPcAsm.or(31, 4, 4));
+            // li r5,0x1                                                                  -> li r5,0x2
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80185b10), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(5, 2));
+            // bl GameSequenceDataAdapter::GetMapOrigin(r3)                               -> nop
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8024b1b8), SeekOrigin.Begin); stream.Write(PowerPcAsm.nop());
+            // bl GameSequenceDataAdapter::GetMapOrigin(r3)                               -> nop
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x802498a8), SeekOrigin.Begin);
+            for (int i = 0; i < 8; i++)
+            {
+                stream.Write(PowerPcAsm.nop());
+            }
+            // --- Default selected map button in wifi ---
+            // since Standard Mode is selected on default, we use this mapset to find the standard map
+            // TODO need asm hack to determine currently selected MapSet and use rather use that ID
+            short defaultMap = 0;
+            for (short i = 0; i < mapDescriptors.Count; i++)
+            {
+                var mapDescriptor = mapDescriptors[i];
+                if (mapDescriptor.MapSet == 1 && mapDescriptor.Zone == 0 && mapDescriptor.Order == 0)
+                { 
+                    defaultMap = i;
+                }
+            }
+            // 0x9 = Castle Trodain
+            // li r3,0x9                                                                  -> li r3,0x9
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8024afc8), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, defaultMap));
+            // TODO 0x13 is some special handling map id. Need to check what is going on with it
+            // li r3,0x13                                                                 -> li r3,0x13
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x80243ae4), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(5, 0x13));
+            // --- Fix out of array bounds error when opening tour mode and viewing the zones and having more than 6 maps in a zone ---
+            // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021f880), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
+            // bl Game::GameSequenceDataAdapter::GetNumMapsInZone    -> li r3,0x6
+            stream.Seek(addressMapper.toFileAddress((BSVAddr)0x8021ff4c), SeekOrigin.Begin); stream.Write(PowerPcAsm.li(3, 0x6));
         }
 
         private List<UInt32> writeSubroutineGetNumMapsInZone(List<MapDescriptor> mapDescriptors)
@@ -100,7 +139,7 @@ namespace CustomStreetMapManager
                     IOrderedEnumerable<MapDescriptor> maps;
                     if (zone == 0)
                         maps = from m in mapDescriptors where m.MapSet == mapSet && m.Zone == 1 orderby m.Order select m;
-                    else if(zone == 1)
+                    else if (zone == 1)
                         maps = from m in mapDescriptors where m.MapSet == mapSet && m.Zone == 0 orderby m.Order select m;
                     else
                         maps = from m in mapDescriptors where m.MapSet == mapSet && m.Zone == zone orderby m.Order select m;
