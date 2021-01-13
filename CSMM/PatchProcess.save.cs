@@ -194,7 +194,7 @@ namespace CustomStreetMapManager
                         }
                         text = Regex.Replace(text, @"Nintendo\sWi-Fi\sConnection", "Wiimmfi", RegexOptions.IgnoreCase);
                         text = Regex.Replace(text, @"Nintendo\sWFC", "Wiimmfi", RegexOptions.IgnoreCase);
-                        text = text.Replace("support.nintendo.com", "https://wiimmfi.de", StringComparison.OrdinalIgnoreCase);
+                        text = text.Replace("support.nintendo.com", "https://wiimmfi.de/error", StringComparison.OrdinalIgnoreCase);
                         ui_message.set(id, text);
                     }
                 }
