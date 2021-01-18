@@ -369,27 +369,59 @@ namespace Editor
             if (board == null)
                 return;
 
-            foreach (SquareData square in board.BoardData.Squares)
+
+            foreach (var square in board.BoardData.Squares)
             {
-                if (square.SquareType == SquareType.OneWayAlleySquare || square.SquareType == SquareType.OneWayAlleyDoorB || square.SquareType == SquareType.OneWayAlleyDoorC || square.SquareType == SquareType.OneWayAlleyDoorD)
+                if (square.SquareType == SquareType.OneWayAlleySquare || 
+                    square.SquareType == SquareType.OneWayAlleyDoorB || 
+                    square.SquareType == SquareType.OneWayAlleyDoorC || 
+                    square.SquareType == SquareType.OneWayAlleyDoorD)
                     continue;
 
-                var touchingSquares = board.BoardData.Squares.Where(s => s != square && Math.Abs(square.Position.X - s.Position.X) <= 64
-                            && Math.Abs(square.Position.Y - s.Position.Y) <= 64).ToArray();
+                var touchingSquares = new List<SquareData>();
 
-                if (touchingSquares.Length > 0)
+                var upper = DoesSquareExistAboveThisOne(square, board, touchingSquares);
+                var lower = DoesSquareExistBelowThisOne(square, board, touchingSquares);
+                var left = DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
+                var right = DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
+
+                if (!upper && !right)
+                {
+                    var upperRight = DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares);
+                }
+
+                if (!upper && !left)
+                {
+                    var upperLeft = DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares);
+                }
+
+                if (!lower && !right)
+                {
+                    var lowerRight = DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares);
+                }
+
+                if (!lower && !left)
+                {
+                    var lowerLeft = DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares);
+                }
+
+                /*var touchingSquares = board.BoardData.Squares.Where(s => s != square 
+                                                                         && Math.Abs(square.Position.X - s.Position.X) <= 64
+                                                                         && Math.Abs(square.Position.Y - s.Position.Y) <= 64).ToArray();*/
+
+                if (touchingSquares.Count > 0)
                 {
                     square.Waypoint1.EntryId = touchingSquares[0].Id;
 
-                    if (touchingSquares.Length > 1)
+                    if (touchingSquares.Count > 1)
                         square.Waypoint1.Destination1 = touchingSquares[1].Id;
                     else square.Waypoint1.Destination1 = 255;
 
-                    if (touchingSquares.Length > 2)
+                    if (touchingSquares.Count > 2)
                         square.Waypoint1.Destination2 = touchingSquares[2].Id;
                     else square.Waypoint1.Destination2 = 255;
 
-                    if (touchingSquares.Length > 3)
+                    if (touchingSquares.Count > 3)
                         square.Waypoint1.Destination3 = touchingSquares[3].Id;
                     else square.Waypoint1.Destination3 = 255;
                 }
@@ -401,16 +433,16 @@ namespace Editor
                     square.Waypoint1.Destination3 = 255;
                 }
 
-                if (touchingSquares.Length > 1)
+                if (touchingSquares.Count > 1)
                 {
                     square.Waypoint2.EntryId = touchingSquares[1].Id;
                     square.Waypoint2.Destination1 = touchingSquares[0].Id;
 
-                    if (touchingSquares.Length > 2)
+                    if (touchingSquares.Count > 2)
                         square.Waypoint2.Destination2 = touchingSquares[2].Id;
                     else square.Waypoint2.Destination2 = 255;
 
-                    if (touchingSquares.Length > 3)
+                    if (touchingSquares.Count > 3)
                         square.Waypoint2.Destination3 = touchingSquares[3].Id;
                     else square.Waypoint2.Destination3 = 255;
                 }
@@ -422,13 +454,13 @@ namespace Editor
                     square.Waypoint2.Destination3 = 255;
                 }
 
-                if (touchingSquares.Length > 2)
+                if (touchingSquares.Count > 2)
                 {
                     square.Waypoint3.EntryId = touchingSquares[2].Id;
                     square.Waypoint3.Destination1 = touchingSquares[0].Id;
                     square.Waypoint3.Destination2 = touchingSquares[1].Id;
 
-                    if (touchingSquares.Length > 3)
+                    if (touchingSquares.Count > 3)
                         square.Waypoint3.Destination3 = touchingSquares[3].Id;
                     else square.Waypoint3.Destination3 = 255;
                 }
@@ -440,7 +472,7 @@ namespace Editor
                     square.Waypoint3.Destination3 = 255;
                 }
 
-                if (touchingSquares.Length > 3)
+                if (touchingSquares.Count > 3)
                 {
                     square.Waypoint4.EntryId = touchingSquares[3].Id;
                     square.Waypoint4.Destination1 = touchingSquares[0].Id;
@@ -457,6 +489,133 @@ namespace Editor
             }
 
             MessageBox.Show("Autopathed entire map");
+        }
+
+        private bool DoesSquareExistAboveThisOne(SquareData thisSquare, BoardFile board,
+            List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.X == thisSquare.Position.X && 
+                    otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y < 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool DoesSquareExistBelowThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.X == thisSquare.Position.X && 
+                    otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y > 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool DoesSquareExistToTheLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.Y == thisSquare.Position.Y && 
+                    otherSquare.Position.X - thisSquare.Position.X >= -127 &&
+                    otherSquare.Position.X - thisSquare.Position.X < 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool DoesSquareExistToTheRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.Y == thisSquare.Position.Y &&
+                    otherSquare.Position.X - thisSquare.Position.X <= 127 &&
+                    otherSquare.Position.X - thisSquare.Position.X > 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool DoesSquareExistToTheUpperRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
+                    otherSquare.Position.X - thisSquare.Position.X <= 127 &&
+                    otherSquare.Position.X - thisSquare.Position.X > 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool DoesSquareExistToTheUpperLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
+                    otherSquare.Position.X - thisSquare.Position.X >= -127 &&
+                    otherSquare.Position.X - thisSquare.Position.X < 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool DoesSquareExistToTheLowerRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
+                    otherSquare.Position.X - thisSquare.Position.X <= 127 &&
+                    otherSquare.Position.X - thisSquare.Position.X > 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool DoesSquareExistToTheLowerLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        {
+            foreach (var otherSquare in board.BoardData.Squares)
+            {
+                if (otherSquare.Id == thisSquare.Id) continue;
+                if (otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
+                    otherSquare.Position.X - thisSquare.Position.X >= -127 &&
+                    otherSquare.Position.X - thisSquare.Position.X < 0)
+                {
+                    touchingSquares.Add(otherSquare);
+                    return true;
+                }
+            }
+            return false;
         }
 
         // Corresponds to "Tools/Verify Board"
