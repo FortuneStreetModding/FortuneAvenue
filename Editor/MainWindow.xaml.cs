@@ -497,8 +497,9 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
+                var range = 90;
                 if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
-                    otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y >= -range &&
                     otherSquare.Position.Y - thisSquare.Position.Y < 0)
                 {
                     touchingSquares.Add(otherSquare);
@@ -513,8 +514,9 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
+                var range = 90;
                 if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
-                    otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
+                    otherSquare.Position.Y - thisSquare.Position.Y <= range &&
                     otherSquare.Position.Y - thisSquare.Position.Y > 0)
                 {
                     touchingSquares.Add(otherSquare);
@@ -551,8 +553,9 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
+                var range = 90;
                 if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) && 
-                    otherSquare.Position.X - thisSquare.Position.X >= -127 &&
+                    otherSquare.Position.X - thisSquare.Position.X >= -range &&
                     otherSquare.Position.X - thisSquare.Position.X < 0)
                 {
                     touchingSquares.Add(otherSquare);
@@ -589,8 +592,9 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
+                var range = 90;
                 if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) &&
-                    otherSquare.Position.X - thisSquare.Position.X <= 127 &&
+                    otherSquare.Position.X - thisSquare.Position.X <= range &&
                     otherSquare.Position.X - thisSquare.Position.X > 0)
                 {
                     touchingSquares.Add(otherSquare);
