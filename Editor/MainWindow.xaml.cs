@@ -488,7 +488,7 @@ namespace Editor
                 }
             }
 
-            MessageBox.Show("Autopathed entire map");
+            MessageBox.Show("Successfully created paths!");
         }
 
         private bool DoesSquareExistAboveThisOne(SquareData thisSquare, BoardFile board,
@@ -497,7 +497,7 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.X == thisSquare.Position.X && 
+                if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
                     otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
                     otherSquare.Position.Y - thisSquare.Position.Y < 0)
                 {
@@ -513,7 +513,7 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.X == thisSquare.Position.X && 
+                if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
                     otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
                     otherSquare.Position.Y - thisSquare.Position.Y > 0)
                 {
@@ -523,12 +523,35 @@ namespace Editor
             }
             return false;
         }
+
+        private static bool SquaresAreApproximatelyEvenOnTheXAxis(SquareData thisSquare, SquareData otherSquare)
+        {
+            var thisXPos = thisSquare.Position.X;
+            var otherXPos = otherSquare.Position.X;
+            var range = 20;
+
+            if (otherXPos > thisXPos)
+            {
+                return (otherXPos - thisXPos <= range && otherXPos - thisXPos >= -range);
+            }
+            if (otherXPos < thisXPos)
+            {
+                return (thisXPos - otherXPos <= range && thisXPos - otherXPos >= -range);
+            }
+            if (otherXPos == thisXPos)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private bool DoesSquareExistToTheLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y == thisSquare.Position.Y && 
+                if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) && 
                     otherSquare.Position.X - thisSquare.Position.X >= -127 &&
                     otherSquare.Position.X - thisSquare.Position.X < 0)
                 {
@@ -538,12 +561,35 @@ namespace Editor
             }
             return false;
         }
+
+        private static bool SquaresAreApproximatelyEvenOnTheYAxis(SquareData thisSquare, SquareData otherSquare)
+        {
+            var thisYPos = thisSquare.Position.Y;
+            var otherYPos = otherSquare.Position.Y;
+            var range = 20;
+
+            if (otherYPos > thisYPos)
+            {
+                return (otherYPos - thisYPos <= range && otherYPos - thisYPos >= -range);
+            }
+            else if (otherYPos < thisYPos)
+            {
+                return (thisYPos - otherYPos <= range && thisYPos - otherYPos >= -range);
+            }
+            else if (otherYPos == thisYPos)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private bool DoesSquareExistToTheRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y == thisSquare.Position.Y &&
+                if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) &&
                     otherSquare.Position.X - thisSquare.Position.X <= 127 &&
                     otherSquare.Position.X - thisSquare.Position.X > 0)
                 {
@@ -558,9 +604,10 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
+                var range = 90;
+                if (otherSquare.Position.Y - thisSquare.Position.Y >= -range &&
                     otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X <= 127 &&
+                    otherSquare.Position.X - thisSquare.Position.X <= range &&
                     otherSquare.Position.X - thisSquare.Position.X > 0)
                 {
                     touchingSquares.Add(otherSquare);
@@ -574,9 +621,10 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y >= -127 &&
+                var range = -90;
+                if (otherSquare.Position.Y - thisSquare.Position.Y >= range &&
                     otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X >= -127 &&
+                    otherSquare.Position.X - thisSquare.Position.X >= range &&
                     otherSquare.Position.X - thisSquare.Position.X < 0)
                 {
                     touchingSquares.Add(otherSquare);
@@ -590,9 +638,10 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
+                var range = 90;
+                if (otherSquare.Position.Y - thisSquare.Position.Y <= range &&
                     otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X <= 127 &&
+                    otherSquare.Position.X - thisSquare.Position.X <= range &&
                     otherSquare.Position.X - thisSquare.Position.X > 0)
                 {
                     touchingSquares.Add(otherSquare);
@@ -606,9 +655,10 @@ namespace Editor
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y <= 127 &&
+                var range = 90;
+                if (otherSquare.Position.Y - thisSquare.Position.Y <= range &&
                     otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X >= -127 &&
+                    otherSquare.Position.X - thisSquare.Position.X >= -range &&
                     otherSquare.Position.X - thisSquare.Position.X < 0)
                 {
                     touchingSquares.Add(otherSquare);
