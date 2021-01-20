@@ -144,10 +144,13 @@ namespace Editor
         };
         #endregion
 
-        public static Int16 Snap { get; private set; }
-        private String currentFileName = null; // Includes position, used for File/Save
-        private String loneFileName = null; // File name only, used for titlebar
-        private static Boolean backgroundAxesOn = false;
+        public static short Snap { get; private set; }
+
+        public DirectionCheckModule DirectionCheckModule { get; }
+
+        private string _currentFileName = null; // Includes position, used for File/Save
+        private string _loneFileName = null; // File name only, used for titlebar
+        private static bool backgroundAxesOn = false;
         private static Brush backgroundBrush = Brushes.Transparent;
 
         public MainWindow()
@@ -159,14 +162,15 @@ namespace Editor
             ShopComboBox.DisplayMemberPath = "Value";
             ShopComboBox.SelectedValuePath = "Key";
             ShopComboBox.ItemsSource = ShopTypeList;
+            DirectionCheckModule = new DirectionCheckModule(this);
         }
 
         private void UpdateTitle()
         {
-            if (loneFileName == null)
+            if (_loneFileName == null)
                 this.Title = "Fortune Avenue - [New Board]";
             else
-                this.Title = "Fortune Avenue - [" + loneFileName + "]";
+                this.Title = "Fortune Avenue - [" + _loneFileName + "]";
         }
 
         private void UpdateGalaxyRadio()
@@ -203,15 +207,14 @@ namespace Editor
 
             // Get scrollviewer
             ScrollViewer scrollViewer = border.Child as ScrollViewer;
-            if (scrollViewer != null)
-            {
-                // center the Scroll Viewer...
-                double cx = scrollViewer.ScrollableWidth / 2.0;
-                scrollViewer.ScrollToHorizontalOffset(cx);
+            if (scrollViewer == null) return;
+            // center the Scroll Viewer...
 
-                double cy = scrollViewer.ScrollableHeight / 2.0;
-                scrollViewer.ScrollToVerticalOffset(cy);
-            }
+            var cx = scrollViewer.ScrollableWidth / 2.0;
+            scrollViewer.ScrollToHorizontalOffset(cx);
+
+            var cy = scrollViewer.ScrollableHeight / 2.0;
+            scrollViewer.ScrollToVerticalOffset(cy);
         }
 
         #region Menu Items
@@ -221,8 +224,8 @@ namespace Editor
         // Corresponds to "File/New"
         private void New_Click(object sender, RoutedEventArgs e)
         {
-            currentFileName = null;
-            loneFileName = null;
+            _currentFileName = null;
+            _loneFileName = null;
             var Board = BoardFile.LoadDefault();
             this.DataContext = Board;
             UpdateTitle();
@@ -242,8 +245,8 @@ namespace Editor
             if (openFileDialog.ShowDialog() != true)
                 return;
 
-            currentFileName = openFileDialog.FileName;
-            loneFileName = openFileDialog.SafeFileName;
+            _currentFileName = openFileDialog.FileName;
+            _loneFileName = openFileDialog.SafeFileName;
 
             using (var stream = openFileDialog.OpenFile())
             {
@@ -264,13 +267,13 @@ namespace Editor
             if (board == null)
                 return;
 
-            if (currentFileName == null)
+            if (_currentFileName == null)
             {
                 SaveAs_Click(sender, e);
                 return;
             }
 
-            using (var stream = new FileStream(currentFileName, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite, System.IO.FileShare.None))
+            using (var stream = new FileStream(_currentFileName, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite, System.IO.FileShare.None))
             {
                 MiscUtil.IO.EndianBinaryWriter binWriter = new MiscUtil.IO.EndianBinaryWriter(MiscUtil.Conversion.EndianBitConverter.Big, stream);
                 board.WriteToStream(binWriter);
@@ -292,8 +295,8 @@ namespace Editor
             if (saveFileDialog.ShowDialog() != true)
                 return;
 
-            currentFileName = saveFileDialog.FileName;
-            loneFileName = saveFileDialog.SafeFileName;
+            _currentFileName = saveFileDialog.FileName;
+            _loneFileName = saveFileDialog.SafeFileName;
 
             using (var stream = saveFileDialog.OpenFile())
             {
@@ -321,9 +324,9 @@ namespace Editor
             if (board == null)
                 return;
 
-            Int32[] districtCount = new Int32[12];
-            Int32[] districtSum = new Int32[12];
-            Int32 highestDistrict = -1;
+            var districtCount = new Int32[12];
+            var districtSum = new Int32[12];
+            var highestDistrict = -1;
 
             foreach (var square in board.BoardData.Squares)
             {
@@ -342,13 +345,13 @@ namespace Editor
             }
 
             StringBuilder stockssb = new StringBuilder();
-            for (Int32 i = 0; i <= highestDistrict; ++i)
+            for (var i = 0; i <= highestDistrict; ++i)
             {
                 if (districtCount[i] == 0)
                     continue;
 
                 // The base stock value is just the average value of shops in that district
-                Int64 stpri = districtSum[i] / districtCount[i];
+                var stpri = districtSum[i] / districtCount[i];
 
                 // Initial stock has a base multiplier of 0xB00 in 16.16 fixed point,
                 // so we simulate that
@@ -369,7 +372,6 @@ namespace Editor
             if (board == null)
                 return;
 
-
             foreach (var square in board.BoardData.Squares)
             {
                 if (square.SquareType == SquareType.OneWayAlleySquare || 
@@ -379,297 +381,11 @@ namespace Editor
                     continue;
 
                 var touchingSquares = new List<SquareData>();
-
-                var upper = DoesSquareExistAboveThisOne(square, board, touchingSquares);
-                var lower = DoesSquareExistBelowThisOne(square, board, touchingSquares);
-                var left = DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
-                var right = DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
-
-                if (!upper && !right)
-                {
-                    var upperRight = DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares);
-                }
-
-                if (!upper && !left)
-                {
-                    var upperLeft = DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares);
-                }
-
-                if (!lower && !right)
-                {
-                    var lowerRight = DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares);
-                }
-
-                if (!lower && !left)
-                {
-                    var lowerLeft = DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares);
-                }
-
-                /*var touchingSquares = board.BoardData.Squares.Where(s => s != square 
-                                                                         && Math.Abs(square.Position.X - s.Position.X) <= 64
-                                                                         && Math.Abs(square.Position.Y - s.Position.Y) <= 64).ToArray();*/
-
-                if (touchingSquares.Count > 0)
-                {
-                    square.Waypoint1.EntryId = touchingSquares[0].Id;
-
-                    if (touchingSquares.Count > 1)
-                        square.Waypoint1.Destination1 = touchingSquares[1].Id;
-                    else square.Waypoint1.Destination1 = 255;
-
-                    if (touchingSquares.Count > 2)
-                        square.Waypoint1.Destination2 = touchingSquares[2].Id;
-                    else square.Waypoint1.Destination2 = 255;
-
-                    if (touchingSquares.Count > 3)
-                        square.Waypoint1.Destination3 = touchingSquares[3].Id;
-                    else square.Waypoint1.Destination3 = 255;
-                }
-                else
-                {
-                    square.Waypoint1.EntryId = 255;
-                    square.Waypoint1.Destination1 = 255;
-                    square.Waypoint1.Destination2 = 255;
-                    square.Waypoint1.Destination3 = 255;
-                }
-
-                if (touchingSquares.Count > 1)
-                {
-                    square.Waypoint2.EntryId = touchingSquares[1].Id;
-                    square.Waypoint2.Destination1 = touchingSquares[0].Id;
-
-                    if (touchingSquares.Count > 2)
-                        square.Waypoint2.Destination2 = touchingSquares[2].Id;
-                    else square.Waypoint2.Destination2 = 255;
-
-                    if (touchingSquares.Count > 3)
-                        square.Waypoint2.Destination3 = touchingSquares[3].Id;
-                    else square.Waypoint2.Destination3 = 255;
-                }
-                else
-                {
-                    square.Waypoint2.EntryId = 255;
-                    square.Waypoint2.Destination1 = 255;
-                    square.Waypoint2.Destination2 = 255;
-                    square.Waypoint2.Destination3 = 255;
-                }
-
-                if (touchingSquares.Count > 2)
-                {
-                    square.Waypoint3.EntryId = touchingSquares[2].Id;
-                    square.Waypoint3.Destination1 = touchingSquares[0].Id;
-                    square.Waypoint3.Destination2 = touchingSquares[1].Id;
-
-                    if (touchingSquares.Count > 3)
-                        square.Waypoint3.Destination3 = touchingSquares[3].Id;
-                    else square.Waypoint3.Destination3 = 255;
-                }
-                else
-                {
-                    square.Waypoint3.EntryId = 255;
-                    square.Waypoint3.Destination1 = 255;
-                    square.Waypoint3.Destination2 = 255;
-                    square.Waypoint3.Destination3 = 255;
-                }
-
-                if (touchingSquares.Count > 3)
-                {
-                    square.Waypoint4.EntryId = touchingSquares[3].Id;
-                    square.Waypoint4.Destination1 = touchingSquares[0].Id;
-                    square.Waypoint4.Destination2 = touchingSquares[1].Id;
-                    square.Waypoint4.Destination3 = touchingSquares[2].Id;
-                }
-                else
-                {
-                    square.Waypoint4.EntryId = 255;
-                    square.Waypoint4.Destination1 = 255;
-                    square.Waypoint4.Destination2 = 255;
-                    square.Waypoint4.Destination3 = 255;
-                }
+                DirectionCheckModule.CheckSurroundingsForSquares(square, board, touchingSquares);
+                WaypointModule.PopulateWaypoints(square, touchingSquares);
             }
 
             MessageBox.Show("Successfully created paths!");
-        }
-
-        private bool DoesSquareExistAboveThisOne(SquareData thisSquare, BoardFile board,
-            List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
-                    otherSquare.Position.Y - thisSquare.Position.Y >= -range &&
-                    otherSquare.Position.Y - thisSquare.Position.Y < 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool DoesSquareExistBelowThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
-                    otherSquare.Position.Y - thisSquare.Position.Y <= range &&
-                    otherSquare.Position.Y - thisSquare.Position.Y > 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static bool SquaresAreApproximatelyEvenOnTheXAxis(SquareData thisSquare, SquareData otherSquare)
-        {
-            var thisXPos = thisSquare.Position.X;
-            var otherXPos = otherSquare.Position.X;
-            var range = 20;
-
-            if (otherXPos > thisXPos)
-            {
-                return (otherXPos - thisXPos <= range && otherXPos - thisXPos >= -range);
-            }
-            if (otherXPos < thisXPos)
-            {
-                return (thisXPos - otherXPos <= range && thisXPos - otherXPos >= -range);
-            }
-            if (otherXPos == thisXPos)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool DoesSquareExistToTheLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) && 
-                    otherSquare.Position.X - thisSquare.Position.X >= -range &&
-                    otherSquare.Position.X - thisSquare.Position.X < 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static bool SquaresAreApproximatelyEvenOnTheYAxis(SquareData thisSquare, SquareData otherSquare)
-        {
-            var thisYPos = thisSquare.Position.Y;
-            var otherYPos = otherSquare.Position.Y;
-            var range = 20;
-
-            if (otherYPos > thisYPos)
-            {
-                return (otherYPos - thisYPos <= range && otherYPos - thisYPos >= -range);
-            }
-            else if (otherYPos < thisYPos)
-            {
-                return (thisYPos - otherYPos <= range && thisYPos - otherYPos >= -range);
-            }
-            else if (otherYPos == thisYPos)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool DoesSquareExistToTheRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) &&
-                    otherSquare.Position.X - thisSquare.Position.X <= range &&
-                    otherSquare.Position.X - thisSquare.Position.X > 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-        private bool DoesSquareExistToTheUpperRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (otherSquare.Position.Y - thisSquare.Position.Y >= -range &&
-                    otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X <= range &&
-                    otherSquare.Position.X - thisSquare.Position.X > 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-        private bool DoesSquareExistToTheUpperLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = -90;
-                if (otherSquare.Position.Y - thisSquare.Position.Y >= range &&
-                    otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X >= range &&
-                    otherSquare.Position.X - thisSquare.Position.X < 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-        private bool DoesSquareExistToTheLowerRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (otherSquare.Position.Y - thisSquare.Position.Y <= range &&
-                    otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X <= range &&
-                    otherSquare.Position.X - thisSquare.Position.X > 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
-        }
-        private bool DoesSquareExistToTheLowerLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
-        {
-            foreach (var otherSquare in board.BoardData.Squares)
-            {
-                if (otherSquare.Id == thisSquare.Id) continue;
-                var range = 90;
-                if (otherSquare.Position.Y - thisSquare.Position.Y <= range &&
-                    otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X >= -range &&
-                    otherSquare.Position.X - thisSquare.Position.X < 0)
-                {
-                    touchingSquares.Add(otherSquare);
-                    return true;
-                }
-            }
-            return false;
         }
 
         // Corresponds to "Tools/Verify Board"
@@ -680,14 +396,14 @@ namespace Editor
             if (board == null)
                 return;
 
-            StringBuilder errsb = new StringBuilder();
-            StringBuilder warnsb = new StringBuilder();
+            var errsb = new StringBuilder();
+            var warnsb = new StringBuilder();
 
-            Int16 errors = 0;
-            Int16 warnings = 0;
+            short errors = 0;
+            short warnings = 0;
 
-            Int32[] districts = new Int32[12];
-            Int32 highestDistrict = -1;
+            var districts = new Int32[12];
+            var highestDistrict = -1;
 
             if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) == 0)
                 warnsb.AppendFormat("W{0}: There should be at least one Bank.\n", ++warnings);
