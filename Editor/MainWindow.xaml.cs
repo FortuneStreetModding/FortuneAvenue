@@ -15,6 +15,7 @@ using FSEditor.FSData;
 using System.IO;
 using System.Linq;
 using CustomStreetMapManager;
+using FortuneAvenue.Modules.Pathing;
 
 namespace Editor
 {
@@ -146,8 +147,6 @@ namespace Editor
 
         public static short Snap { get; private set; }
 
-        public DirectionCheckModule DirectionCheckModule { get; }
-
         private string _currentFileName = null; // Includes position, used for File/Save
         private string _loneFileName = null; // File name only, used for titlebar
         private static bool backgroundAxesOn = false;
@@ -162,7 +161,6 @@ namespace Editor
             ShopComboBox.DisplayMemberPath = "Value";
             ShopComboBox.SelectedValuePath = "Key";
             ShopComboBox.ItemsSource = ShopTypeList;
-            DirectionCheckModule = new DirectionCheckModule(this);
         }
 
         private void UpdateTitle()
@@ -324,8 +322,8 @@ namespace Editor
             if (board == null)
                 return;
 
-            var districtCount = new Int32[12];
-            var districtSum = new Int32[12];
+            var districtCount = new int[12];
+            var districtSum = new int[12];
             var highestDistrict = -1;
 
             foreach (var square in board.BoardData.Squares)
@@ -381,11 +379,24 @@ namespace Editor
                     continue;
 
                 var touchingSquares = new List<SquareData>();
-                DirectionCheckModule.CheckSurroundingsForSquares(square, board, touchingSquares);
+                CheckSurroundingsForSquares(square, board, touchingSquares);
                 WaypointModule.PopulateWaypoints(square, touchingSquares);
             }
 
             MessageBox.Show("Successfully created paths!");
+        }
+
+        public void CheckSurroundingsForSquares(SquareData square, BoardFile board, List<SquareData> touchingSquares)
+        {
+            var upper = DirectionCheckModule.DoesSquareExistAboveThisOne(square, board, touchingSquares);
+            var lower = DirectionCheckModule.DoesSquareExistBelowThisOne(square, board, touchingSquares);
+            var left = DirectionCheckModule.DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
+            var right = DirectionCheckModule.DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
+
+            if (upper == null && right == null) { var upperRight = DirectionCheckModule.DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares); }
+            if (upper == null && left == null) { var upperLeft = DirectionCheckModule.DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares); }
+            if (lower == null && right == null) { var lowerRight = DirectionCheckModule.DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares); }
+            if (lower == null && left == null) { var lowerLeft = DirectionCheckModule.DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares); }
         }
 
         // Corresponds to "Tools/Verify Board"

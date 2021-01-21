@@ -1,222 +1,154 @@
 ﻿using System.Collections.Generic;
+using Editor;
 using FSEditor.FSData;
 
-namespace Editor
+namespace FortuneAvenue.Modules.Pathing
 {
-    public class DirectionCheckModule
+    public static class DirectionCheckModule
     {
-        private MainWindow _mainWindow;
+        public static int directionCheckRange = 100;
 
-        public int directionCheckRange = 100;
-
-        public DirectionCheckModule(MainWindow mainWindow)
+        public static void AddSquareToTouchingSquaresList(SquareData square, List<SquareData> touchingSquares)
         {
-            _mainWindow = mainWindow;
+            touchingSquares.Add(square);
         }
-
-        private static bool SquaresAreApproximatelyEvenOnTheXAxis(SquareData thisSquare, SquareData otherSquare)
-        {
-            var thisXPos = thisSquare.Position.X;
-            var otherXPos = otherSquare.Position.X;
-            var range = 20;
-
-            if (otherXPos > thisXPos)
-            {
-                return (otherXPos - thisXPos <= range && otherXPos - thisXPos >= -range);
-            }
-            if (otherXPos < thisXPos)
-            {
-                return (thisXPos - otherXPos <= range && thisXPos - otherXPos >= -range);
-            }
-            if (otherXPos == thisXPos)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool SquaresAreApproximatelyEvenOnTheYAxis(SquareData thisSquare, SquareData otherSquare)
-        {
-            var thisYPos = thisSquare.Position.Y;
-            var otherYPos = otherSquare.Position.Y;
-            var range = 20;
-
-            if (otherYPos > thisYPos)
-            {
-                return (otherYPos - thisYPos <= range && otherYPos - thisYPos >= -range);
-            }
-            else if (otherYPos < thisYPos)
-            {
-                return (thisYPos - otherYPos <= range && thisYPos - otherYPos >= -range);
-            }
-            else if (otherYPos == thisYPos)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool DoesSquareExistAboveThisOne(SquareData thisSquare, BoardFile board,
-            List<SquareData> touchingSquares)
+        /// 
+        /// Cardinal Direction Checks
+        ///
+        /// 
+        public static SquareData DoesSquareExistAboveThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) &&
-                    otherSquare.Position.Y - thisSquare.Position.Y >= -directionCheckRange &&
-                    otherSquare.Position.Y - thisSquare.Position.Y < 0)
+                if (PositionValueComparisonModule.SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinTheNegativeYDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInYIsLessThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistBelowThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        public static SquareData DoesSquareExistBelowThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) &&
-                    otherSquare.Position.Y - thisSquare.Position.Y <= directionCheckRange &&
-                    otherSquare.Position.Y - thisSquare.Position.Y > 0)
+                if (PositionValueComparisonModule.SquaresAreApproximatelyEvenOnTheXAxis(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinPositiveYDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInYIsGreaterThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistToTheRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        public static SquareData DoesSquareExistToTheRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) &&
-                    otherSquare.Position.X - thisSquare.Position.X <= directionCheckRange &&
-                    otherSquare.Position.X - thisSquare.Position.X > 0)
+                if (PositionValueComparisonModule.SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinPositiveXDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInXIsGreaterThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistToTheLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        public static SquareData DoesSquareExistToTheLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) &&
-                    otherSquare.Position.X - thisSquare.Position.X >= -directionCheckRange &&
-                    otherSquare.Position.X - thisSquare.Position.X < 0)
+                if (PositionValueComparisonModule.SquaresAreApproximatelyEvenOnTheYAxis(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinNegativeXDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInXIsLessThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistToTheUpperRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        ///
+        /// Diagonal Direction Checks
+        ///
+        public static SquareData DoesSquareExistToTheUpperRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y >= -directionCheckRange &&
-                    otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X <= directionCheckRange &&
-                    otherSquare.Position.X - thisSquare.Position.X > 0)
+                if (PositionValueComparisonModule.OtherSquareIsWithinTheNegativeYDirectionCheckRange(thisSquare, otherSquare) &&
+                    PositionValueComparisonModule.TheDifferenceInYIsLessThanZero(thisSquare, otherSquare) &&
+                    PositionValueComparisonModule.OtherSquareIsWithinPositiveXDirectionCheckRange(thisSquare, otherSquare) &&
+                    PositionValueComparisonModule.TheDifferenceInXIsGreaterThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistToTheUpperLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        public static SquareData DoesSquareExistToTheUpperLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y >= -directionCheckRange &&
-                    otherSquare.Position.Y - thisSquare.Position.Y < 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X >= -directionCheckRange &&
-                    otherSquare.Position.X - thisSquare.Position.X < 0)
+                if (PositionValueComparisonModule.OtherSquareIsWithinTheNegativeYDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInYIsLessThanZero(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinNegativeXDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInXIsLessThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistToTheLowerRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        public static SquareData DoesSquareExistToTheLowerRightOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y <= directionCheckRange &&
-                    otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X <= directionCheckRange &&
-                    otherSquare.Position.X - thisSquare.Position.X > 0)
+                if (PositionValueComparisonModule.OtherSquareIsWithinPositiveYDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInYIsGreaterThanZero(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinPositiveXDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInXIsGreaterThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
+            return null;
         }
 
-        public bool DoesSquareExistToTheLowerLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
+        public static SquareData DoesSquareExistToTheLowerLeftOfThisOne(SquareData thisSquare, BoardFile board, List<SquareData> touchingSquares)
         {
             foreach (var otherSquare in board.BoardData.Squares)
             {
                 if (otherSquare.Id == thisSquare.Id) continue;
-                if (otherSquare.Position.Y - thisSquare.Position.Y <= directionCheckRange &&
-                    otherSquare.Position.Y - thisSquare.Position.Y > 0 &&
-                    otherSquare.Position.X - thisSquare.Position.X >= -directionCheckRange &&
-                    otherSquare.Position.X - thisSquare.Position.X < 0)
+                if (PositionValueComparisonModule.OtherSquareIsWithinPositiveYDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInYIsGreaterThanZero(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.OtherSquareIsWithinNegativeXDirectionCheckRange(thisSquare, otherSquare) && 
+                    PositionValueComparisonModule.TheDifferenceInXIsLessThanZero(thisSquare, otherSquare))
                 {
-                    touchingSquares.Add(otherSquare);
-                    return true;
+                    AddSquareToTouchingSquaresList(otherSquare, touchingSquares);
+                    return otherSquare;
                 }
             }
-            return false;
-        }
-
-        public void CheckSurroundingsForSquares(SquareData square, BoardFile board, List<SquareData> touchingSquares)
-        {
-            var upper = this.DoesSquareExistAboveThisOne(square, board, touchingSquares);
-            var lower = this.DoesSquareExistBelowThisOne(square, board, touchingSquares);
-            var left = this.DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
-            var right = this.DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
-
-            if (!upper && !right)
-            {
-                var upperRight = this.DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares);
-            }
-
-            if (!upper && !left)
-            {
-                var upperLeft = this.DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares);
-            }
-
-            if (!lower && !right)
-            {
-                var lowerRight = this.DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares);
-            }
-
-            if (!lower && !left)
-            {
-                var lowerLeft = this.DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares);
-            }
+            return null;
         }
     }
 }

@@ -3,7 +3,7 @@ using FSEditor.FSData;
 
 namespace Editor
 {
-    public class WaypointModule
+    public static class WaypointModule
     {
         public static void PopulateWaypoints(SquareData square, List<SquareData> touchingSquares)
         {
@@ -84,6 +84,10 @@ namespace Editor
                 square.Waypoint4.Destination2 = 255;
                 square.Waypoint4.Destination3 = 255;
             }
+        }
+        public static void AddSquareToTouchingSquaresList(SquareData square, List<SquareData> touchingSquares)
+        {
+            touchingSquares.Add(square);
         }
     }
 }
