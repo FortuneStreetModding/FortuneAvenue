@@ -12,30 +12,14 @@ namespace FortuneAvenue.Modules.Pathing
         public static void PopulateExitLists(List<SquareData> startingTiles, List<SquareData> start1Exits, List<SquareData> start2Exits, List<SquareData> start3Exits,
             List<SquareData> start4Exits)
         {
-            for (var i = 0; i < startingTiles.Count; i++) //for each entry
+            for (var i = 0; i < startingTiles.Count; i++)
             {
                 switch (i)
                 {
-                    case 0:
-                    {
-                        start1Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
-                        break;
-                    }
-                    case 1:
-                    {
-                        start2Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
-                        break;
-                    }
-                    case 2:
-                    {
-                        start3Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
-                        break;
-                    }
-                    case 3:
-                    {
-                        start4Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
-                        break;
-                    }
+                    case 0: { start1Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id)); break; }
+                    case 1: { start2Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id)); break; }
+                    case 2: { start3Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id)); break; }
+                    case 3: { start4Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id)); break; }
                 }
             }
         }
