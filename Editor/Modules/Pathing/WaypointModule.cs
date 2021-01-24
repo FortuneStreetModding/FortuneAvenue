@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
@@ -16,53 +17,25 @@ namespace FortuneAvenue.Modules.Pathing
                 switch (i)
                 {
                     case 0:
-                        {
-                            foreach (var entry in startingTiles) //run through again
-                            {
-                                if (entry.Id != startingTiles[i].Id) //and add each one that isn't the entry we're checking for
-                                {
-                                    start1Exits.Add(entry); //to its exits list
-                                }
-                            }
-
-                            break;
-                        }
+                    {
+                        start1Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
+                        break;
+                    }
                     case 1:
-                        {
-                            foreach (var entry in startingTiles)
-                            {
-                                if (entry.Id != startingTiles[i].Id)
-                                {
-                                    start2Exits.Add(entry);
-                                }
-                            }
-
-                            break;
-                        }
+                    {
+                        start2Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
+                        break;
+                    }
                     case 2:
-                        {
-                            foreach (var entry in startingTiles)
-                            {
-                                if (entry.Id != startingTiles[i].Id)
-                                {
-                                    start3Exits.Add(entry);
-                                }
-                            }
-
-                            break;
-                        }
+                    {
+                        start3Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
+                        break;
+                    }
                     case 3:
-                        {
-                            foreach (var entry in startingTiles)
-                            {
-                                if (entry.Id != startingTiles[i].Id)
-                                {
-                                    start4Exits.Add(entry);
-                                }
-                            }
-
-                            break;
-                        }
+                    {
+                        start4Exits.AddRange(startingTiles.Where(entry => entry.Id != startingTiles[i].Id));
+                        break;
+                    }
                 }
             }
         }
@@ -220,10 +193,8 @@ namespace FortuneAvenue.Modules.Pathing
             {
                 foreach (var destinationSquare in waypointDestinationList) //for each square in that list
                 {
-                    if (destinationSquare.Id == directionalReferenceIdToCheck && !directionalRuleToCheck)
-                    {
-                        waypointDestinationList.Remove(destinationSquare); //if the destination is one that we disallow, remove it.
-                    }
+                    //if the destination is one that we disallow, remove it.
+                    if (destinationSquare.Id == directionalReferenceIdToCheck && !directionalRuleToCheck) { waypointDestinationList.Remove(destinationSquare); }
                 }
             }
         }

@@ -16,15 +16,15 @@ namespace FortuneAvenue.Modules.Pathing
 
             WaypointModule.PopulateExitLists(startingTiles, start1Exits, start2Exits, start3Exits, start4Exits);
 
-            var exitsList = new List<SquareData>[4]; //packaging the lists up for action in another method
-            exitsList[0] = start1Exits;
-            exitsList[1] = start2Exits;
-            exitsList[2] = start3Exits;
-            exitsList[3] = start4Exits;
+            var waypointDestinationLists = new List<SquareData>[4]; //packaging the lists up for action in another method
+            waypointDestinationLists[0] = start1Exits;
+            waypointDestinationLists[1] = start2Exits;
+            waypointDestinationLists[2] = start3Exits;
+            waypointDestinationLists[3] = start4Exits;
 
             WaypointModule.ZeroOutAllWaypointValues(square);
-            ApplyPathingRules(square, startingTiles, exitsList);
-            WaypointModule.UpdateWaypointValues(square, startingTiles, exitsList);
+            ApplyPathingRules(square, startingTiles, waypointDestinationLists);
+            WaypointModule.UpdateWaypointValues(square, startingTiles, waypointDestinationLists);
         }
 
         public static void ApplyPathingRules(SquareData square, List<SquareData> startSquaresList, List<SquareData>[] exitsList)
