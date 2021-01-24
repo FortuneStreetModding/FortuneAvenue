@@ -380,7 +380,7 @@ namespace Editor
 
                 var touchingSquares = new List<SquareData>();
                 CheckSurroundingsForSquares(square, board, touchingSquares);
-                WaypointModule.PopulateWaypoints(square, touchingSquares);
+                AutoPathModule.PathSquare(square, touchingSquares);
             }
 
             MessageBox.Show("Successfully created paths!");

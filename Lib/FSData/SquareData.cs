@@ -227,6 +227,14 @@ namespace FSEditor.FSData {
         public bool fromNorthWestAllowSouthEast = true;
         public bool fromNorthWestAllowSouth = true;
 
+        public bool fromNorthAllowSouthWest = true;
+        public bool fromNorthAllowWest = true;
+        public bool fromNorthAllowNorthWest = true;
+        public bool fromNorthAllowNorthEast = true;
+        public bool fromNorthAllowEast = true;
+        public bool fromNorthAllowSouthEast = true;
+        public bool fromNorthAllowSouth = true;
+
         public bool fromNorthEastAllowSouthWest = true;
         public bool fromNorthEastAllowWest = true;
         public bool fromNorthEastAllowNorthWest = true;
