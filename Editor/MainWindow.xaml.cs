@@ -388,15 +388,15 @@ namespace Editor
 
         public void CheckSurroundingsForSquares(SquareData square, BoardFile board, List<SquareData> touchingSquares)
         {
-            var upper = DirectionCheckModule.DoesSquareExistAboveThisOne(square, board, touchingSquares);
-            var lower = DirectionCheckModule.DoesSquareExistBelowThisOne(square, board, touchingSquares);
-            var left = DirectionCheckModule.DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
-            var right = DirectionCheckModule.DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
+            square.upper = DirectionCheckModule.DoesSquareExistAboveThisOne(square, board, touchingSquares);
+            square.lower = DirectionCheckModule.DoesSquareExistBelowThisOne(square, board, touchingSquares);
+            square.left = DirectionCheckModule.DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
+            square.right = DirectionCheckModule.DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
 
-            if (upper == null && right == null) { var upperRight = DirectionCheckModule.DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares); }
-            if (upper == null && left == null) { var upperLeft = DirectionCheckModule.DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares); }
-            if (lower == null && right == null) { var lowerRight = DirectionCheckModule.DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares); }
-            if (lower == null && left == null) { var lowerLeft = DirectionCheckModule.DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares); }
+            if (square.upper == null && square.right == null) { square.upperRight = DirectionCheckModule.DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares); }
+            if (square.upper == null && square.left == null) { square.upperLeft = DirectionCheckModule.DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares); }
+            if (square.lower == null && square.right == null) { square.lowerRight = DirectionCheckModule.DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares); }
+            if (square.lower == null && square.left == null) { square.lowerLeft = DirectionCheckModule.DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares); }
         }
 
         // Corresponds to "Tools/Verify Board"
@@ -413,7 +413,7 @@ namespace Editor
             short errors = 0;
             short warnings = 0;
 
-            var districts = new Int32[12];
+            var districts = new int[12];
             var highestDistrict = -1;
 
             if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) == 0)
@@ -458,16 +458,15 @@ namespace Editor
                     destinations.Add(waypointData.Destination2);
                     destinations.Add(waypointData.Destination3);
                 }
-                if(destinations.Contains(255))
-                {
-                    destinations.Remove(255);
-                }
-                if (destinations.Count() > 4)
+
+                if(destinations.Contains(255)) { destinations.Remove(255); }
+
+                if (destinations.Count() > 4) 
                 {
                     errsb.AppendFormat("E{2}: Square {0}, has {1} different destinations. The max amount is 4. \n", square.Id, destinations.Count(), ++errors);
                 }
 
-                for (int i = 0; i < 4; ++i)
+                for (var i = 0; i < 4; ++i)
                 {
                     //Entry
                     if (square.Waypoints[i].EntryId >= board.BoardData.Squares.Count)

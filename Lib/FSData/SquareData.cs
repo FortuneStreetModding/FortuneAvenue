@@ -174,10 +174,24 @@ namespace FSEditor.FSData {
             }
         }
         private Byte _ShopModelId;
+
+        /// <summary>
+        /// Surrounding tiles for the purpose of autopathing.
+        /// </summary>
+        public SquareData upper;
+        public SquareData lower;
+        public SquareData left;
+        public SquareData right;
+        public SquareData upperRight;
+        public SquareData upperLeft;
+        public SquareData lowerRight;
+        public SquareData lowerLeft;
+
+
         // ----------------------------------------------------------------------------------------------------
         #endregion
 
-		#region Loading & Writing Methods
+        #region Loading & Writing Methods
         public static SquareData LoadDefault(Byte squareId)
         {
             var newSquare = new SquareData()
