@@ -174,6 +174,10 @@ namespace FSEditor.FSData {
             }
         }
         private Byte _ShopModelId;
+        // ----------------------------------------------------------------------------------------------------
+        #endregion
+
+        #region Custom Editor Values Not Written To FRB
 
         /// <summary>
         /// Surrounding tiles for the purpose of autopathing.
@@ -187,8 +191,66 @@ namespace FSEditor.FSData {
         public SquareData lowerRight;
         public SquareData lowerLeft;
 
+        /// <summary>
+        /// Booleans to control autopathing logic.
+        /// </summary>
+        
+        public bool fromSouthAllowSouthWest = true;
+        public bool fromSouthAllowWest = true;
+        public bool fromSouthAllowNorthWest = true;
+        public bool fromSouthAllowNorth = true;
+        public bool fromSouthAllowNorthEast = true;
+        public bool fromSouthAllowEast = true;
+        public bool fromSouthAllowSouthEast = true;
 
-        // ----------------------------------------------------------------------------------------------------
+        public bool fromSouthWestAllowWest = true;
+        public bool fromSouthWestAllowNorthWest = true;
+        public bool fromSouthWestAllowNorth = true;
+        public bool fromSouthWestAllowNorthEast = true;
+        public bool fromSouthWestAllowEast = true;
+        public bool fromSouthWestAllowSouthEast = true;
+        public bool fromSouthWestAllowSouth = true;
+
+        public bool fromWestAllowSouthWest = true;
+        public bool fromWestAllowNorthWest = true;
+        public bool fromWestAllowNorth = true;
+        public bool fromWestAllowNorthEast = true;
+        public bool fromWestAllowEast = true;
+        public bool fromWestAllowSouthEast = true;
+        public bool fromWestAllowSouth = true;
+
+        public bool fromNorthWestAllowSouthWest = true;
+        public bool fromNorthWestAllowWest = true;
+        public bool fromNorthWestAllowNorth = true;
+        public bool fromNorthWestAllowNorthEast = true;
+        public bool fromNorthWestAllowEast = true;
+        public bool fromNorthWestAllowSouthEast = true;
+        public bool fromNorthWestAllowSouth = true;
+
+        public bool fromNorthEastAllowSouthWest = true;
+        public bool fromNorthEastAllowWest = true;
+        public bool fromNorthEastAllowNorthWest = true;
+        public bool fromNorthEastAllowNorth = true;
+        public bool fromNorthEastAllowEast = true;
+        public bool fromNorthEastAllowSouthEast = true;
+        public bool fromNorthEastAllowSouth = true;
+
+        public bool fromEastAllowSouthWest = true;
+        public bool fromEastAllowWest = true;
+        public bool fromEastAllowNorthWest = true;
+        public bool fromEastAllowNorth = true;
+        public bool fromEastAllowNorthEast = true;
+        public bool fromEastAllowSouthEast = true;
+        public bool fromEastAllowSouth = true;
+
+        public bool fromSouthEastAllowSouthWest = true;
+        public bool fromSouthEastAllowWest = true;
+        public bool fromSouthEastAllowNorthWest = true;
+        public bool fromSouthEastAllowNorth = true;
+        public bool fromSouthEastAllowNorthEast = true;
+        public bool fromSouthEastAllowEast = true;
+        public bool fromSouthEastAllowSouth = true;
+
         #endregion
 
         #region Loading & Writing Methods
