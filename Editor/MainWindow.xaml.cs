@@ -379,24 +379,11 @@ namespace Editor
                     continue;
 
                 var touchingSquares = new List<SquareData>();
-                CheckSurroundingsForSquares(square, board, touchingSquares);
+                AutoPathModule.CheckSurroundingsForSquares(square, board, touchingSquares);
                 AutoPathModule.PathSquare(square, touchingSquares);
             }
 
             MessageBox.Show("Successfully created paths!");
-        }
-
-        public void CheckSurroundingsForSquares(SquareData square, BoardFile board, List<SquareData> touchingSquares)
-        {
-            square.upper = DirectionCheckModule.DoesSquareExistAboveThisOne(square, board, touchingSquares);
-            square.lower = DirectionCheckModule.DoesSquareExistBelowThisOne(square, board, touchingSquares);
-            square.left = DirectionCheckModule.DoesSquareExistToTheLeftOfThisOne(square, board, touchingSquares);
-            square.right = DirectionCheckModule.DoesSquareExistToTheRightOfThisOne(square, board, touchingSquares);
-
-            if (square.upper == null && square.right == null) { square.upperRight = DirectionCheckModule.DoesSquareExistToTheUpperRightOfThisOne(square, board, touchingSquares); }
-            if (square.upper == null && square.left == null) { square.upperLeft = DirectionCheckModule.DoesSquareExistToTheUpperLeftOfThisOne(square, board, touchingSquares); }
-            if (square.lower == null && square.right == null) { square.lowerRight = DirectionCheckModule.DoesSquareExistToTheLowerRightOfThisOne(square, board, touchingSquares); }
-            if (square.lower == null && square.left == null) { square.lowerLeft = DirectionCheckModule.DoesSquareExistToTheLowerLeftOfThisOne(square, board, touchingSquares); }
         }
 
         // Corresponds to "Tools/Verify Board"
