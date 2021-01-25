@@ -263,11 +263,14 @@ namespace Editor
                         square.SquareType == SquareType.OneWayAlleyDoorD)
                         continue;
 
-                    var entryList = new List<SquareData>();
-                    AutoPathModule.CheckSurroundingsForSquares(square, Board, entryList); //this populates the list as well
-                    AutoPathModule.EnumerateAutopathingRules(square, entryList);
+                    if (Board.BoardInfo.VersionFlag == 0) //if it doesn't contain the extra auto-pathing detail, try and figure it out
+                    {
+                        var entryList = new List<SquareData>();
+                        AutoPathModule.CheckSurroundingsForSquares(square, Board, entryList); //this populates the list as well
+                        AutoPathModule.EnumerateAutopathingRules(square, entryList);
+                    }
 
-                    MessageBox.Show("Square " + square.Id + " Best-Guess Results:\n"
+                    /*MessageBox.Show("Square " + square.Id + " Best-Guess Results:\n"
                     + "FromWestAllowNorth: " + square.fromWestAllowNorth + "\n"
                     + "FromWestAllowEast: " + square.fromWestAllowEast + "\n"
                     + "FromWestAllowSouth: " + square.fromWestAllowSouth + "\n"
@@ -281,7 +284,21 @@ namespace Editor
                     + "FromSouthAllowNorthWest: " + square.fromSouthAllowNorthWest + "\n"
                     + "FromSouthAllowNorthEast: " + square.fromSouthAllowNorthEast + "\n"
                     + "FromSouthAllowSouthWest: " + square.fromSouthAllowSouthWest + "\n"
-                    + "FromSouthAllowSouthEast: " + square.fromSouthAllowSouthEast + "\n");
+                    + "FromSouthAllowSouthEast: " + square.fromSouthAllowSouthEast + "\n"
+                    + "FromNorthWestAllowNorth: " + square.fromNorthWestAllowNorth + "\n"
+                    + "FromNorthWestAllowWest: " + square.fromNorthWestAllowWest + "\n"
+                    + "FromNorthWestAllowEast: " + square.fromNorthWestAllowEast + "\n"
+                    + "FromNorthWestAllowSouth: " + square.fromNorthWestAllowSouth + "\n"
+                    + "FromNorthWestAllowNorthEast: " + square.fromNorthWestAllowNorthEast + "\n"
+                    + "FromNorthWestAllowSouthWest: " + square.fromNorthWestAllowSouthWest + "\n"
+                    + "FromNorthWestAllowSouthEast: " + square.fromNorthWestAllowSouthEast + "\n\n"
+                    + "FromSouthEastAllowNorth: " + square.fromSouthEastAllowNorth + "\n"
+                    + "FromSouthEastAllowEast: " + square.fromSouthEastAllowEast + "\n"
+                    + "FromSouthEastAllowWest: " + square.fromSouthEastAllowWest + "\n"
+                    + "FromSouthEastAllowSouth: " + square.fromSouthEastAllowSouth + "\n"
+                    + "FromSouthEastAllowNorthWest: " + square.fromSouthEastAllowNorthWest + "\n"
+                    + "FromSouthEastAllowNorthEast: " + square.fromSouthEastAllowNorthEast + "\n"
+                    + "FromSouthEastAllowSouthWest: " + square.fromSouthEastAllowSouthWest + "\n");*/
                 }
             }
             UpdateTitle();
