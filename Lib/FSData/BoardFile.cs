@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MiscUtil.IO;
 using System.IO;
+using Editor.FSData;
 
 namespace FSEditor.FSData {
 	public class BoardFile : Header {
@@ -27,6 +28,12 @@ namespace FSEditor.FSData {
 		/// Gets or sets the board data header holding information about the board's squares.
 		/// </summary>
 		public BoardData BoardData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the board data header holding the board's stored autopath information.
+        /// </summary>
+        public AutopathData PathingData { get; set; }
+
 		// ----------------------------------------------------------------------------------------------------
 		#endregion
 
@@ -75,7 +82,13 @@ namespace FSEditor.FSData {
 			// Load BoardData
 			boardFile.BoardData = BoardData.LoadFromStream(stream);
 
-			return boardFile;
+            // Load Autopath Data
+            if (boardFile.BoardInfo.VersionFlag > 0)
+            {
+                AutopathData.LoadFromStream(stream, boardFile.BoardData.Squares);
+            }
+
+            return boardFile;
 		}
 
         public void WriteToStream(EndianBinaryWriter stream)
@@ -91,11 +104,14 @@ namespace FSEditor.FSData {
             // Write Unknown
             stream.Write(Unknown);
 
-            // Load BoardInfo
+            // Write BoardInfo
             BoardInfo.WriteToStream(stream);
 
-            // Load BoardData
+            // Write BoardData
             BoardData.WriteToStream(stream);
+
+			// Write Autopath Data
+            AutopathData.WriteToStream(stream, BoardData.Squares);
         }
 		// ----------------------------------------------------------------------------------------------------
 		#endregion

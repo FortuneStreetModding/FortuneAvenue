@@ -194,7 +194,7 @@ namespace FSEditor.FSData {
         /// <summary>
         /// Booleans to control autopathing logic.
         /// </summary>
-        
+
         public bool fromSouthAllowSouthWest = true;
         public bool fromSouthAllowWest = true;
         public bool fromSouthAllowNorthWest = true;

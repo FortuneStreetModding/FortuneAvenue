@@ -234,12 +234,14 @@ namespace Editor
         // Corresponds to "File/Open"
         private void Open_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog();
-            openFileDialog.AddExtension = true;
-            openFileDialog.CheckFileExists = true;
-            openFileDialog.DefaultExt = "frb";
-            openFileDialog.Filter = "Fortune Street Board (.frb) | *.frb";
-            openFileDialog.Multiselect = false;
+            var openFileDialog = new OpenFileDialog
+            {
+                AddExtension = true,
+                CheckFileExists = true,
+                DefaultExt = "frb",
+                Filter = "Fortune Street Board (.frb) | *.frb",
+                Multiselect = false
+            };
             if (openFileDialog.ShowDialog() != true)
                 return;
 
@@ -248,7 +250,7 @@ namespace Editor
 
             using (var stream = openFileDialog.OpenFile())
             {
-                MiscUtil.IO.EndianBinaryReader binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
+                var binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
                 var Board = BoardFile.LoadFromStream(binReader);
                 this.DataContext = Board;
             }

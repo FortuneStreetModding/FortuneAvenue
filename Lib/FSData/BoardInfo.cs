@@ -43,6 +43,8 @@ namespace FSEditor.FSData {
         /// </summary>
         public LoopingMode GalaxyStatus { get; set; }
 
+		public uint VersionFlag { get; set; }
+
         // ----------------------------------------------------------------------------------------------------
 		#endregion
 
@@ -82,7 +84,7 @@ namespace FSEditor.FSData {
 			boardInfo.SalaryIncrement = stream.ReadUInt16();
             boardInfo.MaxDiceRoll = stream.ReadUInt16();
             boardInfo.GalaxyStatus = (LoopingMode) stream.ReadUInt16();
-            stream.ReadUInt32(); // Read padding data.
+            boardInfo.VersionFlag = stream.ReadUInt32(); // Read padding data. (used to always be 0, now is used as a version flag)
 
 			return boardInfo;
 		}
@@ -100,8 +102,8 @@ namespace FSEditor.FSData {
             stream.Write(BaseSalary);
             stream.Write(SalaryIncrement);
             stream.Write(MaxDiceRoll);
-            stream.Write((UInt16)GalaxyStatus);
-            stream.Write((Int32)0); // Data padding.
+            stream.Write((ushort)GalaxyStatus);
+            stream.Write((int)1); // Data padding. //number is version number.
         }
 		// ----------------------------------------------------------------------------------------------------
 		#endregion

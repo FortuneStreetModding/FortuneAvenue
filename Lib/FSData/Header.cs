@@ -48,7 +48,7 @@ namespace FSEditor.FSData {
 
         protected void WriteMagicNumberAndHeaderSize(EndianBinaryWriter stream)
         {
-            byte[] magic = ASCIIEncoding.ASCII.GetBytes(MagicNumber);
+            var magic = Encoding.ASCII.GetBytes(MagicNumber);
             stream.Write(magic[0]);
             stream.Write(magic[1]);
             stream.Write(magic[2]);

@@ -173,9 +173,9 @@ namespace FortuneAvenue.Modules.Pathing
 
         public static void CleanWaypointList(byte directionalReferenceIdToCheck, bool directionalRuleToCheck, List<SquareData>[] exitsList)
         {
-            foreach (var waypointDestinationList in exitsList) //for each list of Waypoint Destinations
+            foreach (var waypointDestinationList in exitsList.ToList()) //for each list of Waypoint Destinations
             {
-                foreach (var destinationSquare in waypointDestinationList) //for each square in that list
+                foreach (var destinationSquare in waypointDestinationList.ToList()) //for each square in that list
                 {
                     //if the destination is one that we disallow, remove it.
                     if (destinationSquare.Id == directionalReferenceIdToCheck && !directionalRuleToCheck) { waypointDestinationList.Remove(destinationSquare); }

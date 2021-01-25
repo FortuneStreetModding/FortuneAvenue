@@ -6,6 +6,7 @@ using MiscUtil.IO;
 using System.IO;
 using System.Drawing;
 using System.Collections.ObjectModel;
+using Editor.FSData;
 
 namespace FSEditor.FSData {
 	public class BoardData : Header {
@@ -39,8 +40,8 @@ namespace FSEditor.FSData {
 		/// <param name="stream">The stream to read from.</param>
 		/// <returns>A new BoardData object representing the contents of a FortuneStreet board.</returns>
 		public static BoardData LoadFromStream(EndianBinaryReader stream) {
-			BoardData board = new BoardData();
-            UInt16 squareCount;
+			var board = new BoardData();
+            ushort squareCount;
 
 			// Verify Header & Read FileSize
 			board.ReadMagicNumberAndHeaderSize(stream);
@@ -50,7 +51,7 @@ namespace FSEditor.FSData {
             stream.ReadUInt16(); // Padding
 
 			// Loading Square Data
-			for (Byte i = 0; i < squareCount; i++) {
+			for (byte i = 0; i < squareCount; i++) {
 				board.Squares.Add(SquareData.LoadFromStream(stream, i));
 			}
 
