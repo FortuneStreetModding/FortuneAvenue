@@ -83,7 +83,7 @@ namespace FortuneAvenue.Modules.Pathing
             }
         }
 
-        public static void CheckPathsFromSouthEast(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromSouthEast(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromSouthEastAllowSouth, exitsList); }
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromSouthEastAllowSouthWest, exitsList); }
@@ -94,7 +94,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.right != null) { CleanWaypointList(square.right.Id, square.fromSouthEastAllowEast, exitsList); }
         }
 
-        public static void CheckPathsFromEast(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromEast(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromEastAllowSouth, exitsList); }
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromEastAllowSouthWest, exitsList); }
@@ -105,7 +105,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.lowerRight != null) { CleanWaypointList(square.lowerRight.Id, square.fromEastAllowSouthEast, exitsList); }
         }
 
-        public static void CheckPathsFromNorthEast(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromNorthEast(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromNorthEastAllowSouth, exitsList); }
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromNorthEastAllowSouthWest, exitsList); }
@@ -116,7 +116,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.lowerRight != null) { CleanWaypointList(square.lowerRight.Id, square.fromNorthEastAllowSouthEast, exitsList); }
         }
 
-        public static void CheckPathsFromNorth(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromNorth(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromNorthAllowSouth, exitsList); }
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromNorthAllowSouthWest, exitsList); }
@@ -127,7 +127,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.lowerRight != null) { CleanWaypointList(square.lowerRight.Id, square.fromNorthAllowSouthEast, exitsList); }
         }
 
-        public static void CheckPathsFromNorthWest(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromNorthWest(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromNorthWestAllowSouth, exitsList); }
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromNorthWestAllowSouthWest, exitsList); }
@@ -138,7 +138,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.lowerRight != null) { CleanWaypointList(square.lowerRight.Id, square.fromNorthWestAllowSouthEast, exitsList); }
         }
 
-        public static void CheckPathsFromWest(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromWest(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromWestAllowSouth, exitsList); }
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromWestAllowSouthWest, exitsList); }
@@ -149,7 +149,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.lowerRight != null) { CleanWaypointList(square.lowerRight.Id, square.fromWestAllowSouthEast, exitsList); }
         }
 
-        public static void CheckPathsFromSouthWest(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromSouthWest(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lower != null) { CleanWaypointList(square.lower.Id, square.fromSouthWestAllowSouth, exitsList); }
             if (square.left != null) { CleanWaypointList(square.left.Id, square.fromSouthWestAllowWest, exitsList); }
@@ -160,7 +160,7 @@ namespace FortuneAvenue.Modules.Pathing
             if (square.lowerRight != null) { CleanWaypointList(square.lowerRight.Id, square.fromSouthWestAllowSouthEast, exitsList); }
         }
 
-        public static void CheckPathsFromSouth(SquareData square, List<SquareData>[] exitsList)
+        public static void CleanPathsFromSouth(SquareData square, List<SquareData>[] exitsList)
         {
             if (square.lowerLeft != null) { CleanWaypointList(square.lowerLeft.Id, square.fromSouthAllowSouthWest, exitsList); }
             if (square.left != null) { CleanWaypointList(square.left.Id, square.fromSouthAllowWest, exitsList); }
@@ -181,6 +181,104 @@ namespace FortuneAvenue.Modules.Pathing
                     if (destinationSquare.Id == directionalReferenceIdToCheck && !directionalRuleToCheck) { waypointDestinationList.Remove(destinationSquare); }
                 }
             }
+        }
+
+        public static void CheckPathsFromNorth(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromNorthAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.lowerLeft != null) { square.fromNorthAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.left != null) { square.fromNorthAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromNorthAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.upperRight != null) { square.fromNorthAllowNorthEast = EnumerateDirectionsFromWaypoints(square.upperRight.Id, exitsList); }
+            if (square.right != null) { square.fromNorthAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromNorthAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromSouth(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lowerLeft != null) { square.fromSouthAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.left != null) { square.fromSouthAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromSouthAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.upper != null) { square.fromSouthAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.upperRight != null) { square.fromSouthAllowNorthEast = EnumerateDirectionsFromWaypoints(square.upperRight.Id, exitsList); }
+            if (square.right != null) { square.fromSouthAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromSouthAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromWest(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromWestAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.lowerLeft != null) { square.fromWestAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromWestAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.upper != null) { square.fromWestAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.upperRight != null) { square.fromWestAllowNorthEast = EnumerateDirectionsFromWaypoints(square.upperRight.Id, exitsList); }
+            if (square.right != null) { square.fromWestAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromWestAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromEast(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromEastAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.lowerLeft != null) { square.fromEastAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.left != null) { square.fromEastAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromEastAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.upper != null) { square.fromEastAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.upperRight != null) { square.fromEastAllowNorthEast = EnumerateDirectionsFromWaypoints(square.upperRight.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromEastAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromNorthWest(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromNorthWestAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.lowerLeft != null) { square.fromNorthWestAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.left != null) { square.fromNorthWestAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upper != null) { square.fromNorthWestAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.upperRight != null) { square.fromNorthWestAllowNorthEast = EnumerateDirectionsFromWaypoints(square.upperRight.Id, exitsList); }
+            if (square.right != null) { square.fromNorthWestAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromNorthWestAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromNorthEast(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromNorthEastAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.lowerLeft != null) { square.fromNorthEastAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromNorthEastAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.left != null) { square.fromNorthEastAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upper != null) { square.fromNorthEastAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.right != null) { square.fromNorthEastAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromNorthEastAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromSouthWest(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromSouthWestAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.left != null) { square.fromSouthWestAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromSouthWestAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.upper != null) { square.fromSouthWestAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.upperRight != null) { square.fromSouthWestAllowNorthEast = EnumerateDirectionsFromWaypoints(square.upperRight.Id, exitsList); }
+            if (square.right != null) { square.fromSouthWestAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+            if (square.lowerRight != null) { square.fromSouthWestAllowSouthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+        }
+        public static void CheckPathsFromSouthEast(SquareData square, List<SquareData>[] exitsList)
+        {
+            if (square.lower != null) { square.fromSouthEastAllowSouth = EnumerateDirectionsFromWaypoints(square.lower.Id, exitsList); }
+            if (square.lowerLeft != null) { square.fromSouthEastAllowSouthWest = EnumerateDirectionsFromWaypoints(square.lowerLeft.Id, exitsList); }
+            if (square.upperLeft != null) { square.fromSouthEastAllowNorthWest = EnumerateDirectionsFromWaypoints(square.upperLeft.Id, exitsList); }
+            if (square.left != null) { square.fromSouthEastAllowWest = EnumerateDirectionsFromWaypoints(square.left.Id, exitsList); }
+            if (square.upper != null) { square.fromSouthEastAllowNorth = EnumerateDirectionsFromWaypoints(square.upper.Id, exitsList); }
+            if (square.upperRight != null) { square.fromSouthEastAllowNorthEast = EnumerateDirectionsFromWaypoints(square.lowerRight.Id, exitsList); }
+            if (square.right != null) { square.fromSouthEastAllowEast = EnumerateDirectionsFromWaypoints(square.right.Id, exitsList); }
+        }
+
+        public static bool EnumerateDirectionsFromWaypoints(byte directionalReferenceIdToCheck, List<SquareData>[] exitsList)
+        {
+            foreach (var waypointDestinationList in exitsList.ToList()) //for each list of Waypoint Destinations
+            {
+                foreach (var destinationSquare in waypointDestinationList.ToList()) //for each square in that list
+                {
+                    //if the destination exists, we'll assume we allow pathing to it.
+                    if (destinationSquare.Id == directionalReferenceIdToCheck)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

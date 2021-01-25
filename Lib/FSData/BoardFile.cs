@@ -29,12 +29,7 @@ namespace FSEditor.FSData {
 		/// </summary>
 		public BoardData BoardData { get; set; }
 
-        /// <summary>
-        /// Gets or sets the board data header holding the board's stored autopath information.
-        /// </summary>
-        public AutopathData PathingData { get; set; }
-
-		// ----------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------
 		#endregion
 
 		#region Initialization

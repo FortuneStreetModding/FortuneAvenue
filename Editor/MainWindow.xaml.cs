@@ -253,6 +253,36 @@ namespace Editor
                 var binReader = new MiscUtil.IO.EndianBinaryReader(MiscUtil.Conversion.EndianBitConverter.Big, stream);
                 var Board = BoardFile.LoadFromStream(binReader);
                 this.DataContext = Board;
+
+                var entries = new List<SquareData>();
+                foreach (var square in Board.BoardData.Squares)
+                {
+                    if (square.SquareType == SquareType.OneWayAlleySquare ||
+                        square.SquareType == SquareType.OneWayAlleyDoorB ||
+                        square.SquareType == SquareType.OneWayAlleyDoorC ||
+                        square.SquareType == SquareType.OneWayAlleyDoorD)
+                        continue;
+
+                    var entryList = new List<SquareData>();
+                    AutoPathModule.CheckSurroundingsForSquares(square, Board, entryList); //this populates the list as well
+                    AutoPathModule.EnumerateAutopathingRules(square, entryList);
+
+                    MessageBox.Show("Square " + square.Id + " Best-Guess Results:\n"
+                    + "FromWestAllowNorth: " + square.fromWestAllowNorth + "\n"
+                    + "FromWestAllowEast: " + square.fromWestAllowEast + "\n"
+                    + "FromWestAllowSouth: " + square.fromWestAllowSouth + "\n"
+                    + "FromWestAllowNorthWest: " + square.fromWestAllowNorthWest + "\n" 
+                    + "FromWestAllowNorthEast: " + square.fromWestAllowNorthEast + "\n"
+                    + "FromWestAllowSouthWest: " + square.fromWestAllowSouthWest + "\n"
+                    + "FromWestAllowSouthEast: " + square.fromWestAllowSouthEast + "\n\n"
+                    + "FromSouthAllowNorth: " + square.fromSouthAllowNorth + "\n"
+                    + "FromSouthAllowEast: " + square.fromSouthAllowEast + "\n"
+                    + "FromSouthAllowWest: " + square.fromSouthAllowWest + "\n"
+                    + "FromSouthAllowNorthWest: " + square.fromSouthAllowNorthWest + "\n"
+                    + "FromSouthAllowNorthEast: " + square.fromSouthAllowNorthEast + "\n"
+                    + "FromSouthAllowSouthWest: " + square.fromSouthAllowSouthWest + "\n"
+                    + "FromSouthAllowSouthEast: " + square.fromSouthAllowSouthEast + "\n");
+                }
             }
             UpdateTitle();
             UpdateGalaxyRadio();
@@ -275,7 +305,7 @@ namespace Editor
 
             using (var stream = new FileStream(_currentFileName, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite, System.IO.FileShare.None))
             {
-                MiscUtil.IO.EndianBinaryWriter binWriter = new MiscUtil.IO.EndianBinaryWriter(MiscUtil.Conversion.EndianBitConverter.Big, stream);
+                var binWriter = new MiscUtil.IO.EndianBinaryWriter(MiscUtil.Conversion.EndianBitConverter.Big, stream);
                 board.WriteToStream(binWriter);
             }
             UpdateTitle();
