@@ -1,6 +1,6 @@
 # Deprecated
 
-This tool is deprecated and has been supersceeded by FortuneAvenue-qt and CSMM-qt:
+This tool is deprecated and has been superseded by FortuneAvenue-qt and CSMM-qt:
 - https://github.com/FortuneStreetModding/fortune-avenue-qt
 - https://github.com/FortuneStreetModding/csmm-qt
 
