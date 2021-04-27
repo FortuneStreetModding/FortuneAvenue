@@ -1,3 +1,12 @@
+# Deprecated
+
+This tool is deprecated and has been supersceeded by FortuneAvenue-qt and CSMM-qt:
+- https://github.com/FortuneStreetModding/fortune-avenue-qt
+- https://github.com/FortuneStreetModding/csmm-qt
+
+As such, this repository has been archived.
+
+
 FortuneAvenue
 =============
 
